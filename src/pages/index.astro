@@ -1,6 +1,7 @@
 ---
-// src/pages/index.astro
 import Calculator from '../components/Calculator';
+import { DailyGoals } from '../components/DailyGoals';
+import { Dashboard } from '../components/Dashboard';
 import '../styles/global.css';
 ---
 
@@ -29,7 +30,7 @@ import '../styles/global.css';
 
     <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
       {/* Esto es lo que "despierta" a la calculadora */}
-      <Calculator client:load />
+		<Dashboard client:load />
     </main>
 
     <footer class="p-8 text-center border-t border-white/5 mt-auto">
