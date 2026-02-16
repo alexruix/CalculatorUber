@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  /* Tu paleta de marca NODO */
+  --color-nodo-petrol: #1a4d5c;
+  --color-nodo-wine: #6b1f3d;
+  --color-nodo-sand: #d4c5b0;
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0a0a0a] text-white;
+  }
+}
