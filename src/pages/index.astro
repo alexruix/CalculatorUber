@@ -1,17 +1,82 @@
 ---
-import { Calculator } from '../components/Calculator';
-import { DailyGoals } from '../components/DailyGoals';
-import '../styles/global.css';
+/**
+ * Página principal de Astro
+ * Integra el componente Calculator con React
+ */
+import Calculator from '../components/Calculator/Calculator';
 ---
 
+<!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Calculadora de rentabilidad para conductores de Uber y economía gig - NODO Studio" />
+    <meta name="theme-color" content="#0f172a" />
+    
+    <title>NODO | Calculadora de Rentabilidad</title>
+    
+    <!-- Tailwind CSS (CDN para desarrollo) -->
+    <script is:inline src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style is:global>
+      * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      
+      /* Custom scrollbar para dark mode */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgb(15 23 42);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgb(51 65 85);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgb(71 85 105);
+      }
+
+      /* Animaciones */
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .animate-in {
+        animation: fade-in 0.3s ease-in;
+      }
+
+      /* Ocultar scrollbar en botones de distancia rápida */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
   </head>
-<body class="bg-[#0a0a0a] text-white font-sans antialiased">
-  <div class="min-h-screen flex flex-col">
-    <main class="flex-1 max-w-md mx-auto w-full px-4 py-8">
-      <Calculator client:load />
-    </main>
-    </div>
-</body>
+  
+  <body>
+    <!-- 
+      client:load - Hydrata inmediatamente en el cliente
+      Alternativas:
+      - client:idle - Hydrata cuando el navegador esté idle
+      - client:visible - Hydrata cuando el componente sea visible
+      - client:media - Hydrata según media query
+    -->
+    <Calculator client:load />
+  </body>
 </html>
