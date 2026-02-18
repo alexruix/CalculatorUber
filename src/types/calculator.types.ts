@@ -58,3 +58,19 @@ export interface ProfitabilityTheme {
   /** Etiqueta mostrada al usuario */
   label: string;
 }
+
+export interface Trip {
+  id: string;
+  fare: number;
+  distance: number;
+  duration: number;
+  pickupDistance: number;
+  deadheadDistance: number; // 👈 Nuevo: KM desde el viaje anterior hasta este
+  platform: 'Uber' | 'Didi' | 'Cabify' | 'Particular'; // 👈 Nuevo
+  metrics: {
+    netMargin: number;
+    profitPerKm: number;
+    profitPerHour: number; // 👈 Nuevo: Ganancia real por hora de trabajo
+    efficiencyRatio: number; // 👈 Nuevo: % de KM facturados
+  }
+}

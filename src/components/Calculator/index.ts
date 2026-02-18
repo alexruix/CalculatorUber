@@ -4,6 +4,7 @@
  */
 
 export { default as Calculator } from './Calculator';
+export { Onboarding } from './Onboarding';
 export { ProfitabilityScore } from './ProfitabilityScore';
 export { SessionControls } from './SessionControls';
 export { TripInputForm } from './TripInputForm';

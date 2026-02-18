@@ -87,3 +87,4 @@ export const useProfitability = (
     };
   }, [fare, distTrip, distPickup, kmPerLiter, maintPerKm, fuelPrice, isHeavyTraffic, expenseSettings]);
 };
+
