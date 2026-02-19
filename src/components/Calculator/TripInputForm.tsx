@@ -1,6 +1,6 @@
 // src/components/Calculator/TripInputForm.tsx
 import React from 'react';
-import { DollarSign, Navigation, Navigation2, Clock, ChevronDown, Minus, Plus, Save } from 'lucide-react';
+import { DollarSign, Navigation, Navigation2, Clock, ChevronDown, Minus, Plus, NotebookPen } from 'lucide-react';
 
 interface TripInputFormProps {
   fare: string;
@@ -102,7 +102,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
         disabled={!isValid} onClick={onSave}
         className="w-full bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] disabled:opacity-20 active:scale-95 hover:bg-sky-400 shadow-xl flex items-center justify-center gap-2 transition-all"
       >
-        <Save className="w-5 h-5" /> Anotar viaje
+        <NotebookPen className="w-5 h-5" /> Anotar viaje
       </button>
     </div>
   );

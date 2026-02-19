@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  Fuel, Settings, CheckCircle2, Save,
-  Car, Wrench, ShieldCheck, DollarSign, ChevronDown, Target
+  Settings, CheckCircle2, Save,
+  Car, ShieldCheck, DollarSign, ChevronDown, Target
 } from 'lucide-react';
 import type { ExpenseToggle } from '../../types/calculator.types';
 
@@ -12,8 +12,8 @@ interface ProfileSettingsProps {
   setKmPerLiter: (value: number) => void;
   maintPerKm: number;
   setMaintPerKm: (value: number) => void;
-  fuelPrice: number; // 👈 Agregado para persistencia
-  setFuelPrice: (value: number) => void; // 👈 Agregado
+  fuelPrice: number;
+  setFuelPrice: (value: number) => void;
   expenseSettings: ExpenseToggle[];
   setExpenseSettings: (value: ExpenseToggle[]) => void;
   showSettings: boolean;
@@ -28,7 +28,7 @@ interface ProfileSettingsProps {
 }
 
 /**
- * ProfileSettings - Configuración modular del ecosistema NODO
+ * ProfileSettings - Configuración del ADN de Manguito
  */
 export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   vehicleName, setVehicleName,
@@ -73,9 +73,9 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             <Car className="w-5 h-5 text-nodo-petrol" />
           </div>
           <div>
-            <span className="text-sm font-black text-white italic tracking-tight">{vehicleName}</span>
+            <span className="text-sm font-black text-white italic tracking-tight">{vehicleName || "Tu Máquina"}</span>
             <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
-              {kmPerLiter} KM/L • {activeExpensesCount} GASTOS ACTIVOS
+              {kmPerLiter} KM/L • {activeExpensesCount} COSTOS EN LA MIRA
             </p>
           </div>
         </div>
@@ -86,26 +86,26 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       {showSettings && (
         <div className="px-6 pb-6 border-t border-white/5 space-y-6 pt-6 animate-in slide-in-from-top-4 duration-300">
 
-          {/* Sección 1: Especificaciones del Vehículo */}
+          {/* Sección 1: El Fierro */}
           <div className="space-y-4">
             <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
-              <Settings className="w-3 h-3" /> Ficha Técnica
+              <Settings className="w-3 h-3" /> Sobre el Fierro
             </h4>
 
             <div className="space-y-3">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Modelo del Vehículo</label>
+                <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Tu Vehículo (Nombre o Apodo)</label>
                 <input
                   type="text" value={vehicleName}
                   onChange={(e) => setVehicleName(e.target.value)}
                   className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-nodo-petrol transition-all"
-                  placeholder="Ej: Chevrolet Spin"
+                  placeholder="Ej: La Nave / Chevrolet Spin"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Nafta $/L</label>
+                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Precio Nafta/GNC</label>
                   <div className="relative">
                     <input
                       type="number" value={fuelPrice}
@@ -116,7 +116,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Consumo</label>
+                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">¿Cuánto chupa?</label>
                   <div className="relative">
                     <input
                       type="number" value={kmPerLiter}
@@ -130,10 +130,10 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             </div>
           </div>
 
-          {/* Sección 2: Algoritmo de Rentabilidad */}
+          {/* Sección 2: Los Descuentos */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
-              <ShieldCheck className="w-3 h-3" /> Algoritmo de Costos
+              <ShieldCheck className="w-3 h-3" /> Qué descontamos
             </h4>
 
             <div className="grid grid-cols-1 gap-2">
@@ -150,11 +150,13 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                       {expense.enabled && <CheckCircle2 className="w-3 h-3 text-white" />}
                     </div>
                     <div>
-                      <p className="text-[11px] font-black text-white uppercase tracking-tighter">{expense.label}</p>
-                      <p className="text-[9px] text-white/40 font-bold">
-                        {expense.id === 'fuel' && `Gasto de combustible real`}
-                        {expense.id === 'maintenance' && `$${maintPerKm}/KM recorridos`}
-                        {expense.id === 'amortization' && `+$${(maintPerKm * 0.5).toFixed(1)}/KM de desgaste`}
+                      <p className="text-[11px] font-black text-white uppercase tracking-tighter">
+                        {expense.id === 'fuel' ? 'Combustible' : expense.id === 'maintenance' ? 'Service y Arreglos' : 'Desgaste del Auto'}
+                      </p>
+                      <p className="text-[9px] text-white/40 font-bold italic">
+                        {expense.id === 'fuel' && `Lo que se quema en cada vuelta`}
+                        {expense.id === 'maintenance' && `$${maintPerKm}/KM para el mecánico`}
+                        {expense.id === 'amortization' && `+$${(maintPerKm * 0.5).toFixed(1)}/KM por el modelo`}
                       </p>
                     </div>
                   </div>
@@ -163,23 +165,28 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             </div>
           </div>
 
+          {/* Sección 3: Tu Vara de Ganancia */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
-              <Target className="w-3 h-3" /> Sensibilidad de Rentabilidad
+              <Target className="w-3 h-3" /> Tu Vara de Ganancia
             </h4>
 
             <div className="glass-card rounded-2xl p-4 bg-white/[0.02] border border-white/5">
               <p className="text-[10px] text-white/40 mb-4 leading-relaxed italic">
-                Ajusta cómo Manguito califica tus viajes. El modo "Inteligente" se adapta al consumo de tu {vehicleName}.
+                Ajustá qué tan exigente es Manguito con tus números. El modo inteligente conoce a fondo tu {vehicleName || 'auto'}.
               </p>
 
               <div className="grid grid-cols-3 gap-2">
-                {['Conservador', 'Equilibrado', 'Exigente'].map((mode) => (
+                {[
+                  { label: 'Tranqui', desc: 'Todo suma' },
+                  { label: 'Justo', desc: 'Equilibrado' },
+                  { label: 'Exigente', desc: 'Valoro mi tiempo' }
+                ].map((mode) => (
                   <button
-                    key={mode}
-                    className="py-2 rounded-xl text-[9px] font-black uppercase border border-white/10 hover:bg-nodo-petrol/20 transition-all"
+                    key={mode.label}
+                    className="flex flex-col items-center py-2 rounded-xl border border-white/10 hover:bg-white/5 transition-all focus:bg-nodo-petrol/20 focus:border-nodo-petrol/50"
                   >
-                    {mode}
+                    <span className="text-[9px] font-black uppercase text-white">{mode.label}</span>
                   </button>
                 ))}
               </div>
@@ -189,10 +196,10 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           {/* Botón de Sincronización */}
           <button
             onClick={handleSaveSettings}
-            className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 hover:bg-gray-200"
           >
             <Save className="w-4 h-4" />
-            Sincronizar Perfil
+            Listo, Guardar Cambios
           </button>
         </div>
       )}

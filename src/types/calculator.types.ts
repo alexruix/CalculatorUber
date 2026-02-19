@@ -1,5 +1,5 @@
 /**
- * Manguito - Type Definitions
+ * Radar Manguito - Type Definitions
  * Interfaces y tipos para el sistema de cálculo de rentabilidad
  */
 

@@ -63,7 +63,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">MANGUITO</h1>
+                    <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">Radar Manguito</h1>
                     <p className="text-sm text-white/60">Configura tu perfil operativo para comenzar</p>
                 </div>
 

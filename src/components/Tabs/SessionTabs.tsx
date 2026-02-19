@@ -23,7 +23,7 @@ export const SessionTab: React.FC<SessionTabProps> = ({
   const profitableTrips = trips.filter(t => t.margin > 0).length;
 
   const handleShare = async () => {
-    const text = `📊 MANGUITO Intelligence\n\n` +
+    const text = `📊 Radar Manguito\n\n` +
       `Viajes: ${trips.length}\n` +
       `Ingresos: $${totalFare.toLocaleString('es-AR')}\n` +
       `Ganancia Neta: $${totalMargin.toLocaleString('es-AR')}\n` +
