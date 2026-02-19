@@ -9,4 +9,5 @@ export { ProfitabilityScore } from './ProfitabilityScore';
 export { SessionControls } from './SessionControls';
 export { TripInputForm } from './TripInputForm';
 export { SessionSummary } from './SessionSummary';
+export { SessionAnalysis } from './SessionAnalysis';
 export { ProfileSettings } from './ProfileSettings';

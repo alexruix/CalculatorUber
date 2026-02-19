@@ -1,5 +1,5 @@
 /**
- * NODO Calculator - Type Definitions
+ * Manguito - Type Definitions
  * Interfaces y tipos para el sistema de cálculo de rentabilidad
  */
 
@@ -31,6 +31,8 @@ export interface SavedTrip {
   margin: number;
   /** Timestamp de cuando se guardó el viaje */
   timestamp: number;
+  distance: number;
+  duration: number;
 }
 
 /**
@@ -73,4 +75,50 @@ export interface Trip {
     profitPerHour: number; // 👈 Nuevo: Ganancia real por hora de trabajo
     efficiencyRatio: number; // 👈 Nuevo: % de KM facturados
   }
+}
+
+
+/**
+ * Análisis de sesión con insights y gamificación
+ */
+export interface SessionInsights {
+  /** Mejor viaje del día */
+  bestTrip: SavedTrip | null;
+  /** Peor viaje del día */
+  worstTrip: SavedTrip | null;
+  /** Tendencia: mejorando, estable, empeorando */
+  trend: 'improving' | 'stable' | 'declining';
+  /** Porcentaje de viajes rentables (margin > 0) */
+  profitableTripsPercent: number;
+  /** Promedio de ganancia por viaje */
+  avgMarginPerTrip: number;
+  /** Hora con mejor rentabilidad */
+  bestTimeOfDay: string | null;
+  /** Racha de viajes rentables consecutivos */
+  profitableStreak: number;
+  /** Tips accionables para mejorar */
+  tips: string[];
+  /** Badges ganados en esta sesión */
+  badges: Badge[];
+  /** Nivel del conductor */
+  driverLevel: number;
+}
+
+
+/**
+ * Badge/logro ganado por el usuario
+ */
+export interface Badge {
+  /** ID único del badge */
+  id: string;
+  /** Nombre del logro */
+  name: string;
+  /** Descripción */
+  description: string;
+  /** Icono emoji */
+  icon: string;
+  /** Color del badge */
+  color: string;
+  /** Si fue desbloqueado en esta sesión */
+  unlockedNow: boolean;
 }

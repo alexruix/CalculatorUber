@@ -3,32 +3,43 @@
  * Página principal de Astro
  * Integra el componente Calculator con React
  */
-import Calculator from '../components/Calculator/Calculator';
+import Calculator from "../components/Calculator/Calculator";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Calculadora de rentabilidad para conductores de Uber y economía gig - NODO Studio" />
+    <meta
+      name="description"
+      content="Calculadora de rentabilidad para conductores de Uber y economía gig - NODO Studio"
+    />
     <meta name="theme-color" content="#0f172a" />
-    
-    <title>NODO | Calculadora de Rentabilidad</title>
-    
+
+    <title>Manguito | Calculadora de rentabilidad</title>
+
     <!-- Tailwind CSS (CDN para desarrollo) -->
     <script is:inline src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
     <style is:global>
       * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
       }
-      
+
       /* Custom scrollbar para dark mode */
       ::-webkit-scrollbar {
         width: 8px;
@@ -68,7 +79,7 @@ import Calculator from '../components/Calculator/Calculator';
       }
     </style>
   </head>
-  
+
   <body>
     <!-- 
       client:load - Hydrata inmediatamente en el cliente
