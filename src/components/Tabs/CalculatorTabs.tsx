@@ -93,31 +93,9 @@ export const CalculatorTab: React.FC<CalculatorTabProps> = ({
                         </div>
                     </div>
 
-                    {/* Pickup con Botones Rápidos */}
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">
-                            Distancia al pasajero
-                        </label>
-                        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                            {quickDistances.map((val) => (
-                                <button
-                                    key={val}
-                                    onClick={() => setDistPickup(val.toString())}
-                                    className={`px-5 py-3 rounded-xl text-[10px] font-black transition-all border whitespace-nowrap ${distPickup === val.toString()
-                                        ? 'border-sky-500 bg-sky-500/20 text-white shadow-[0_0_15px_rgba(14,165,233,0.3)]'
-                                        : 'border-white/5 bg-white/5 text-white/40 hover:border-white/20'
-                                        }`}
-                                >
-                                    {val === 0 ? 'EN EL LUGAR' : `${val} KM`}
-                                </button>
-                            ))}
-                        </div>
-                        <input
-                            type="number" placeholder="KM manual" value={distPickup}
-                            onChange={(e) => setDistPickup(e.target.value)}
-                            className="w-full bg-black/20 border border-white/5 rounded-xl py-4 px-4 text-sm font-bold outline-none focus:border-sky-500 text-white"
-                        />
-                    </div>
+                    
+
+
 
                     {/* Grid: Viaje y Tiempo */}
                     <div className="grid grid-cols-2 gap-4">
@@ -144,6 +122,36 @@ export const CalculatorTab: React.FC<CalculatorTabProps> = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* Distancia al Pasajero (Colapsable) */}
+                    <details className="glass-card rounded-2xl overflow-hidden group">
+                        <summary className="px-5 py-4 cursor-pointer list-none flex items-center justify-between touch-target hover:bg-white/5 transition-colors">
+                            <span className="text-sm font-bold text-white">Distancia hasta pasajero</span>
+                            <span className="text-xs text-white/40">Opcional</span>
+                        </summary>
+
+                        <div className="px-5 pb-4 border-t border-white/10 pt-3">
+                            <div className="flex gap-2 overflow-x-auto pb-1">
+                            {quickDistances.map((val) => (
+                                <button
+                                    key={val}
+                                    onClick={() => setDistPickup(val.toString())}
+                                    className={`px-5 py-3 rounded-xl text-[10px] font-black transition-all border whitespace-nowrap ${distPickup === val.toString()
+                                        ? 'border-sky-500 bg-sky-500/20 text-white shadow-[0_0_15px_rgba(14,165,233,0.3)]'
+                                        : 'border-white/5 bg-white/5 text-white/40 hover:border-white/20'
+                                        }`}
+                                >
+                                    {val === 0 ? 'EN EL LUGAR' : `${val} KM`}
+                                </button>
+                            ))}
+                        </div>
+                        <input
+                            type="number" placeholder="KM manual" value={distPickup}
+                            onChange={(e) => setDistPickup(e.target.value)}
+                            className="w-full bg-black/20 border border-white/5 rounded-xl py-4 px-4 text-sm font-bold outline-none focus:border-sky-500 text-white"
+                        />
+                        </div>
+                    </details>
 
                     {/* Botón de Guardado (Visual Original Sky) */}
                     <button
