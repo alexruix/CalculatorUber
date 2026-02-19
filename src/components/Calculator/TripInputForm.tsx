@@ -32,7 +32,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
 
       {/* 1. Tarifa con Ajuste Rápido */}
       <div className="space-y-2">
-        <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Tarifa Bruta (ARS)</label>
+        <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Total cobrado (App)</label>
         <div className="flex items-center gap-3">
           <button onClick={() => adjustValue(fare, setFare, -500)} className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center active:scale-90 border border-white/5"><Minus className="w-5 h-5" /></button>
           <div className="relative flex-1">
@@ -50,7 +50,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
       {/* 2. Grid: Viaje y Tiempo */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Dist. Viaje</label>
+          <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Recorrido del viaje</label>
           <div className="relative">
             <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/10" />
             <input
@@ -61,7 +61,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Tiempo (min)</label>
+          <label className="text-[10px] font-black text-white/30 ml-2 uppercase tracking-widest">Minutos de reloj</label>
           <div className="relative">
             <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/10" />
             <input
@@ -102,7 +102,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
         disabled={!isValid} onClick={onSave}
         className="w-full bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] disabled:opacity-20 active:scale-95 hover:bg-sky-400 shadow-xl flex items-center justify-center gap-2 transition-all"
       >
-        <Save className="w-5 h-5" /> Guardar Viaje
+        <Save className="w-5 h-5" /> Anotar viaje
       </button>
     </div>
   );

@@ -21,7 +21,7 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({ totalMargin, tripCount
         <div className="flex items-center gap-2 mb-1">
           <TrendingUp className="w-3 h-3 text-green-400" />
           <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-            Ganancia Hoy
+            Ganancias
           </span>
         </div>
         <p className="text-xl font-black text-white">

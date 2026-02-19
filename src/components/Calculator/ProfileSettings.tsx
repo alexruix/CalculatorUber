@@ -1,7 +1,7 @@
 import React from 'react';
-import { 
-  Fuel, Settings, CheckCircle2, Save, 
-  Car, Wrench, ShieldCheck, DollarSign, ChevronDown 
+import {
+  Fuel, Settings, CheckCircle2, Save,
+  Car, Wrench, ShieldCheck, DollarSign, ChevronDown, Target
 } from 'lucide-react';
 import type { ExpenseToggle } from '../../types/calculator.types';
 
@@ -30,8 +30,8 @@ interface ProfileSettingsProps {
 /**
  * ProfileSettings - Configuración modular del ecosistema NODO
  */
-export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ 
-  vehicleName, setVehicleName, 
+export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
+  vehicleName, setVehicleName,
   kmPerLiter, setKmPerLiter,
   maintPerKm, setMaintPerKm,
   fuelPrice, setFuelPrice,
@@ -39,9 +39,9 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   showSettings, setShowSettings,
   onSave
 }) => {
-  
+
   const handleToggleExpense = (id: string) => {
-    const updated = expenseSettings.map(exp => 
+    const updated = expenseSettings.map(exp =>
       exp.id === id ? { ...exp, enabled: !exp.enabled } : exp
     );
     setExpenseSettings(updated);
@@ -62,7 +62,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   return (
     <div className={`glass-card rounded-[2rem] overflow-hidden transition-all duration-500 border border-white/10 ${showSettings ? 'shadow-2xl ring-2 ring-nodo-petrol/20' : ''}`}>
-      
+
       {/* Header - Glanceable View */}
       <button
         onClick={() => setShowSettings(!showSettings)}
@@ -81,17 +81,17 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         </div>
         <ChevronDown className={`w-5 h-5 text-white/20 transition-transform duration-300 ${showSettings ? 'rotate-180 text-nodo-petrol' : ''}`} />
       </button>
-      
+
       {/* Panel de Configuración */}
       {showSettings && (
         <div className="px-6 pb-6 border-t border-white/5 space-y-6 pt-6 animate-in slide-in-from-top-4 duration-300">
-          
+
           {/* Sección 1: Especificaciones del Vehículo */}
           <div className="space-y-4">
             <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
               <Settings className="w-3 h-3" /> Ficha Técnica
             </h4>
-            
+
             <div className="space-y-3">
               <div className="space-y-2">
                 <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Modelo del Vehículo</label>
@@ -135,20 +135,18 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
               <ShieldCheck className="w-3 h-3" /> Algoritmo de Costos
             </h4>
-            
+
             <div className="grid grid-cols-1 gap-2">
               {expenseSettings.map((expense) => (
                 <button
                   key={expense.id}
                   onClick={() => handleToggleExpense(expense.id)}
-                  className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${
-                    expense.enabled ? 'border-nodo-petrol/40 bg-nodo-petrol/10' : 'border-white/5 bg-white/5 opacity-40'
-                  }`}
+                  className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${expense.enabled ? 'border-nodo-petrol/40 bg-nodo-petrol/10' : 'border-white/5 bg-white/5 opacity-40'
+                    }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${
-                      expense.enabled ? 'border-nodo-petrol bg-nodo-petrol' : 'border-white/20'
-                    }`}>
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${expense.enabled ? 'border-nodo-petrol bg-nodo-petrol' : 'border-white/20'
+                      }`}>
                       {expense.enabled && <CheckCircle2 className="w-3 h-3 text-white" />}
                     </div>
                     <div>
@@ -162,6 +160,29 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                   </div>
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
+              <Target className="w-3 h-3" /> Sensibilidad de Rentabilidad
+            </h4>
+
+            <div className="glass-card rounded-2xl p-4 bg-white/[0.02] border border-white/5">
+              <p className="text-[10px] text-white/40 mb-4 leading-relaxed italic">
+                Ajusta cómo Manguito califica tus viajes. El modo "Inteligente" se adapta al consumo de tu {vehicleName}.
+              </p>
+
+              <div className="grid grid-cols-3 gap-2">
+                {['Conservador', 'Equilibrado', 'Exigente'].map((mode) => (
+                  <button
+                    key={mode}
+                    className="py-2 rounded-xl text-[9px] font-black uppercase border border-white/10 hover:bg-nodo-petrol/20 transition-all"
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

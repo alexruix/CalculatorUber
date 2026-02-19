@@ -15,6 +15,7 @@ export interface TripMetrics {
   netMargin: number;
   /** Ganancia por kilómetro recorrido */
   profitPerKm: number;
+  roi: number;
   /** Estado de rentabilidad basado en umbrales */
   status: 'excellent' | 'fair' | 'poor' | 'neutral';
 }

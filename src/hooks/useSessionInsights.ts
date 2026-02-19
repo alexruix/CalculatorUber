@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import type { SavedTrip, SessionInsights, Badge } from '../types/calculator.types';
 
 /**
- * Hook para calcular insights y gamificación de la sesión
- * Analiza todos los viajes y genera estadísticas, tips y badges
+ * Hook para calcular la data y las chapas (badges) de la sesión.
+ * Transforma los números fríos en consejos de colega.
  */
 export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
   return useMemo(() => {
-    // Si no hay viajes, retornar estado vacío
+    // Si no hay viajes, devolvemos el garage vacío
     if (trips.length === 0) {
       return {
         bestTrip: null,
@@ -15,15 +15,16 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
         trend: 'stable',
         profitableTripsPercent: 0,
         avgMarginPerTrip: 0,
-        bestTimeOfDay: null,
         profitableStreak: 0,
         tips: [],
         badges: [],
         driverLevel: 1,
+        pointsToNextLevel: 10,
+        totalPoints: 0,
       };
     }
 
-    // === 1. IDENTIFICAR MEJOR Y PEOR VIAJE ===
+    // === 1. IDENTIFICAR LA JOYITA Y EL CLAVO DEL DÍA ===
     const bestTrip = trips.reduce((best, trip) => 
       trip.margin > best.margin ? trip : best
     );
@@ -32,31 +33,28 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
       trip.margin < worst.margin ? trip : worst
     );
 
-    // === 2. CALCULAR TENDENCIA ===
+    // === 2. ¿CÓMO VIENE LA MANO? (TENDENCIA) ===
     const trend = calculateTrend(trips);
 
-    // === 3. CALCULAR PORCENTAJE DE VIAJES RENTABLES ===
+    // === 3. PUNTERÍA (PORCENTAJE DE VIAJES QUE SIRVEN) ===
     const profitableTrips = trips.filter(t => t.margin > 0);
     const profitableTripsPercent = Math.round((profitableTrips.length / trips.length) * 100);
 
-    // === 4. PROMEDIO DE GANANCIA ===
+    // === 4. PROMEDIO DE GUITA LIMPIA ===
     const totalMargin = trips.reduce((sum, t) => sum + t.margin, 0);
     const avgMarginPerTrip = Math.round(totalMargin / trips.length);
 
-    // === 5. MEJOR HORA DEL DÍA ===
-    const bestTimeOfDay = findBestTimeOfDay(trips);
-
-    // === 6. RACHA DE VIAJES RENTABLES ===
+    // === 5. SEGUIDILLA DE BUENAS RENTABILIDADES ===
     const profitableStreak = calculateProfitableStreak(trips);
 
-    // === 7. GENERAR TIPS ACCIONABLES ===
-    const tips = generateTips(trips, profitableTripsPercent, avgMarginPerTrip);
+    // === 6. LOS CONSEJOS DEL VIEJO LOBO (TIPS) ===
+    const tips = generateTips(trips, profitableTripsPercent, avgMarginPerTrip, bestTrip, worstTrip);
 
-    // === 8. CALCULAR BADGES ===
-    const badges = calculateBadges(trips, profitableStreak, profitableTripsPercent);
+    // === 7. LAS CHAPAS (BADGES) ===
+    const badges = calculateBadges(trips, profitableStreak, profitableTripsPercent, totalMargin, avgMarginPerTrip);
 
-    // === 9. CALCULAR NIVEL DEL CONDUCTOR ===
-    const driverLevel = calculateDriverLevel(trips.length, totalMargin);
+    // === 8. EL RANGO DE CALLE (NIVEL) ===
+    const { level, points, pointsToNext } = calculateLevel(trips.length, totalMargin);
 
     return {
       bestTrip,
@@ -64,17 +62,18 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
       trend,
       profitableTripsPercent,
       avgMarginPerTrip,
-      bestTimeOfDay,
       profitableStreak,
       tips,
       badges,
-      driverLevel,
+      driverLevel: level,
+      pointsToNextLevel: pointsToNext,
+      totalPoints: points,
     };
   }, [trips]);
 };
 
 /**
- * Calcula la tendencia de rentabilidad
+ * Calcula si la jornada viene repuntando o cayendo
  */
 const calculateTrend = (trips: SavedTrip[]): 'improving' | 'stable' | 'declining' => {
   if (trips.length < 3) return 'stable';
@@ -94,49 +93,14 @@ const calculateTrend = (trips: SavedTrip[]): 'improving' | 'stable' | 'declining
 };
 
 /**
- * Encuentra la mejor hora del día (en ventanas de 2 horas)
- */
-const findBestTimeOfDay = (trips: SavedTrip[]): string | null => {
-  if (trips.length < 2) return null;
-
-  // Agrupar por ventanas de 2 horas
-  const timeWindows: Record<string, { total: number; count: number }> = {};
-
-  trips.forEach(trip => {
-    const date = new Date(trip.timestamp);
-    const hour = date.getHours();
-    const window = Math.floor(hour / 2) * 2; // 0-2, 2-4, 4-6, etc
-    const windowKey = `${window}:00-${window + 2}:00`;
-
-    if (!timeWindows[windowKey]) {
-      timeWindows[windowKey] = { total: 0, count: 0 };
-    }
-    timeWindows[windowKey].total += trip.margin;
-    timeWindows[windowKey].count += 1;
-  });
-
-  // Encontrar la ventana con mejor promedio
-  let bestWindow = null;
-  let bestAvg = -Infinity;
-
-  Object.entries(timeWindows).forEach(([window, data]) => {
-    const avg = data.total / data.count;
-    if (avg > bestAvg) {
-      bestAvg = avg;
-      bestWindow = window;
-    }
-  });
-
-  return bestWindow;
-};
-
-/**
- * Calcula la racha actual de viajes rentables
+ * Cuenta cuántos viajes buenos metiste al hilo
  */
 const calculateProfitableStreak = (trips: SavedTrip[]): number => {
   let streak = 0;
-  
-  // Contar desde el viaje más reciente (index 0)
+  // Contamos desde el último viaje hacia atrás
+  // (Asumiendo que trips[0] es el más reciente, si no, invertir lógica)
+  // Nota: Ajustar según cómo ordenes el array en tu estado global.
+  // Aquí asumo que iteramos sobre todos y cortamos cuando uno no es rentable.
   for (let i = 0; i < trips.length; i++) {
     if (trips[i].margin > 0) {
       streak++;
@@ -144,136 +108,221 @@ const calculateProfitableStreak = (trips: SavedTrip[]): number => {
       break;
     }
   }
-
   return streak;
 };
 
 /**
- * Genera tips accionables basados en el análisis
+ * Genera los consejos con voz de "Manguito"
  */
 const generateTips = (
   trips: SavedTrip[], 
   profitablePercent: number, 
-  avgMargin: number
+  avgMargin: number,
+  bestTrip: SavedTrip,
+  worstTrip: SavedTrip
 ): string[] => {
   const tips: string[] = [];
 
-  // Tip 1: Rentabilidad general
-  if (profitablePercent < 70) {
-    tips.push('Solo el ' + profitablePercent + '% de tus viajes fueron rentables. Intenta rechazar viajes con distancias largas hasta el pasajero.');
-  } else if (profitablePercent === 100) {
-    tips.push('¡Todos tus viajes fueron rentables! Sigue eligiendo viajes inteligentemente.');
+  // Analizar patrones
+  const avgFare = trips.reduce((sum, t) => sum + t.fare, 0) / trips.length;
+  const highMarginTrips = trips.filter(t => t.margin > avgMargin);
+  const avgFareOfGoodTrips = highMarginTrips.length > 0 
+    ? highMarginTrips.reduce((sum, t) => sum + t.fare, 0) / highMarginTrips.length 
+    : avgFare;
+
+  // Tip 1: Piso de tarifa
+  if (avgMargin < 1000) {
+    const minRecommended = Math.round(avgFareOfGoodTrips * 0.9);
+    tips.push(`No regales el laburo. Tratá de no agarrar viajes de menos de $${minRecommended.toLocaleString('es-AR')}. Ahí es donde perdés plata.`);
   }
 
-  // Tip 2: Ganancia promedio
-  if (avgMargin < 800) {
-    tips.push('Tu ganancia promedio es de $' + avgMargin + ' por viaje. Busca viajes con tarifas más altas o distancias más cortas.');
-  } else if (avgMargin > 1500) {
-    tips.push('Excelente ganancia promedio de $' + avgMargin + ' por viaje. ¡Así se hace!');
+  // Tip 2: Replicar el éxito
+  if (bestTrip && trips.length >= 3) {
+    const bestFare = bestTrip.fare;
+    tips.push(`¡Esa es la actitud! Tu mejor vuelta dejó buena guita ($${bestTrip.margin.toLocaleString('es-AR')} limpios). Buscá más viajes como ese.`);
   }
 
-  // Tip 3: Consistencia
-  const margins = trips.map(t => t.margin);
-  const maxMargin = Math.max(...margins);
-  const minMargin = Math.min(...margins);
-  const variance = maxMargin - minMargin;
-
-  if (variance > 2000 && trips.length >= 3) {
-    tips.push('Tus ganancias varían mucho ($' + minMargin + ' a $' + maxMargin + '). Intenta mantener criterios más consistentes.');
+  // Tip 3: Alerta de clavos
+  const lowMarginTrips = trips.filter(t => t.margin < avgMargin * 0.5);
+  if (lowMarginTrips.length > trips.length * 0.3) {
+    tips.push(`Ojo al piojo: El ${Math.round((lowMarginTrips.length / trips.length) * 100)}% de tus viajes son "clavos" (tarifas bajas, mucho gasto). Aprendé a decir que no.`);
   }
 
-  // Tip 4: Volumen
-  if (trips.length >= 10) {
-    tips.push('¡Gran volumen hoy! Hiciste ' + trips.length + ' viajes. Recuerda descansar para mantener la concentración.');
+  // Tip 4: Consistencia
+  if (profitablePercent === 100 && trips.length >= 3) {
+    tips.push(`Venís invicto. Ni un solo viaje a pérdida hoy. Mantené ese criterio que el auto te lo agradece.`);
   }
 
-  // Tip 5: Si no hay tips específicos, dar uno motivacional
+  // Tip 5: Ratio ganancia/tarifa (Eficiencia pura)
+  const bestRatio = bestTrip ? (bestTrip.margin / bestTrip.fare) * 100 : 0;
+  if (bestRatio > 40 && trips.length >= 3) {
+    tips.push(`Cazaste un viaje corto y caro: el sueño del pibe. Te quedó el ${Math.round(bestRatio)}% de la tarifa en el bolsillo. ¡Esos son los que valen!`);
+  }
+
+  // Fallback si no hay nada específico
   if (tips.length === 0) {
-    tips.push('Sigue así, conductor. Cada viaje te acerca más a tus metas.');
+    tips.push(`El secreto es la selección. No te desesperes por agarrar todo; agarrá lo que rinde.`);
   }
 
   return tips.slice(0, 3); // Máximo 3 tips
 };
 
 /**
- * Calcula badges ganados en esta sesión
+ * Calcula las medallas (Gamificación argenta)
  */
 const calculateBadges = (
   trips: SavedTrip[], 
   streak: number, 
-  profitablePercent: number
+  profitablePercent: number,
+  totalMargin: number,
+  avgMargin: number
 ): Badge[] => {
   const badges: Badge[] = [];
 
-  // Badge: Primera sesión
+  // --- CANTIDAD DE VIAJES ---
   if (trips.length >= 1) {
     badges.push({
       id: 'first_trip',
-      name: 'Primera Vuelta',
-      description: 'Completaste tu primer viaje',
-      icon: '🚗',
+      name: 'Primer Laburo',
+      description: 'Arrancó el día',
+      icon: '🔑',
       color: 'sky',
       unlockedNow: trips.length === 1,
     });
   }
 
-  // Badge: 5 viajes en una sesión
   if (trips.length >= 5) {
     badges.push({
       id: 'productive_day',
-      name: 'Día Productivo',
-      description: '5+ viajes en una sesión',
+      name: 'Metiendo Pata',
+      description: '5 viajes adentro',
       icon: '⚡',
       color: 'amber',
       unlockedNow: trips.length === 5,
     });
   }
 
-  // Badge: 10 viajes en una sesión
   if (trips.length >= 10) {
     badges.push({
       id: 'marathon',
-      name: 'Maratonista',
-      description: '10+ viajes en una sesión',
-      icon: '🏃',
+      name: 'Remador',
+      description: '10 viajes (y contando)',
+      icon: '🚣',
       color: 'orange',
       unlockedNow: trips.length === 10,
     });
   }
 
-  // Badge: 100% rentable
-  if (profitablePercent === 100 && trips.length >= 3) {
+  if (trips.length >= 15) {
     badges.push({
-      id: 'perfect_day',
-      name: 'Día Perfecto',
-      description: 'Todos tus viajes fueron rentables',
-      icon: '💎',
-      color: 'purple',
-      unlockedNow: true,
+      id: 'unstoppable',
+      name: 'Dueño de la Calle',
+      description: '¡15 viajes! Sos una máquina',
+      icon: '🚀',
+      color: 'red',
+      unlockedNow: trips.length === 15,
     });
   }
 
-  // Badge: Racha de 5
+  // --- CALIDAD ---
+  if (profitablePercent === 100 && trips.length >= 3) {
+    badges.push({
+      id: 'perfect_day',
+      name: 'Cero Clavos',
+      description: 'Puros viajes rentables hoy',
+      icon: '💎',
+      color: 'purple',
+      unlockedNow: true, // Se mantiene si sigue perfecto
+    });
+  }
+
+  // --- RACHAS ---
+  if (streak >= 3) {
+    badges.push({
+      id: 'on_fire',
+      name: 'Racha Picante',
+      description: '3 al hilo sumando fuerte',
+      icon: '🔥',
+      color: 'orange',
+      unlockedNow: streak === 3,
+    });
+  }
+
   if (streak >= 5) {
     badges.push({
       id: 'hot_streak',
-      name: 'En Racha',
-      description: '5 viajes rentables consecutivos',
-      icon: '🔥',
+      name: 'Imparable',
+      description: '5 seguidos en verde',
+      icon: '😤',
       color: 'red',
       unlockedNow: streak === 5,
     });
   }
 
-  // Badge: Ganancia alta
-  const totalMargin = trips.reduce((sum, t) => sum + t.margin, 0);
+  // --- DINERO EN MANO ---
+  if (totalMargin >= 5000) {
+    badges.push({
+      id: 'earner',
+      name: 'Para el Asado',
+      description: '$5.000 limpios en el bolsillo',
+      icon: '🥩',
+      color: 'green',
+      unlockedNow: true,
+    });
+  }
+
   if (totalMargin >= 10000) {
     badges.push({
       id: 'big_earner',
-      name: 'Gran Ganador',
-      description: '$10,000+ de ganancia neta',
+      name: 'Caja Fuerte',
+      description: 'Pasaste las 10 lucas hoy',
       icon: '💰',
       color: 'green',
+      unlockedNow: true,
+    });
+  }
+
+  if (totalMargin >= 20000) {
+    badges.push({
+      id: 'money_maker',
+      name: 'La Bóveda',
+      description: '¡$20.000 de ganancia neta!',
+      icon: '🏦',
+      color: 'green',
+      unlockedNow: true,
+    });
+  }
+
+  // --- PROMEDIOS ---
+  if (avgMargin >= 1500 && trips.length >= 5) {
+    badges.push({
+      id: 'high_roller',
+      name: 'Fino y Elegante',
+      description: 'Promedio >$1.500 por viaje',
+      icon: '🎩',
+      color: 'amber',
+      unlockedNow: true,
+    });
+  }
+
+  if (avgMargin >= 2000 && trips.length >= 5) {
+    badges.push({
+      id: 'elite',
+      name: 'Limpia-Asfalto',
+      description: 'Promedio >$2.000 (Nivel Dios)',
+      icon: '👑',
+      color: 'purple',
+      unlockedNow: true,
+    });
+  }
+
+  if (profitablePercent >= 90 && trips.length >= 5) {
+    badges.push({
+      id: 'efficient',
+      name: 'Francotirador',
+      description: 'No errás casi nunca (90%+)',
+      icon: '🎯',
+      color: 'sky',
       unlockedNow: true,
     });
   }
@@ -282,12 +331,23 @@ const calculateBadges = (
 };
 
 /**
- * Calcula el nivel del conductor basado en viajes y ganancias
+ * Calcula nivel y puntos de calle
  */
-const calculateDriverLevel = (tripCount: number, totalMargin: number): number => {
-  // Sistema simple: 1 punto por viaje + 1 punto por cada $1000 de ganancia
+const calculateLevel = (tripCount: number, totalMargin: number) => {
+  // Sistema: 1 punto por viaje + 1 punto por cada $1000 de ganancia
+  // Esto premia tanto el esfuerzo (cantidad) como la inteligencia (calidad)
   const points = tripCount + Math.floor(totalMargin / 1000);
   
   // Niveles cada 10 puntos
-  return Math.max(1, Math.floor(points / 10) + 1);
+  const level = Math.max(1, Math.floor(points / 10) + 1);
+  
+  // Puntos para el próximo escalón
+  const pointsForNextLevel = level * 10;
+  const pointsToNext = pointsForNextLevel - points;
+
+  return {
+    level,
+    points,
+    pointsToNext: Math.max(0, pointsToNext)
+  };
 };

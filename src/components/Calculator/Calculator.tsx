@@ -145,16 +145,18 @@ const Calculator: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
       {/* Header Fijo con Branding NODO */}
-      <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-md">
+      <header className="border-b border-white/5 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-md mx-auto px-6 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-slate-100">Manguito</h1>
-            <p className="text-xs text-slate-400 mt-0.5">Calculadora de rentabilidad</p>
-          </div>
-          {/* <div className="flex items-center gap-2 px-3 py-1 bg-nodo-sand/10 rounded-full border border-nodo-petrol/20">
-            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-[10px] font-black text-nodo-petrol uppercase">Live</span>
-          </div> */}
+          <h1 className="text-xl font-black text-white tracking-tighter flex-col items-center gap-2">
+            MANGUITO
+            {/* Un pequeño tag para darle un toque "tech-callejero" */}
+            <span className="text-[9px] bg-white/10 text-white/60 px-1.5 py-0.5 rounded-full tracking-normal border border-white/5">
+              V1.0
+            </span>
+          </h1>
+          <p className="text-[10px] text-white/40 uppercase font-bold tracking-[0.15em]">
+            La posta de tus viajes
+          </p>
         </div>
       </header>
 

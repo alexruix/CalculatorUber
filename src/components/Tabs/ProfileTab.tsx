@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  Car, DollarSign, Settings, LogOut, ChevronRight, 
-  Edit3, Save, Fuel, Wrench, ShieldCheck, AlertTriangle, 
-  RotateCcw, Info
+  Car, DollarSign, Settings, Save, 
+  Fuel, Wrench, ShieldCheck, AlertTriangle, 
+  Info, ChevronRight, CheckCircle2
 } from 'lucide-react';
 import type { ExpenseToggle } from '../../types/calculator.types';
 
@@ -17,12 +17,11 @@ interface ProfileTabProps {
   setFuelPrice: (value: number) => void;
   expenseSettings: ExpenseToggle[];
   setExpenseSettings: (value: ExpenseToggle[]) => void;
-  isHeavyTraffic: boolean;
-  setIsHeavyTraffic: (value: boolean) => void;
   onSaveConfig: (config: {
     vehicleName: string;
     kmPerLiter: number;
     maintPerKm: number;
+    fuelPrice: number; // 👈 Ahora incluido
     expenseSettings: ExpenseToggle[];
   }) => void;
   onResetAll: () => void;
@@ -36,196 +35,180 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   maintPerKm, setMaintPerKm,
   fuelPrice, setFuelPrice,
   expenseSettings, setExpenseSettings,
-  isHeavyTraffic, setIsHeavyTraffic,
   onSaveConfig, onResetAll,
   totalTrips, driverLevel
 }) => {
-  const [isEditingVehicle, setIsEditingVehicle] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleToggleExpense = (id: string) => {
     const updated = expenseSettings.map(exp => 
       exp.id === id ? { ...exp, enabled: !exp.enabled } : exp
     );
     setExpenseSettings(updated);
-    setHasUnsavedChanges(true);
   };
 
-  const handleSaveChanges = () => {
+  const handleSave = () => {
     onSaveConfig({
       vehicleName,
       kmPerLiter,
       maintPerKm,
+      fuelPrice,
       expenseSettings
     });
-    setIsEditingVehicle(false);
-    setHasUnsavedChanges(false);
-  };
-
-  const getExpenseIcon = (id: string) => {
-    switch (id) {
-      case 'fuel': return <Fuel className="w-4 h-4" />;
-      case 'maintenance': return <Wrench className="w-4 h-4" />;
-      case 'amortization': return <ShieldCheck className="w-4 h-4" />;
-      default: return <DollarSign className="w-4 h-4" />;
-    }
+    setIsEditing(false);
   };
 
   return (
     <div className="pb-32 space-y-6 animate-in fade-in duration-500">
       
-      {/* Header de Perfil: Identidad Visual NODO */}
+      {/* 1. HERO SECTION: Consistencia Visual NODO */}
       <div className="px-4 pt-4">
-        <div className="glass-card rounded-[2.5rem] p-8 text-center relative overflow-hidden">
+        <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 text-center relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 p-4 opacity-5">
             <Car className="w-24 h-24" />
           </div>
-          <div className="w-24 h-24 bg-nodo-petrol/20 border-2 border-nodo-petrol/50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,183,189,0.2)]">
-            <Car className="w-12 h-12 text-nodo-petrol" />
+          <div className="w-20 h-20 bg-nodo-petrol/20 border-2 border-nodo-petrol/40 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(0,183,189,0.15)]">
+            <Car className="w-10 h-10 text-nodo-petrol" />
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tighter mb-2 italic">
+          <h2 className="text-2xl font-black text-white tracking-tight mb-3">
             {vehicleName}
           </h2>
-          <div className="flex items-center justify-center gap-4">
-            <div className="px-3 py-1 bg-nodo-sand/20 rounded-full border border-nodo-sand/30">
-              <span className="text-[10px] font-black text-nodo-sand uppercase">Nivel {driverLevel}</span>
+          <div className="flex items-center justify-center gap-2">
+            <div className="px-4 py-1.5 bg-nodo-sand/20 rounded-full border border-nodo-sand/40">
+              <span className="text-xs font-black text-nodo-sand uppercase tracking-wider">Nivel {driverLevel}</span>
             </div>
-            <div className="px-3 py-1 bg-white/5 rounded-full border border-white/10">
-              <span className="text-[10px] font-black text-white/40 uppercase">{totalTrips} Viajes</span>
+            <div className="px-4 py-1.5 bg-white/10 rounded-full border border-white/10">
+              <span className="text-xs font-black text-white/70 uppercase tracking-wider">{totalTrips} Viajes</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sección 1: Información Técnica del Vehículo */}
+      {/* 2. CONFIGURACIÓN TÉCNICA (Edición Unificada) */}
       <div className="px-4">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Especificaciones</h3>
+        <div className="flex items-center justify-between mb-4 px-2">
+          <h3 className="text-xs font-black text-white/60 uppercase tracking-widest flex items-center gap-2">
+            <Settings className="w-4 h-4" /> Configuración Base
+          </h3>
           <button
-            onClick={() => isEditingVehicle ? handleSaveChanges() : setIsEditingVehicle(true)}
-            className={`text-[10px] font-black uppercase flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
-              isEditingVehicle ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-nodo-petrol'
+            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+            className={`px-5 py-2 rounded-xl text-xs font-black uppercase transition-all ${
+              isEditing ? 'bg-green-500 text-black' : 'bg-nodo-petrol/20 text-nodo-petrol border border-nodo-petrol/30'
             }`}
           >
-            {isEditingVehicle ? <><Save className="w-3 h-3" /> Guardar</> : <><Edit3 className="w-3 h-3" /> Editar</>}
+            {isEditing ? 'Confirmar' : 'Editar Datos'}
           </button>
         </div>
         
-        <div className="glass-card rounded-3xl p-5 space-y-5">
-          <div className="space-y-2">
-            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest ml-1">Modelo</p>
-            {isEditingVehicle ? (
-              <input
-                type="text" value={vehicleName}
-                onChange={(e) => { setVehicleName(e.target.value); setHasUnsavedChanges(true); }}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-nodo-petrol transition-all"
-              />
-            ) : (
-              <div className="flex items-center gap-3 px-1">
-                <Car className="w-4 h-4 text-white/20" />
-                <p className="text-base font-bold text-white">{vehicleName}</p>
-              </div>
-            )}
-          </div>
-
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6">
+          {/* Fila 1: Nombre y Precio Nafta */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest ml-1">Consumo (km/L)</p>
-              {isEditingVehicle ? (
-                <input
-                  type="number" value={kmPerLiter}
-                  onChange={(e) => { setKmPerLiter(Number(e.target.value)); setHasUnsavedChanges(true); }}
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-nodo-petrol"
-                />
-              ) : (
-                <div className="flex items-center gap-3 px-1">
-                  <Fuel className="w-4 h-4 text-orange-500/50" />
-                  <p className="text-base font-bold text-white">{kmPerLiter} <span className="text-[10px] text-white/20">KM/L</span></p>
-                </div>
-              )}
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Vehículo</label>
+              <input
+                disabled={!isEditing}
+                type="text" value={vehicleName}
+                onChange={(e) => setVehicleName(e.target.value)}
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-sm font-bold text-white outline-none focus:border-nodo-petrol disabled:opacity-50 transition-all"
+              />
             </div>
             <div className="space-y-2">
-              <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest ml-1">Mantenimiento</p>
-              {isEditingVehicle ? (
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Nafta $/L</label>
+              <div className="relative">
                 <input
-                  type="number" value={maintPerKm}
-                  onChange={(e) => { setMaintPerKm(Number(e.target.value)); setHasUnsavedChanges(true); }}
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-nodo-petrol"
+                  disabled={!isEditing}
+                  type="number" value={fuelPrice}
+                  onChange={(e) => setFuelPrice(Number(e.target.value))}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-sm font-bold text-white outline-none focus:border-nodo-petrol disabled:opacity-50"
                 />
-              ) : (
-                <div className="flex items-center gap-3 px-1">
-                  <Settings className="w-4 h-4 text-nodo-sand/50" />
-                  <p className="text-base font-bold text-white">${maintPerKm} <span className="text-[10px] text-white/20">/KM</span></p>
-                </div>
-              )}
+                <DollarSign className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              </div>
+            </div>
+          </div>
+
+          {/* Fila 2: Consumo y Mantenimiento */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Consumo (KM/L)</label>
+              <div className="relative">
+                <input
+                  disabled={!isEditing}
+                  type="number" value={kmPerLiter}
+                  onChange={(e) => setKmPerLiter(Number(e.target.value))}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-sm font-bold text-white outline-none focus:border-nodo-petrol disabled:opacity-50"
+                />
+                <Fuel className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Service $/KM</label>
+              <div className="relative">
+                <input
+                  disabled={!isEditing}
+                  type="number" value={maintPerKm}
+                  onChange={(e) => setMaintPerKm(Number(e.target.value))}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-sm font-bold text-white outline-none focus:border-nodo-petrol disabled:opacity-50"
+                />
+                <Settings className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sección 2: Variables de Costo (Inspirado en Onboarding) */}
+      {/* 3. ALGORITMO DE GASTOS (Mejor contraste) */}
       <div className="px-4">
-        <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-3 px-1">Algoritmo de Gastos</h3>
-        <div className="glass-card rounded-3xl p-4 space-y-2">
+        <h3 className="text-xs font-black text-white/60 uppercase tracking-widest mb-4 px-2">Estrategia de Costos</h3>
+        <div className="bg-white/5 border border-white/10 rounded-[2rem] p-5 space-y-3">
           {expenseSettings.map((expense) => (
             <button
               key={expense.id}
               onClick={() => handleToggleExpense(expense.id)}
               className={`w-full p-4 rounded-2xl transition-all text-left border-2 flex items-center justify-between ${
-                expense.enabled ? 'border-nodo-petrol/50 bg-nodo-petrol/10' : 'border-white/5 bg-white/5 opacity-40'
+                expense.enabled ? 'border-nodo-petrol bg-nodo-petrol/5' : 'border-white/5 bg-white/5'
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-lg ${expense.enabled ? 'bg-nodo-petrol/20 text-nodo-petrol' : 'bg-white/10 text-white/20'}`}>
-                  {getExpenseIcon(expense.id)}
+                <div className={`p-2.5 rounded-xl ${expense.enabled ? 'bg-nodo-petrol text-black' : 'bg-white/10 text-white/40'}`}>
+                  {expense.id === 'fuel' ? <Fuel size={18} /> : expense.id === 'maintenance' ? <Wrench size={18} /> : <ShieldCheck size={18} />}
                 </div>
                 <div>
-                  <p className="text-xs font-black text-white uppercase tracking-tighter">{expense.label}</p>
-                  <p className="text-[10px] text-white/40 font-medium">
-                    {expense.id === 'fuel' && `Basado en $${fuelPrice}/L`}
-                    {expense.id === 'maintenance' && `$${maintPerKm}/km de service`}
-                    {expense.id === 'amortization' && `+$${(maintPerKm * 0.5).toFixed(1)}/km depreciación`}
+                  <p className="text-sm font-black text-white uppercase tracking-tight">{expense.label}</p>
+                  <p className="text-xs text-white/50 font-medium">
+                    {expense.id === 'fuel' && `Afectado por $/L y KM/L`}
+                    {expense.id === 'maintenance' && `Reserva de $${maintPerKm}/km`}
+                    {expense.id === 'amortization' && `Plus de desgaste preventivo`}
                   </p>
                 </div>
               </div>
-              <div className={`w-10 h-5 rounded-full relative transition-colors ${expense.enabled ? 'bg-nodo-petrol' : 'bg-white/10'}`}>
-                <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${expense.enabled ? 'left-6' : 'left-1'}`} />
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                expense.enabled ? 'border-nodo-petrol bg-nodo-petrol' : 'border-white/20'
+              }`}>
+                {expense.enabled && <CheckCircle2 size={14} text-black />}
               </div>
             </button>
           ))}
-          <div className="flex items-start gap-2 p-3 bg-white/5 rounded-xl mt-2">
-            <Info className="w-4 h-4 text-nodo-petrol shrink-0 mt-0.5" />
-            <p className="text-[9px] text-white/30 leading-relaxed italic">
-              Configura estas variables para que el cálculo de rentabilidad sea exacto según tu realidad económica.
+          
+          <div className="flex items-start gap-3 p-4 bg-white/5 rounded-2xl border border-white/5 mt-2">
+            <Info className="w-5 h-5 text-nodo-petrol shrink-0" />
+            <p className="text-xs text-white/60 leading-relaxed font-medium">
+              Estos ajustes modifican los umbrales de rentabilidad en tiempo real en tu calculadora.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Botón de Guardado Flotante / Condicional */}
-      {hasUnsavedChanges && (
-        <div className="px-4 animate-in slide-in-from-bottom-4">
+      {/* 4. ZONA CRÍTICA: Contraste y Accesibilidad mejorados */}
+      <div className="px-4 pt-10 pb-10">
+        <div className="p-8 border-2 border-red-500/20 rounded-[2.5rem] bg-red-500/[0.03] text-center">
+          <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-4" />
+          <h4 className="text-sm font-black text-red-500 uppercase tracking-widest mb-2">Restablecer Aplicación</h4>
+          <p className="text-xs text-white/40 mb-8 font-medium">Esta acción eliminará permanentemente tu configuración y todos los viajes guardados.</p>
           <button
-            onClick={handleSaveChanges}
-            className="w-full bg-nodo-petrol text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(0,183,189,0.3)] active:scale-95 transition-all"
+            onClick={() => confirm('¿Deseas borrar todos tus datos?') && onResetAll()}
+            className="w-full py-4 bg-red-500 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-red-600 transition-all shadow-lg active:scale-95"
           >
-            Sincronizar Cambios
-          </button>
-        </div>
-      )}
-
-      {/* Zona de Reseteo */}
-      <div className="px-4 pt-6">
-        <div className="p-6 border-2 border-red-500/10 rounded-[2.5rem] bg-red-500/[0.02]">
-          <div className="flex items-center gap-3 mb-4 opacity-40">
-            <AlertTriangle className="w-4 h-4 text-red-500" />
-            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Procedimiento Crítico</span>
-          </div>
-          <button
-            onClick={() => { if(confirm('¿Seguro? Se borrará todo tu historial de NODO.')) onResetAll(); }}
-            className="w-full py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500/20 transition-all active:scale-95"
-          >
-            Borrar Datos de Usuario
+            Borrar Historial Completo
           </button>
         </div>
       </div>
