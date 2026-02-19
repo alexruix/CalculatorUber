@@ -14,7 +14,8 @@ import { CalculatorTab } from '../Tabs/CalculatorTabs';
 import { ProfileTab } from '../Tabs/ProfileTab';
 import { SessionAnalysis } from './SessionAnalysis';
 import { SessionSummary } from './SessionSummary';
-// import { DailyGoals } from './DailyGoals';
+import { DailyGoals } from './DailyGoals';
+import { HistoryTab } from '../Tabs/HistoryTab';
 
 // Types
 import type { SavedTrip, ExpenseToggle } from '../../types/calculator.types';
@@ -27,6 +28,7 @@ const Calculator: React.FC = () => {
   const [vehicleName, setVehicleName] = useState('Name');
   const [kmPerLiter, setKmPerLiter] = useState(9);
   const [maintPerKm, setMaintPerKm] = useState(10);
+  const [fuelPrice, setFuelPrice] = useState(1600); // 👈 Ahora se hidratará desde LS
   const [expenseSettings, setExpenseSettings] = useState<ExpenseToggle[]>([
     { id: 'fuel', label: 'Combustible', enabled: true },
     { id: 'maintenance', label: 'Mantenimiento', enabled: true },
@@ -44,7 +46,6 @@ const Calculator: React.FC = () => {
   // ========================================================================
   // ESTADO: Parámetros de Jornada
   // ========================================================================
-  const [fuelPrice, setFuelPrice] = useState(1600);
   const [isHeavyTraffic, setIsHeavyTraffic] = useState(false);
 
   // ========================================================================
@@ -64,6 +65,7 @@ const Calculator: React.FC = () => {
         setKmPerLiter(config.kmPerLiter);
         setMaintPerKm(config.maintPerKm);
         setExpenseSettings(config.expenseSettings);
+        if (config.fuelPrice) setFuelPrice(config.fuelPrice);
       } catch (error) {
         console.error('Error loading config:', error);
       }
@@ -92,8 +94,16 @@ const Calculator: React.FC = () => {
     setKmPerLiter(updates.kmPerLiter);
     setMaintPerKm(updates.maintPerKm);
     setExpenseSettings(updates.expenseSettings);
-    localStorage.setItem('nodo_config_v1', JSON.stringify(updates));
+    if (updates.fuelPrice) setFuelPrice(updates.fuelPrice);
+
+    const configToSave = {
+      ...updates,
+      // Aseguramos que si fuelPrice no vino en updates, guardamos el actual del estado
+      fuelPrice: updates.fuelPrice || fuelPrice
+    };
+    localStorage.setItem('nodo_config_v1', JSON.stringify(configToSave));
   };
+
 
   const saveTrip = () => {
     if (!metrics.isValid) return;
@@ -112,6 +122,10 @@ const Calculator: React.FC = () => {
   const resetInputs = () => {
     setFare(''); setDistTrip(''); setDistPickup(''); setDuration('');
   };
+
+  const totalDayMargin = useMemo(() =>
+    sessionTrips.reduce((acc, t) => acc + t.margin, 0),
+    [sessionTrips]);
 
   const clearSession = () => {
     if (confirm('¿Borrar historial del día?')) setSessionTrips([]);
@@ -134,7 +148,7 @@ const Calculator: React.FC = () => {
       <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-md">
         <div className="max-w-md mx-auto px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-slate-100">Maguito</h1>
+            <h1 className="text-xl font-bold text-slate-100">Manguito</h1>
             <p className="text-xs text-slate-400 mt-0.5">Calculadora de rentabilidad</p>
           </div>
           {/* <div className="flex items-center gap-2 px-3 py-1 bg-nodo-sand/10 rounded-full border border-nodo-petrol/20">
@@ -148,9 +162,12 @@ const Calculator: React.FC = () => {
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
         {activeTab === 'calculator' && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            {/* <DailyGoals totalMargin={sessionTrips.reduce((acc, t) => acc + t.margin, 0)} /> */}
+
+            {/* <DailyGoals currentMargin={totalDayMargin} /> */}
+
             <CalculatorTab
               metrics={metrics}
+              totalMargin={totalDayMargin} tripCount={sessionTrips.length}
               fare={fare} setFare={setFare}
               distTrip={distTrip} setDistTrip={setDistTrip}
               distPickup={distPickup} setDistPickup={setDistPickup}
@@ -160,13 +177,23 @@ const Calculator: React.FC = () => {
               onSaveTrip={saveTrip}
               onReset={resetInputs}
             />
+
+
           </div>
         )}
 
-        {activeTab === 'session' && (
-          <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-6">
+        {activeTab === 'history' && (
+          <HistoryTab
+            trips={sessionTrips}
+            onClearHistory={clearSession}
+            onDeleteTrip={deleteTrip}
+          />
+        )}
+
+        {activeTab === 'analysis' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
             <SessionAnalysis trips={sessionTrips} />
-            <SessionSummary trips={sessionTrips} onClear={clearSession} onDeleteTrip={deleteTrip} />
+            {/* Aquí podrías agregar gráficos de Chart.js en el futuro */}
           </div>
         )}
 
@@ -186,7 +213,10 @@ const Calculator: React.FC = () => {
             />
           </div>
         )}
+
       </main>
+
+
 
       {/* Navegación Inferior */}
       <BottomTabNavigation
