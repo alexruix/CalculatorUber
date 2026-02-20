@@ -265,7 +265,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                                     </Field>
                                 </div>
 
-                                <Field id="maint-per-km" label="Service por KM" hint="Ej: Divide gasto mensual por km recorridos" error={errors.maintPerKm} required icon={Settings} suffix="$/KM">
+                                <Field id="maint-per-km" label="Ahorro para gastos corrientes" hint="Dinero destinado al lavado y mantenimiento del vehiculo" error={errors.maintPerKm} icon={Settings} suffix="$/KM">
                                     <input
                                         type="number" inputMode="decimal"
                                         value={maintPerKm}
