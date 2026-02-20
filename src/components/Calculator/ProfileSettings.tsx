@@ -116,7 +116,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">¿Cuánto chupa?</label>
+                  <label className="text-[9px] font-bold text-white/30 uppercase ml-1">Combustible</label>
                   <div className="relative">
                     <input
                       type="number" value={kmPerLiter}
