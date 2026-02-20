@@ -74,11 +74,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             {vehicleName || "Tu Máquina"}
           </h2>
           <div className="flex items-center justify-center gap-2">
-            <div className="px-4 py-1.5 bg-nodo-sand/20 rounded-full border border-nodo-sand/40">
+            <div className="px-4 py-1.5 bg-nodo-sand/20 rounded-full">
               <span className="text-xs font-black text-nodo-sand uppercase tracking-wider">Chofer Nivel {driverLevel}</span>
             </div>
             <div className="px-4 py-1.5 bg-white/10 rounded-full border border-white/10">
-              <span className="text-xs font-black text-white/70 uppercase tracking-wider">{totalTrips} Viajes Metidos</span>
+              <span className="text-xs font-black text-white/70 uppercase tracking-wider">{totalTrips} Viajes hechos</span>
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           {/* Fila 1: Nombre y Precio Nafta */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Tu Auto</label>
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Tu vehiculo</label>
               <input
                 disabled={!isEditing}
                 type="text" value={vehicleName}
@@ -129,7 +129,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           {/* Fila 2: Consumo y Mantenimiento */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">¿Cuánto Chupa? (KM/L)</label>
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Combustible (KM/L)</label>
               <div className="relative">
                 <input
                   disabled={!isEditing}
@@ -141,7 +141,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Plata para el auto ($/KM)</label>
+              <label className="text-xs font-bold text-white/40 uppercase ml-1 tracking-wide">Gastos corrientes ($/KM)</label>
               <div className="relative">
                 <input
                   disabled={!isEditing}
@@ -173,12 +173,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-black text-white uppercase tracking-tight">
-                    {expense.id === 'fuel' ? 'Combustible' : expense.id === 'maintenance' ? 'Gastos corrientes' : 'Amortización'}
+                    {expense.id === 'fuel' ? 'Combustible' : expense.id === 'maintenance' ? 'Mantenimiento' : 'Amortización'}
                   </p>
                   <p className="text-xs text-white/50 font-medium mt-0.5">
                     {expense.id === 'fuel' && `Lo que vas gastando al andar`}
                     {expense.id === 'maintenance' && `Ahorro de $${maintPerKm}/km para lavado y gastos corrientes del auto.`}
-                    {expense.id === 'amortization' && `Ahorro para no quedarte a pata a futuro y llevarlo al mecánico`}
+                    {expense.id === 'amortization' && `Ahorro para y llevarlo al mecánico`}
                   </p>
                 </div>
               </div>
