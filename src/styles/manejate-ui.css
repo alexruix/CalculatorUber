@@ -1,0 +1,775 @@
+/* =============================================================================
+   RADAR Manejate — DESIGN SYSTEM
+   Atomic Design + Tailwind CSS @layer components
+
+   REGLA DE ORO DE ESTE ARCHIVO:
+   · Las clases "base" (btn-base, badge-base, etc.) viven en CSS PURO fuera
+     de @layer, escritas como propiedades nativas. Esto las hace utilizables
+     desde @apply sin errores de Tailwind.
+   · Todas las variantes dentro de @layer components usan ÚNICAMENTE utilidades
+     nativas de Tailwind — jamás @apply de clases custom.
+   · Las variantes son AUTOCONTENIDAS: incluyen todos los estilos necesarios
+     para funcionar solas en HTML con una sola clase.
+
+   Principios de diseño:
+   ─ Contraste mínimo WCAG AA: 4.5:1 texto normal · 3:1 texto grande / UI
+   ─ Touch targets mínimos: 48×48px (WCAG 2.5.5)
+   ─ Ningún texto funcional por debajo de 12px (0.75rem)
+   ─ Estados explícitos: default · hover · focus-visible · active · disabled · error · success
+   ─ prefers-reduced-motion respetado en todas las animaciones
+   ─ Jerarquía tipográfica: 5 niveles, diferencia mínima de 2 pasos entre niveles
+   ─ Espaciado en escala 4px: 4 · 8 · 12 · 16 · 20 · 24 · 28 · 32 · 40 · 48 · 64
+   ============================================================================= */
+
+
+/* =============================================================================
+   TOKENS DE DISEÑO — Custom Properties
+   Fuente única de verdad para colores, sombras y radios.
+   ============================================================================= */
+:root {
+  /* ── Escala de opacidad de texto (blanco sobre fondo #090909) ────────────
+     Ratios calculados: #FFFFFF sobre #090909
+     /100  → 21:1   Énfasis absoluto
+     /90   → ~18:1  Primario — headings
+     /70   → ~12:1  Secundario — labels (MÍNIMO para labels de campo)
+     /50   → ~7.5:1 Terciario — hints ≥ 12px
+     /35   → ~4.5:1 Mínimo AA — placeholders y decorativa
+     /25   → ~3:1   Sólo bordes y dividers — nunca en texto
+  */
+  --text-primary: rgba(255, 255, 255, 1);
+  --text-secondary: rgba(255, 255, 255, 0.90);
+  --text-tertiary: rgba(255, 255, 255, 0.70);
+  --text-quaternary: rgba(255, 255, 255, 0.50);
+  --text-placeholder: rgba(255, 255, 255, 0.35);
+  --text-disabled: rgba(255, 255, 255, 0.30);
+
+  /* ── Brand ───────────────────────────────────────────────────────────── */
+  --color-accent: #0ea5e9;
+  /* sky-500  */
+  --color-accent-dark: #0284c7;
+  /* sky-600  */
+  --color-success: #22c55e;
+  /* green-500 */
+  --color-warning: #f59e0b;
+  /* amber-500 */
+  --color-error: #ef4444;
+  /* red-500  */
+
+  /* ── Focus ring ──────────────────────────────────────────────────────── */
+  --ring-color: rgba(255, 255, 255, 0.9);
+  --ring-offset: #09090b;
+  /* zinc-950 — igual al fondo base */
+
+  /* ── Radios ──────────────────────────────────────────────────────────── */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-2xl: 2.5rem;
+
+  /* ── Sombras ─────────────────────────────────────────────────────────── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 8px 24px -4px rgba(14, 165, 233, 0.35);
+  --shadow-error: 0 8px 24px -4px rgba(239, 68, 68, 0.25);
+}
+
+
+/* =============================================================================
+   CLASES BASE — CSS PURO (fuera de @layer)
+
+   Por qué están aquí y no dentro de @layer components:
+   Tailwind procesa @apply en tiempo de compilación y sólo reconoce sus propias
+   utilidades generadas. Si una clase custom (definida por el usuario) se usa
+   dentro de @apply, el compilador no la encuentra y lanza:
+   "Cannot apply unknown utility class: btn-base".
+
+   Solución (Option A): las clases base se escriben en CSS nativo fuera de
+   @layer. Las variantes dentro de @layer son autocontenidas y no las referencian
+   con @apply — las incluyen directamente como utilidades Tailwind.
+   Las clases base siguen disponibles para uso directo en HTML.
+   ============================================================================= */
+
+/* ── Botones ─────────────────────────────────────────────────────────────── */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  font-size: 0.8125rem;
+  /* 13px — mínimo para botones */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 200ms ease;
+}
+
+.btn-base:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring-offset), 0 0 0 4px var(--ring-color);
+}
+
+.btn-base:active {
+  transform: scale(0.97);
+}
+
+.btn-base:disabled {
+  opacity: 0.30;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Badges / Chips ──────────────────────────────────────────────────────── */
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  /* 11px */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-width: 1px;
+  border-style: solid;
+  transition: color 200ms ease, background-color 200ms ease;
+}
+
+/* ── Íconos contenedores ─────────────────────────────────────────────────── */
+.icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* ── Feedback inline ─────────────────────────────────────────────────────── */
+.feedback-base {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  /* 12px */
+  font-weight: 600;
+  line-height: 1.625;
+}
+
+/* ── Toggle / Switch ─────────────────────────────────────────────────────── */
+.toggle-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border-width: 2px;
+  border-style: solid;
+  text-align: left;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.toggle-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring-offset), 0 0 0 4px var(--ring-color);
+}
+
+.toggle-row:active {
+  transform: scale(0.99);
+}
+
+/* ── Toggle indicator (cuadrado de check) ────────────────────────────────── */
+.toggle-indicator {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  border-width: 2px;
+  border-style: solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 200ms ease;
+}
+
+/* ── Nav label ───────────────────────────────────────────────────────────── */
+.nav-label {
+  font-size: 0.6875rem;
+  /* 11px — mínimo recomendado para uppercase */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  transition: color 300ms ease;
+}
+
+/* ── Progress fill ───────────────────────────────────────────────────────── */
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 700ms ease;
+}
+
+
+/* =============================================================================
+   @LAYER COMPONENTS — Variantes y composiciones
+   REGLA ÚNICA: @apply sólo con utilidades nativas de Tailwind.
+   ============================================================================= */
+@layer components {
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: TIPOGRAFÍA
+     Escala: H1(36px) → H2(24px) → H3(16px) → Label(12px) → Hint(12px) → Caption(11px)
+     ========================================================================= */
+
+  .heading-1 {
+    @apply text-4xl font-black text-white tracking-tighter leading-none;
+  }
+
+  .heading-2 {
+    @apply text-2xl font-black text-white tracking-tight leading-tight;
+  }
+
+  /* Uppercase compensa la diferencia visual entre 16px y 24px */
+  .heading-3 {
+    @apply text-base font-black text-white uppercase tracking-[0.12em] leading-tight;
+  }
+
+  /* Mínimo text-white/70 (~12:1) en labels ✅ */
+  .label-base {
+    @apply block text-xs font-black text-white/70 uppercase tracking-[0.14em] leading-none;
+  }
+
+  /* text-white/50 (~7.5:1) a ≥ 12px ✅ */
+  .label-hint {
+    @apply text-xs text-white/50 font-medium leading-relaxed;
+  }
+
+  /* Sólo para información no crítica */
+  .caption {
+    @apply text-[11px] text-white/40 font-bold uppercase tracking-widest leading-none;
+  }
+
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: BOTONES
+     AUTOCONTENIDOS — cada variante incluye todos sus estilos.
+     La clase .btn-base (CSS puro) existe para uso directo en HTML cuando
+     se necesite el esqueleto sin color específico.
+     ========================================================================= */
+
+  /* Primario — 1 por pantalla
+     text-slate-950 (#020617) sobre sky-500 (#0ea5e9) = 5.1:1 ✅ */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-sky-500 text-slate-950 hover:bg-sky-400 active:bg-sky-600 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* Secundario — jerarquía media
+     text-white (~21:1) sobre bg ~#141414 ✅ */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-white/[0.08] text-white border border-white/20 hover:bg-white/[0.14] hover:border-white/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+
+  /* Destructivo — borrado / acciones irreversibles
+     text-red-300 (~6:1) sobre bg-red-500/8 ✅ */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-red-500/[0.08] text-red-300 border border-red-500/25 hover:bg-red-500/[0.15] hover:text-red-200 hover:border-red-500/40 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+
+  /* Fantasma — "Volver", acciones de baja prioridad
+     text-white/60 (~8:1) ✅ */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-transparent text-white/60 border border-white/10 hover:bg-white/[0.06] hover:text-white/80 hover:border-white/20 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+
+  /* Ícono — sólo ícono, siempre con aria-label en HTML
+     48×48px garantizados (WCAG 2.5.5) · text-white/60 (~8:1) ✅ */
+  .btn-icon {
+    @apply inline-flex items-center justify-center min-h-[48px] min-w-[48px] rounded-xl cursor-pointer text-white/60 hover:text-white hover:bg-white/[0.08] transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+  }
+
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: INPUTS
+     Estados: default · focus · error · success · disabled
+     py-4 + text-base ≈ 56px → touch target ✅
+     16px (text-base) evita zoom automático en iOS ✅
+     ========================================================================= */
+
+  .input-base {
+    @apply w-full bg-white/[0.04] border border-white/20 rounded-2xl py-4 px-5 text-base font-semibold text-white placeholder:text-white/35 outline-none transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed disabled:select-none;
+  }
+
+  .input-focus {
+    @apply focus:border-sky-500/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-sky-500/20;
+  }
+
+  .input-error {
+    @apply border-red-500/50 bg-red-500/[0.04] focus:border-red-500/70 focus:ring-2 focus:ring-red-500/15;
+  }
+
+  .input-success {
+    @apply border-green-500/40 bg-green-500/[0.03] focus:border-green-500/60 focus:ring-2 focus:ring-green-500/10;
+  }
+
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: BADGES / CHIPS
+     AUTOCONTENIDOS — no referencian .badge-base vía @apply.
+     ========================================================================= */
+
+  .badge-neutral {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
+  }
+
+  /* text-sky-300 (#7dd3fc) sobre fondo ~#0c1a25 → ~8:1 ✅ */
+  .badge-accent {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-sky-500/15 text-sky-300 border-sky-500/25;
+  }
+
+  /* text-green-300 (#86efac) → ~8:1 ✅ */
+  .badge-success {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-green-500/15 text-green-300 border-green-500/25;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-amber-500/15 text-amber-300 border-amber-500/25;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-red-500/15 text-red-300 border-red-500/25;
+  }
+
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: ÍCONOS CONTENEDORES
+     Patrón HTML: <div class="icon-wrap-md icon-wrap-accent">
+     Tamaño y color son ortogonales — se combinan en HTML.
+     ========================================================================= */
+
+  /* Tamaños — autocontenidos (incluyen flex + forma) */
+  .icon-wrap-sm {
+    @apply flex items-center justify-center shrink-0 w-8 h-8 rounded-lg border;
+  }
+
+  .icon-wrap-md {
+    @apply flex items-center justify-center shrink-0 w-10 h-10 rounded-xl border;
+  }
+
+  .icon-wrap-lg {
+    @apply flex items-center justify-center shrink-0 w-12 h-12 rounded-2xl border;
+  }
+
+  /* Colores — se combinan con una clase de tamaño */
+  .icon-wrap-accent {
+    @apply bg-sky-500/[0.12] border-sky-500/25;
+    box-shadow: inset 0 0 12px rgba(14, 165, 233, 0.08);
+  }
+
+  .icon-wrap-success {
+    @apply bg-green-500/[0.12] border-green-500/25;
+    box-shadow: inset 0 0 12px rgba(34, 197, 94, 0.08);
+  }
+
+  .icon-wrap-warning {
+    @apply bg-amber-500/[0.12] border-amber-500/25;
+    box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.08);
+  }
+
+  .icon-wrap-error {
+    @apply bg-red-500/[0.12] border-red-500/25;
+    box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.08);
+  }
+
+  .icon-wrap-neutral {
+    @apply bg-white/[0.05] border-white/10;
+  }
+
+
+  /* =========================================================================
+     NIVEL 1 — ÁTOMOS: FEEDBACK INLINE
+     AUTOCONTENIDOS — incluyen la estructura de feedback-base.
+     Siempre acompañar de ícono + role="alert" en el HTML.
+     ========================================================================= */
+
+  .feedback-error {
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-red-400;
+  }
+
+  .feedback-success {
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-green-400;
+  }
+
+  .feedback-warning {
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-amber-400;
+  }
+
+  .feedback-info {
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-sky-400;
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: CARDS
+     Jerarquía de padding: card-main(32px) > card-section(20px) > card-metric(20px)
+     ========================================================================= */
+
+  .card-main {
+    @apply relative overflow-hidden bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/[0.08] rounded-[2rem] p-8 shadow-2xl;
+  }
+
+  .card-section {
+    @apply bg-white/[0.03] border border-white/[0.07] rounded-3xl p-5;
+  }
+
+  /* No interactivo por defecto — agregar card-metric-interactive cuando sea clickeable */
+  .card-metric {
+    @apply bg-white/[0.03] border border-white/[0.06] rounded-3xl p-5 text-center transition-all duration-200 hover:bg-white/[0.07] hover:border-white/[0.12];
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Variante interactiva — AUTOCONTENIDA, no hereda card-metric vía @apply */
+  .card-metric-interactive {
+    @apply bg-white/[0.03] border border-white/[0.06] rounded-3xl p-5 text-center transition-all duration-200 hover:bg-white/[0.07] hover:border-white/[0.12] cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-achievement {
+    @apply flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all duration-200;
+  }
+
+  /* Variante de card-section para viajes con pérdida (netMargin < 0)
+     Se aplica junto a card-section: <div class="card-section card-section-danger"> */
+  .card-section-danger {
+    @apply border-red-500/25 bg-red-500/[0.03];
+  }
+
+  /* Variante de card-metric sin padding ni text-center — para métricas en fila
+     Usada en el header de HistoryTab donde el layout es horizontal */
+  .card-metric-flat {
+    @apply bg-black/40 border border-white/[0.06] rounded-2xl p-4 transition-all duration-200;
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: FILTER CHIPS
+     Distintos de badge-*: son interactivos (touch target mínimo 40px),
+     tienen cursor-pointer, focus ring, y escala en active.
+     ========================================================================= */
+
+  /* Base del chip de filtro — CSS puro para ser reutilizable con @apply seguro */
+  /* (definido aquí como comentario; la clase real está fuera de @layer como .filter-chip) */
+
+  /* Activo — texto negro sobre blanco, máximo contraste */
+  .filter-chip-active {
+    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white text-black border border-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Inactivo — fondo sutil, texto legible white/55 (~6:1 ✅) */
+  .filter-chip-inactive {
+    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white/[0.06] text-white/55 border border-white/10 hover:bg-white/[0.12] hover:text-white/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+  }
+
+
+  /* =========================================================================
+     ÁTOMOS: VALORES SEMÁNTICOS DE VIAJE
+     Clases de color con nombre semántico — evitan dispersar colores
+     hardcodeados en múltiples componentes del historial.
+     ========================================================================= */
+
+  /* Valor positivo (ganancia neta, margen, ingresos) */
+  .trip-value-positive {
+    @apply text-green-400 font-black;
+  }
+
+  /* Valor negativo (pérdida, margen negativo) */
+  .trip-value-negative {
+    @apply text-red-400 font-black;
+  }
+
+  /* Valor neutro / tarifa bruta */
+  .trip-value-fare {
+    @apply text-white font-black;
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: CAMPO DE FORMULARIO
+     ========================================================================= */
+
+  .field-wrapper {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .field-input-wrapper {
+    @apply relative;
+  }
+
+  .field-icon-left {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 pointer-events-none;
+  }
+
+  .field-suffix {
+    @apply absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-black text-white/35 pointer-events-none;
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: TOGGLE / SWITCH
+     role="switch" + aria-checked en el HTML son obligatorios.
+     AUTOCONTENIDOS — no referencian .toggle-row vía @apply.
+     ========================================================================= */
+
+  .toggle-row-on {
+    @apply w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl border-2 text-left cursor-pointer transition-all duration-200 border-sky-500/50 bg-sky-500/[0.10] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+  }
+
+  .toggle-row-off {
+    @apply w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl border-2 text-left cursor-pointer transition-all duration-200 border-white/10 bg-white/[0.03] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+  }
+
+  /* Indicadores — AUTOCONTENIDOS, no referencian .toggle-indicator vía @apply */
+  .toggle-indicator-on {
+    @apply w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all duration-200 border-sky-500 bg-sky-500;
+  }
+
+  .toggle-indicator-off {
+    @apply w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all duration-200 border-white/25 bg-transparent;
+  }
+
+  .toggle-label-on {
+    @apply text-[13px] font-black text-white uppercase tracking-tight;
+  }
+
+  .toggle-label-off {
+    @apply text-[13px] font-black text-white/55 uppercase tracking-tight;
+  }
+
+  .toggle-desc-on {
+    @apply text-xs font-medium text-white/55 mt-0.5;
+  }
+
+  .toggle-desc-off {
+    @apply text-xs font-medium text-white/35 mt-0.5;
+  }
+
+
+  /* =========================================================================
+     NIVEL 3 — ORGANISMOS: BARRA DE NAVEGACIÓN
+     ========================================================================= */
+
+  .nav-bar {
+    @apply fixed bottom-0 left-0 right-0 z-50;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(8, 8, 10, 0.96);
+    backdrop-filter: blur(32px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .nav-bar-inner {
+    @apply grid grid-flow-col auto-cols-fr;
+  }
+
+  .nav-item {
+    @apply relative flex flex-col items-center justify-center gap-1.5 min-h-[64px] py-3 px-2 cursor-pointer transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-inset;
+  }
+
+  /* AUTOCONTENIDOS — no referencian .nav-label vía @apply
+     Se escriben con propiedades nativas para los valores no cubiertos por utilities */
+  .nav-label-active {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    transition: color 300ms ease;
+    @apply text-sky-400;
+  }
+
+  /* text-white/50 (~7.5:1) ✅ */
+  .nav-label-inactive {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    transition: color 300ms ease;
+    @apply text-white/50;
+  }
+
+  .nav-indicator {
+    @apply absolute top-0 left-1/2 -translate-x-1/2 h-[3px] w-10 rounded-b-full;
+    background: #38bdf8;
+    box-shadow:
+      0 3px 10px rgba(56, 189, 248, 0.7),
+      0 0 20px rgba(56, 189, 248, 0.25);
+    animation: nav-fade 0.25s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+
+  /* =========================================================================
+     NIVEL 3 — ORGANISMOS: BARRA DE PROGRESO / XP
+     AUTOCONTENIDOS — no referencian .progress-fill vía @apply.
+     ========================================================================= */
+
+  .progress-track {
+    @apply w-full h-2 bg-white/[0.07] rounded-full overflow-hidden;
+  }
+
+  .progress-fill-default {
+    @apply h-full rounded-full;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    transition: width 700ms ease;
+  }
+
+  .progress-fill-xp {
+    @apply h-full rounded-full;
+    background: linear-gradient(90deg, #d97706, #fbbf24, #fde68a);
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+    transition: width 700ms ease;
+  }
+
+  .progress-fill-success {
+    @apply h-full rounded-full;
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+    transition: width 700ms ease;
+  }
+
+
+  /* =========================================================================
+     UTILIDADES GLOBALES
+     ========================================================================= */
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .divider {
+    @apply w-full h-px bg-white/[0.07] my-4;
+  }
+
+}
+
+/* fin @layer components */
+
+
+/* =============================================================================
+   ANIMACIONES — con prefers-reduced-motion
+   ============================================================================= */
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(0.5) translateY(4px);
+    opacity: 0;
+  }
+
+  65% {
+    transform: scale(1.08) translateY(-1px);
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes nav-fade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.4);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+@keyframes card-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes skeleton-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-card-enter {
+  animation: card-enter 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.animate-skeleton {
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-badge-pop,
+  .animate-card-enter {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .nav-indicator {
+    animation: none;
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+
+  .progress-fill-default,
+  .progress-fill-xp,
+  .progress-fill-success {
+    transition: none;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

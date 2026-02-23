@@ -19,7 +19,7 @@ interface FieldErrors {
     maintPerKm?: string;
 }
 
-// ─── Subcomponente: Campo de formulario (Lógica Radar Manguito) ───────────
+// ─── Subcomponente: Campo de formulario (Lógica Manejate) ───────────
 interface FieldProps {
     id: string;
     label: string;
@@ -55,7 +55,7 @@ const Field: React.FC<FieldProps> = ({ id, label, hint, error, required, icon: I
                     />
                 )}
 
-                {/* 🚀 Inyección de clases al estilo "Radar Manguito" */}
+                {/* 🚀 Inyección de clases al estilo "Manejate" */}
                 {React.cloneElement(children, {
                     id,
                     'aria-required': required ? 'true' : undefined,
@@ -170,8 +170,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
                 {/* Encabezado */}
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">Radar Manguito</h1>
-                    <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Setup de Radar</p>
+                    <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">Manejate</h1>
+                    <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Configuración</p>
                 </div>
 
                 {/* Indicador de progreso */}
@@ -303,7 +303,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                             <div className="flex items-start gap-3 p-4 bg-black/40 rounded-2xl border border-white/5">
                                 <Info className="w-5 h-5 text-white/40 shrink-0" />
                                 <p className="text-xs text-white/60 leading-relaxed font-medium">
-                                    El radar manguito usará estos datos para calcular tu ROI en tiempo real.
+                                    El radar manejate usará estos datos para calcular tu ROI en tiempo real.
                                 </p>
                             </div>
 
@@ -338,7 +338,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                             <button type="button" onClick={() => setStep(1)} className="flex-1 bg-white/5 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/10 hover:bg-white/10 active:scale-95 transition-all">
                                 Atrás
                             </button>
-                            <button type="submit" className="flex-[2] bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-sky-400 hover:text-white active:scale-95 transition-all">
+                            <button type="submit" className="flex-2 bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-sky-400 hover:text-white active:scale-95 transition-all">
                                 Iniciar Radar
                             </button>
                         </div>

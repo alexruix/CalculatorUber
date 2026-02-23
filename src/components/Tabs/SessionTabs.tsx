@@ -23,7 +23,7 @@ export const SessionTab: React.FC<SessionTabProps> = ({
   const profitableTrips = trips.filter(t => t.margin > 0).length;
 
   const handleShare = async () => {
-    const text = `📊 Radar Manguito\n\n` +
+    const text = `📊 Manejate\n\n` +
       `Viajes: ${trips.length}\n` +
       `Ingresos: $${totalFare.toLocaleString('es-AR')}\n` +
       `Ganancia Neta: $${totalMargin.toLocaleString('es-AR')}\n` +
@@ -53,7 +53,7 @@ export const SessionTab: React.FC<SessionTabProps> = ({
           <h2 className="text-2xl font-black text-white mb-3 italic tracking-tighter">
             HISTORIAL VACÍO
           </h2>
-          <p className="text-sm text-white/40 max-w-[240px] leading-relaxed mb-10 font-medium">
+          <p className="text-sm text-white/40 max-w-60 leading-relaxed mb-10 font-medium">
             Registra tus viajes del día para desbloquear el análisis de rentabilidad.
           </p>
 
@@ -92,7 +92,7 @@ export const SessionTab: React.FC<SessionTabProps> = ({
       {/* 3. HERO METRICS (BI Edition) */}
       <div className="px-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="glass-card rounded-[2rem] p-6 border-l-4 border-green-500 shadow-xl">
+          <div className="glass-card rounded-4xl p-6 border-l-4 border-green-500 shadow-xl">
             <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1 block">Net Profit</span>
             <p className="text-3xl font-black text-green-400 tracking-tighter italic">
               ${totalMargin.toLocaleString('es-AR', { maximumFractionDigits: 0 })}
@@ -103,7 +103,7 @@ export const SessionTab: React.FC<SessionTabProps> = ({
             </div>
           </div>
 
-          <div className="glass-card rounded-[2rem] p-6 border-l-4 border-nodo-petrol shadow-xl">
+          <div className="glass-card rounded-4xl p-6 border-l-4 border-nodo-petrol shadow-xl">
             <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1 block">Revenue</span>
             <p className="text-3xl font-black text-nodo-petrol tracking-tighter italic">
               ${totalFare.toLocaleString('es-AR', { maximumFractionDigits: 0 })}
@@ -131,12 +131,12 @@ export const SessionTab: React.FC<SessionTabProps> = ({
 
       {/* 6. DATA EXPORT TOOL */}
       <div className="px-4">
-        <div className="p-6 border-2 border-white/5 rounded-[2.5rem] bg-white/[0.02] flex flex-col items-center text-center">
+        <div className="p-6 border-2 border-white/5 rounded-[2.5rem] bg-white/2 flex flex-col items-center text-center">
           <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-4">
             <Download className="w-5 h-5 text-white/20" />
           </div>
           <h3 className="text-xs font-black text-white uppercase tracking-widest mb-1">Backup de Datos</h3>
-          <p className="text-[10px] text-white/30 mb-5 max-w-[180px]">Exporta tu sesión actual a formato CSV para Excel o Sheets.</p>
+          <p className="text-[10px] text-white/30 mb-5 max-w-45">Exporta tu sesión actual a formato CSV para Excel o Sheets.</p>
           
           <button
             onClick={() => {/* TODO: Export Logic */}}

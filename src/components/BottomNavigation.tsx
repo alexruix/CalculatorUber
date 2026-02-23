@@ -15,10 +15,10 @@ interface BottomTabNavigationProps {
 }
 
 const tabs: Tab[] = [
-  { id: 'calculator', label: 'CALCULADORA', icon: Calculator },
-  { id: 'history', label: 'HISTORIAL', icon: History }, // 👈 Gestión de viajes
-  { id: 'analysis', label: 'ANÁLISIS', icon: BarChart3 }, // 👈 Gráficos e Inteligencia
-  { id: 'profile', label: 'PERFIL', icon: User },
+  { id: 'calculator', label: '', icon: Calculator },
+  { id: 'history', label: '', icon: History }, 
+  { id: 'analysis', label: '', icon: BarChart3 }, 
+  { id: 'profile', label: '', icon: User },
 ];
 
 export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
@@ -27,7 +27,9 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
   badgeCount = 0
 }) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-2xl border-t border-white/10 z-50 pb-safe">
+    <nav 
+    className="nav-bar"
+    aria-label="Navegación principal de la aplicación">
       <div className="max-w-md mx-auto grid grid-cols-4 h-20">
         {tabs.map((tab) => {
           const Icon = tab.icon;

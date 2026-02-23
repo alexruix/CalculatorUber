@@ -82,7 +82,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
 
                     <div className="flex items-center justify-between mb-6 relative">
                         <div>
-                            <h2 className="text-xl font-black text-white uppercase">Tu laburo</h2>
+                            <h2 className="text-xl font-black text-white uppercase">Tus viajes</h2>
                             <p className="text-sm text-nodo-petrol  mt-1">
                                 {/* {activeFilter === 'all' ? 'Todo' : `${activeFilter}`} */}
                             </p>
@@ -172,7 +172,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                             </div>
 
                             <div className="space-y-3 relative">
-                                <div className="absolute left-6 top-0 bottom-0 w-[1px] bg-white/5 -z-10" />
+                                <div className="absolute left-6 top-0 bottom-0 w-px bg-white/5 -z-10" />
                                 {data.trips.map((trip) => {
                                     const isLoss = trip.margin < 0;
                                     const isConfirmingDelete = deletingId === trip.id;

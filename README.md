@@ -1,4 +1,4 @@
-# Radar Manguito - Calculadora de Rentabilidad
+# Manejate - Calculadora de Rentabilidad
 
 Sistema modular para cálculo de rentabilidad de viajes para conductores de Uber y economía gig.
 

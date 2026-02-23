@@ -29,7 +29,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
   // --- 1. EMPTY STATE ---
   if (trips.length === 0) {
     return (
-      <div className="glass-card rounded-[2rem] p-8 text-center border-dashed border-white/10 animate-in fade-in duration-500">
+      <div className="glass-card rounded-4xl p-8 text-center border-dashed border-white/10 animate-in fade-in duration-500">
         <div className="relative w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <div className="absolute inset-0 bg-nodo-petrol/10 blur-xl rounded-full" />
           <BarChart3 className="relative w-8 h-8 text-white/10" />
@@ -40,7 +40,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
         </p>
         <div className="mt-6 pt-6 border-t border-white/5">
           <p className="text-[9px] text-white/30 italic">
-            Anotá tus viajes del día para que el Radar Manguito te tire la posta de tu rentabilidad.          </p>
+            Anotá tus viajes del día para que el radar Manejate te tire la posta de tu rentabilidad.          </p>
         </div>
       </div>
     );
@@ -49,7 +49,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
   // --- 2. PARTIAL STATE: Pocos viajes (< 3) ---
   if (trips.length < 3 && !isExpanded) {
     return (
-      <div className="glass-card rounded-[2rem] p-6 animate-in slide-in-from-bottom-2 duration-500">
+      <div className="glass-card rounded-4xl p-6 animate-in slide-in-from-bottom-2 duration-500">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-nodo-petrol" />
@@ -79,23 +79,23 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
     <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 animate-in fade-in duration-500">
 
       {/* 2. HEADER: Sistema de Niveles y XP (NUEVO) */}
-      <div className="px-6 pt-6 pb-5 bg-gradient-to-b from-white/[0.03] to-transparent">
+      <div className="px-6 pt-6 pb-5 bg-gradient-to-b from-white/3 to-transparent">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center border border-amber-500/30">
               <Trophy className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <h3 className="text-xs font-black uppercase tracking-[0.1em] text-white italic">Radar Manguito</h3>
-<p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">Balance de la jornada</p>            </div>
+              <h3 className="text-xs font-black uppercase tracking-widest text-white italic">Radar manejate</h3>
+              <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">Balance de la jornada</p>            </div>
           </div>
 
           <button
-          onClick={() => confirm('¿Limpiamos el balance del día?') && onClear()}
-          className="p-2 text-white/10 hover:text-nodo-wine transition-colors rounded-full hover:bg-white/5"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+            onClick={() => confirm('¿Limpiamos el balance del día?') && onClear()}
+            className="p-2 text-white/10 hover:text-nodo-wine transition-colors rounded-full hover:bg-white/5"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Barra de Progreso de Nivel (Usa los nuevos datos del hook) */}
@@ -106,7 +106,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
               {insights.pointsToNextLevel} puntos para subir de rango
             </span>
           </div>
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden p-[1px]">
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden p-px">
             <div
               className="h-full bg-gradient-to-r from-amber-600 to-amber-300 rounded-full transition-all duration-1000"
               style={{ width: `${100 - (insights.pointsToNextLevel * 10)}%` }}
@@ -118,13 +118,13 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
       {/* 3. GRID DE PERFORMANCE */}
       <div className="px-6 pb-6">
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/[0.02] p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/[0.04] transition-colors">
+          <div className="bg-white/2 p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/4 transition-colors">
             <Target className="w-4 h-4 text-green-400 mx-auto mb-2 opacity-50" />
             <p className="text-2xl font-black text-green-400 italic tracking-tighter">{insights.profitableTripsPercent}%</p>
             <p className="text-[8px] text-white/20 uppercase font-black tracking-widest">Puntería</p>
           </div>
 
-          <div className="bg-white/[0.02] p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/[0.04] transition-colors">
+          <div className="bg-white/2 p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/4 transition-colors">
             <div className="flex justify-center mb-2">
               {insights.trend === 'improving' && <TrendingUp className="w-4 h-4 text-sky-400" />}
               {insights.trend === 'declining' && <TrendingDown className="w-4 h-4 text-red-400" />}
@@ -135,7 +135,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
             <p className="text-[8px] text-white/20 uppercase font-black tracking-widest">El rumbo</p>
           </div>
 
-          <div className="bg-white/[0.02] p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/[0.04] transition-colors">
+          <div className="bg-white/2 p-4 rounded-3xl border border-white/5 text-center group hover:bg-white/4 transition-colors">
             <Zap className="w-4 h-4 text-orange-400 mx-auto mb-2 opacity-50" />
             <p className="text-2xl font-black text-orange-400 italic tracking-tighter">{insights.profitableStreak}</p>
             <p className="text-[8px] text-white/20 uppercase font-black tracking-widest">Seguidilla</p>
@@ -153,7 +153,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
             {insights.badges.map((badge) => (
               <div
                 key={badge.id}
-                className={`flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all animate-in zoom-in-95 ${badgeColors[badge.color]}`}
+                className={`shrink-0 flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all animate-in zoom-in-95 ${badgeColors[badge.color]}`}
               >
                 <span className="text-xl">{badge.icon}</span>
                 <div className="flex flex-col">
@@ -190,7 +190,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
               <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Consejos</p>            </div>
             <div className="grid grid-cols-1 gap-3">
               {insights.tips.map((tip, i) => (
-                <div key={i} className="flex gap-4 p-5 bg-white/[0.02] rounded-3xl border border-white/5 items-start">
+                <div key={i} className="flex gap-4 p-5 bg-white/2 rounded-3xl border border-white/5 items-start">
                   <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
                     <span className="text-[10px] font-black text-amber-500">{i + 1}</span>
                   </div>
@@ -201,7 +201,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
           </div>
 
           {/* Resumen Final Motivacional */}
-          <div className="p-6 bg-gradient-to-br from-nodo-petrol/20 to-sky-500/10 rounded-[2rem] border border-nodo-petrol/30 text-center relative overflow-hidden">
+          <div className="p-6 bg-gradient-to-br from-nodo-petrol/20 to-sky-500/10 rounded-4xl border border-nodo-petrol/30 text-center relative overflow-hidden">
             <Rocket className="absolute -right-2 -bottom-2 w-16 h-16 text-white/5 -rotate-12" />
             <p className="text-sm font-black text-white italic mb-1 uppercase tracking-tighter">
               {insights.profitableTripsPercent >= 80 ? 'La tenés clarísima' : 'Afilando el criterio'}            </p>

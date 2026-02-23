@@ -147,13 +147,13 @@ const driverLevel = useMemo(() => Math.floor(sessionTrips.length / 5) + 1, [sess
       <header className="border-b border-white/5 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-md mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-xl font-black text-white tracking-tighter flex-col items-center gap-2">
-            Radar Manguito
+            Manejate
             {/* Un pequeño tag para darle un toque "tech-callejero" */}
-            <span className="text-[9px] bg-white/10 text-white/60 px-1.5 py-0.5 rounded-full tracking-normal border border-white/5">
+            {/* <span className="text-[9px] bg-white/10 text-white/60 px-1.5 py-0.5 rounded-full tracking-normal border border-white/5">
               V1.0
-            </span>
+            </span> */}
           </h1>
-          <p className="text-[10px] text-white/40 uppercase font-bold tracking-[0.15em]">
+          <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">
             La posta de tus viajes
           </p>
         </div>
