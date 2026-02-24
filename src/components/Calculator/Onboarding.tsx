@@ -34,29 +34,24 @@ interface FieldProps {
 const Field: React.FC<FieldProps> = ({ id, label, hint, error, required, icon: Icon, suffix, children }) => {
     const errorId = `${id}-error`;
     const hintId = `${id}-hint`;
+    const inputEl = children as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>;
 
     return (
-        <div className="space-y-2">
-            <label
-                htmlFor={id}
-                className="block text-[11px] font-black text-white/60 uppercase tracking-widest ml-1"
-            >
+        <div className="field-wrapper">
+            {/* label-base: block text-xs font-black text-white/70 uppercase tracking-[0.14em] */}
+            <label htmlFor={id} className="label-base ml-1">
                 {label}
                 {required && (
                     <span className="text-sky-500 ml-1" aria-hidden="true">*</span>
                 )}
             </label>
 
-            <div className="relative">
+            <div className="field-input-wrapper">
                 {Icon && (
-                    <Icon
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none z-10"
-                        aria-hidden="true"
-                    />
+                    <Icon className="field-icon-left z-10" aria-hidden="true" />
                 )}
 
-                {/* 🚀 Inyección de clases al estilo "Manejate" */}
-                {React.cloneElement(children, {
+                {React.cloneElement(inputEl, {
                     id,
                     'aria-required': required ? 'true' : undefined,
                     'aria-invalid': error ? 'true' : 'false',
@@ -64,41 +59,31 @@ const Field: React.FC<FieldProps> = ({ id, label, hint, error, required, icon: I
                         .filter(Boolean)
                         .join(' ') || undefined,
                     className: [
-                        children.props.className || 'text-xl', // Tamaño por defecto si no se pasa uno
-                        Icon ? 'pl-12' : 'pl-5',
-                        suffix ? 'pr-16' : 'pr-5',
-                        error
-                            ? 'border-red-500/60 focus:border-red-500 text-red-100'
-                            : 'border-white/5 focus:border-sky-500 text-white',
-                        'w-full bg-black/40 border rounded-2xl py-5 font-black outline-none transition-all',
-                        'placeholder:text-white/20 disabled:opacity-50 disabled:cursor-not-allowed'
+                        'input-base input-focus',
+                        inputEl.props.className || 'text-xl',
+                        Icon ? 'pl-12' : '',
+                        suffix ? 'pr-16' : '',
+                        error ? 'input-error' : '',
                     ]
                         .filter(Boolean)
                         .join(' '),
                 })}
 
                 {suffix && (
-                    <span
-                        className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-white/40 uppercase tracking-widest pointer-events-none"
-                        aria-hidden="true"
-                    >
+                    <span className="field-suffix" aria-hidden="true">
                         {suffix}
                     </span>
                 )}
             </div>
 
             {hint && !error && (
-                <p id={hintId} className="text-[11px] text-white/40 font-medium ml-1 leading-relaxed">
+                <p id={hintId} className="label-hint ml-1">
                     {hint}
                 </p>
             )}
 
             {error && (
-                <p
-                    id={errorId}
-                    role="alert"
-                    className="flex items-center gap-1.5 text-xs font-bold text-red-400 ml-1 mt-1"
-                >
+                <p id={errorId} role="alert" className="feedback-error ml-1 mt-1">
                     <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span>{error}</span>
                 </p>
@@ -165,7 +150,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center p-4 font-sans">
+        <div className="page-shell flex items-center justify-center p-4">
             <div className="w-full max-w-md pb-10">
 
                 {/* Encabezado */}
@@ -183,10 +168,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 {/* ── PASO 1: Vehículo ─────────────────────────────────────────── */}
                 {step === 1 && (
                     <form onSubmit={handleStep1Submit} noValidate className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
-                        <div className="bg-white/5 rounded-[2.5rem] p-8 space-y-6 border border-white/5 shadow-2xl relative overflow-hidden">
+                        <div className="card-main space-y-6 relative overflow-hidden">
 
                             <div className="flex items-center gap-4 mb-4 relative z-10">
-                                <div className="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center border border-sky-500/20">
+                                <div className="icon-wrap-lg icon-wrap-accent">
                                     <Car className="w-6 h-6 text-sky-400" />
                                 </div>
                                 <div>
@@ -276,7 +261,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                             </div>
                         </div>
 
-                        <button type="submit" className="w-full bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-sky-400 hover:text-white active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <button type="submit" className="btn-primary">
                             Siguiente <ChevronRight className="w-5 h-5" />
                         </button>
                     </form>
@@ -285,9 +270,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 {/* ── PASO 2: Gastos Activos ────────────────────────────────────── */}
                 {step === 2 && (
                     <form onSubmit={handleFinish} className="space-y-6 animate-in slide-in-from-right-8 duration-500">
-                        <div className="bg-white/5 rounded-[2.5rem] p-8 space-y-6 border border-white/5 shadow-2xl">
+                        <div className="card-main space-y-6">
                             <div className="flex items-center gap-4 mb-2">
-                                <div className="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center border border-sky-500/20">
+                                <div className="icon-wrap-lg icon-wrap-accent">
                                     <CheckCircle2 className="w-6 h-6 text-sky-400" />
                                 </div>
                                 <div>
@@ -300,45 +285,45 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-3 p-4 bg-black/40 rounded-2xl border border-white/5">
-                                <Info className="w-5 h-5 text-white/40 shrink-0" />
-                                <p className="text-xs text-white/60 leading-relaxed font-medium">
+                            <div className="card-section flex items-start gap-3">
+                                <Info className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" aria-hidden="true" />
+                                <p className="feedback-info">
                                     El radar manejate usará estos datos para calcular tu ROI en tiempo real.
                                 </p>
                             </div>
 
                             <fieldset className="space-y-3 border-0 p-0 m-0">
+                                <legend className="sr-only">Gastos a incluir en el cálculo</legend>
                                 {expenseSettings.map((expense) => (
                                     <button
                                         key={expense.id} type="button" role="switch" aria-checked={expense.enabled}
                                         onClick={() => handleToggleExpense(expense.id)}
-                                        className={`w-full p-4 rounded-2xl border transition-all duration-200 text-left flex items-center justify-between ${expense.enabled ? 'border-sky-500 bg-sky-500/10' : 'border-white/10 bg-black/40'
-                                            }`}
+                                        className={expense.enabled ? 'toggle-row-on' : 'toggle-row-off'}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 transition-colors ${expense.enabled ? 'bg-sky-500 border-sky-500 text-black' : 'border-white/20 bg-transparent'
-                                                }`}>
-                                                {expense.enabled && <CheckCircle2 className="w-5 h-5" />}
+                                            <div className={`icon-wrap-md ${expense.enabled ? 'icon-wrap-accent' : 'icon-wrap-neutral'}`} aria-hidden="true">
+                                                <CheckCircle2 className={`w-4 h-4 ${expense.enabled ? 'text-sky-300' : 'text-white/20'}`} />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black uppercase tracking-tight text-white">{expense.label}</p>
-                                                <p className="text-xs font-medium text-white/50 mt-0.5">
+                                                <p className={expense.enabled ? 'toggle-label-on' : 'toggle-label-off'}>{expense.label}</p>
+                                                <p className={expense.enabled ? 'toggle-desc-on' : 'toggle-desc-off'}>
                                                     {expense.id === 'fuel' && `Calculado a $${fuelPrice}/L`}
                                                     {expense.id === 'maintenance' && `Reserva de $${maintPerKm}/km para gastos corrientes`}
                                                     {expense.id === 'amortization' && `Plus por desgaste del vehículo`}
                                                 </p>
                                             </div>
                                         </div>
+                                        <div className={expense.enabled ? 'toggle-indicator-on' : 'toggle-indicator-off'} aria-hidden="true" />
                                     </button>
                                 ))}
                             </fieldset>
                         </div>
 
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => setStep(1)} className="flex-1 bg-white/5 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/10 hover:bg-white/10 active:scale-95 transition-all">
+                            <button type="button" onClick={() => setStep(1)} className="btn-ghost flex-1">
                                 Atrás
                             </button>
-                            <button type="submit" className="flex-2 bg-white text-black py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-sky-400 hover:text-white active:scale-95 transition-all">
+                            <button type="submit" className="btn-primary flex-[2]">
                                 Iniciar Radar
                             </button>
                         </div>

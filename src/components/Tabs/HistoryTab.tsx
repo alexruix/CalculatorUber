@@ -97,11 +97,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
 
                     <div className="grid grid-cols-2 gap-3">
                         {/* Ganancia Neta */}
-                        <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
+                        <div className="card-metric-flat">
                             <p className="text-[10px] text-white/40 uppercase font-bold tracking-tighter mb-1">
                                 Plata limpia
                             </p>
-                            <p className="text-2xl font-black text-green-400">
+                            <p className="text-2xl trip-value-positive">
                                 ${totalMargin.toLocaleString('es-AR')}
                             </p>
                             <p className="text-[10px] text-white/30 mt-1">
@@ -110,11 +110,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                         </div>
 
                         {/* Ingresos Totales */}
-                        <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
+                        <div className="card-metric-flat">
                             <p className="text-[10px] text-white/40 uppercase font-bold tracking-tighter mb-1">
                                 Recaudación
                             </p>
-                            <p className="text-2xl font-black text-nodo-petrol">
+                            <p className="text-2xl trip-value-fare">
                                 ${totalFare.toLocaleString('es-AR')}
                             </p>
                             <p className="text-[10px] text-white/30 mt-1">
@@ -136,11 +136,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                         <button
                             key={f.id}
                             onClick={() => setActiveFilter(f.id as FilterType)}
-                            className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border
-                ${activeFilter === f.id
-                                    ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
-                                    : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'}
-              `}
+                            className={activeFilter === f.id ? 'filter-chip-active' : 'filter-chip-inactive'}
                         >
                             {f.label}
                         </button>
@@ -185,7 +181,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-base font-black text-white tracking-tight">${trip.fare.toLocaleString()}</span>
-                                                        <span className={`text-[10px] font-bold ${isLoss ? 'text-red-400' : 'text-green-500/60'}`}>${trip.margin.toLocaleString()}</span>
+                                                        <span className={`text-[10px] font-bold ${isLoss ? 'trip-value-negative' : 'trip-value-positive'}`}>${trip.margin.toLocaleString()}</span>
                                                     </div>
                                                     <div className="flex items-center gap-3 mt-1 opacity-30">
                                                         <div className="flex items-center gap-1">

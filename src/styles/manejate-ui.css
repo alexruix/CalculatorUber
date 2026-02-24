@@ -652,8 +652,63 @@
 
 
   /* =========================================================================
+     NIVEL 0 — LAYOUT SHELL
+     Clases de estructura de página completa.
+     ========================================================================= */
+
+  /* Contenedor base de toda la app — reemplaza min-h-screen + bg inline */
+  .page-shell {
+    @apply min-h-screen bg-[#0a0a0a] text-white;
+  }
+
+  /* Header sticky estándar */
+  .app-header {
+    @apply sticky top-0 z-50 border-b border-white/5 bg-black/50 backdrop-blur-md;
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: GLASS CARD
+     Alias semántico de card + blur. Compatibidad con componentes existentes.
+     ========================================================================= */
+
+  /* glass-card — card con blur y borde, sin padding fijo (se añade en HTML) */
+  .glass-card {
+    @apply bg-[#151515]/60 backdrop-blur-xl border border-white/[0.08];
+  }
+
+
+  /* =========================================================================
+     NIVEL 2 — MOLÉCULAS: PROFITABILITY SCORE
+     Variantes de borde+fondo para el widget de rentabilidad.
+     Siempre combinar con: rounded-3xl p-6 text-center transition-all duration-500
+     ========================================================================= */
+
+  .score-card-excellent {
+    @apply border-2 border-green-500 bg-green-500/10;
+  }
+
+  .score-card-fair {
+    @apply border-2 border-amber-500 bg-amber-500/10;
+  }
+
+  .score-card-poor {
+    @apply border-2 border-red-500 bg-red-500/10;
+  }
+
+  .score-card-neutral {
+    @apply border-2 border-white/10 bg-white/5;
+  }
+
+
+  /* =========================================================================
      UTILIDADES GLOBALES
      ========================================================================= */
+
+  /* Touch target mínimo WCAG 2.5.5 — para elementos interactivos pequeños */
+  .touch-target {
+    @apply min-h-[48px] flex items-center justify-center active:scale-[0.97] transition-transform;
+  }
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;

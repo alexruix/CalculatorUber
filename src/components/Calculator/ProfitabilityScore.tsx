@@ -11,26 +11,22 @@ interface ProfitabilityScoreProps {
 const getTheme = (status: TripMetrics['status']): ProfitabilityTheme => {
   const themes: Record<TripMetrics['status'], ProfitabilityTheme> = {
     excellent: {
-      border: 'border-green-500',
-      bg: 'bg-green-500/10',
+      card: 'score-card-excellent',
       text: 'text-green-400',
       label: 'EXCELENTE'
     },
     fair: {
-      border: 'border-amber-500',
-      bg: 'bg-amber-500/10',
+      card: 'score-card-fair',
       text: 'text-amber-400',
       label: 'SIRVE'
     },
     poor: {
-      border: 'border-red-500',
-      bg: 'bg-red-500/10',
+      card: 'score-card-poor',
       text: 'text-red-400',
       label: 'AL HORNO'
     },
     neutral: {
-      border: 'border-white/10',
-      bg: 'bg-white/5',
+      card: 'score-card-neutral',
       text: 'text-white/20',
       label: 'ESPERANDO DATOS'
     }
@@ -48,7 +44,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
 
   return (
     <div
-      className={`border-2 rounded-3xl p-6 text-center transition-all duration-500 ${theme.border} ${theme.bg} shadow-2xl relative overflow-hidden`}
+      className={`${theme.card} rounded-3xl p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden`}
       role="status"
       aria-live="polite"
     >

@@ -142,9 +142,9 @@ const driverLevel = useMemo(() => Math.floor(sessionTrips.length / 5) + 1, [sess
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <div className="page-shell">
       {/* Header Fijo con Branding NODO */}
-      <header className="border-b border-white/5 bg-black/50 backdrop-blur-md sticky top-0 z-50">
+      <header className="app-header">
         <div className="max-w-md mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-xl font-black text-white tracking-tighter flex-col items-center gap-2">
             Manejate

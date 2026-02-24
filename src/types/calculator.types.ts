@@ -50,12 +50,11 @@ export interface ExpenseToggle {
 
 /**
  * Tema visual para el componente de score
+ * card = clase DS score-card-* (incluye border + background)
  */
 export interface ProfitabilityTheme {
-  /** Clase de border de Tailwind */
-  border: string;
-  /** Clase de background de Tailwind */
-  bg: string;
+  /** Clase combinada de borde+fondo del Design System (score-card-*) */
+  card: string;
   /** Clase de text color de Tailwind */
   text: string;
   /** Etiqueta mostrada al usuario */
