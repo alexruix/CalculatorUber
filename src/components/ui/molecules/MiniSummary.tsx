@@ -20,7 +20,7 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({ totalMargin, tripCount
       <div className="glass-card rounded-2xl p-4 border border-green-500/20 bg-green-500/5">
         <div className="flex items-center gap-2 mb-1">
           <TrendingUp className="w-3 h-3 text-green-400" />
-          <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+          <span className="text-xs font-black text-white/40 uppercase tracking-widest">
             Ganancias
           </span>
         </div>
@@ -32,7 +32,7 @@ ${(totalMargin || 0).toLocaleString('es-AR')}        </p>
       <div className="glass-card rounded-2xl p-4 border border-white/10 bg-white/5">
         <div className="flex items-center gap-2 mb-1">
           <Target className="w-3 h-3 text-nodo-petrol" />
-          <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+          <span className="text-xs font-black text-white/40 uppercase tracking-widest">
             Viajes
           </span>
         </div>

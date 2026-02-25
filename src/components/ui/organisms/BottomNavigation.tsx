@@ -6,6 +6,7 @@ export type TabId = 'calculator' | 'history' | 'analysis' | 'profile';
 interface Tab {
   id: TabId;
   label: string;
+  icon: React.FC<any>;
 }
 
 interface BottomTabNavigationProps {
@@ -16,8 +17,8 @@ interface BottomTabNavigationProps {
 
 const tabs: Tab[] = [
   { id: 'calculator', label: '', icon: Calculator },
-  { id: 'history', label: '', icon: History }, 
-  { id: 'analysis', label: '', icon: BarChart3 }, 
+  { id: 'history', label: '', icon: History },
+  { id: 'analysis', label: '', icon: BarChart3 },
   { id: 'profile', label: '', icon: User },
 ];
 
@@ -27,9 +28,9 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
   badgeCount = 0
 }) => {
   return (
-    <nav 
-    className="nav-bar"
-    aria-label="Navegación principal de la aplicación">
+    <nav
+      className="nav-bar"
+      aria-label="Navegación principal de la aplicación">
       <div className="max-w-md mx-auto grid grid-cols-4 h-20">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -54,14 +55,14 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                 {/* Badge con tu color Wine para el historial */}
                 {tab.id === 'analysis' && badgeCount > 0 && (
                   <div className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-nodo-wine border border-black rounded-full flex items-center justify-center px-1 animate-in zoom-in">
-                    <span className="text-[9px] font-black text-white leading-none">
+                    <span className="text-xs font-black text-white leading-none">
                       {badgeCount}
                     </span>
                   </div>
                 )}
               </div>
 
-              <span className="text-[9px] font-black tracking-[0.15em] leading-none">
+              <span className="text-xs font-black tracking-[0.15em] leading-none">
                 {tab.label}
               </span>
             </button>

@@ -21,15 +21,16 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
         driverLevel: 1,
         pointsToNextLevel: 10,
         totalPoints: 0,
+        bestTimeOfDay: null,
       };
     }
 
     // === 1. IDENTIFICAR LA JOYITA Y EL CLAVO DEL DÍA ===
-    const bestTrip = trips.reduce((best, trip) => 
+    const bestTrip = trips.reduce((best, trip) =>
       trip.margin > best.margin ? trip : best
     );
-    
-    const worstTrip = trips.reduce((worst, trip) => 
+
+    const worstTrip = trips.reduce((worst, trip) =>
       trip.margin < worst.margin ? trip : worst
     );
 
@@ -68,6 +69,7 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
       driverLevel: level,
       pointsToNextLevel: pointsToNext,
       totalPoints: points,
+      bestTimeOfDay: null,
     };
   }, [trips]);
 };
@@ -115,8 +117,8 @@ const calculateProfitableStreak = (trips: SavedTrip[]): number => {
  * Genera los consejos con voz de "Manguito"
  */
 const generateTips = (
-  trips: SavedTrip[], 
-  profitablePercent: number, 
+  trips: SavedTrip[],
+  profitablePercent: number,
   avgMargin: number,
   bestTrip: SavedTrip,
   worstTrip: SavedTrip
@@ -126,8 +128,8 @@ const generateTips = (
   // Analizar patrones
   const avgFare = trips.reduce((sum, t) => sum + t.fare, 0) / trips.length;
   const highMarginTrips = trips.filter(t => t.margin > avgMargin);
-  const avgFareOfGoodTrips = highMarginTrips.length > 0 
-    ? highMarginTrips.reduce((sum, t) => sum + t.fare, 0) / highMarginTrips.length 
+  const avgFareOfGoodTrips = highMarginTrips.length > 0
+    ? highMarginTrips.reduce((sum, t) => sum + t.fare, 0) / highMarginTrips.length
     : avgFare;
 
   // Tip 1: Piso de tarifa
@@ -171,8 +173,8 @@ const generateTips = (
  * Calcula las medallas (Gamificación argenta)
  */
 const calculateBadges = (
-  trips: SavedTrip[], 
-  streak: number, 
+  trips: SavedTrip[],
+  streak: number,
   profitablePercent: number,
   totalMargin: number,
   avgMargin: number
@@ -337,10 +339,10 @@ const calculateLevel = (tripCount: number, totalMargin: number) => {
   // Sistema: 1 punto por viaje + 1 punto por cada $1000 de ganancia
   // Esto premia tanto el esfuerzo (cantidad) como la inteligencia (calidad)
   const points = tripCount + Math.floor(totalMargin / 1000);
-  
+
   // Niveles cada 10 puntos
   const level = Math.max(1, Math.floor(points / 10) + 1);
-  
+
   // Puntos para el próximo escalón
   const pointsForNextLevel = level * 10;
   const pointsToNext = pointsForNextLevel - points;

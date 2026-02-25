@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import {
     History, Trash2, X, Navigation, Clock, Calendar,
-    TrendingUp, AlertTriangle, Check, RotateCcw, Filter
+    TrendingUp, AlertTriangle, Check, RotateCcw, Filter, Lock
 } from 'lucide-react';
-import type { SavedTrip } from '../../types/calculator.types';
+import type { SavedTrip } from '../../../../types/calculator.types';
+import { useProfileStore } from '../../../../store/useProfileStore';
+import { SubscriptionModal } from '../SubscriptionModal';
 
 interface HistoryTabProps {
     trips: SavedTrip[];
@@ -15,7 +17,10 @@ type FilterType = 'Hoy' | 'Ayer' | 'Semana' | 'Mes' | 'all';
 
 export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, onDeleteTrip }) => {
     const [deletingId, setDeletingId] = useState<number | null>(null);
-    const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+    const [activeFilter, setActiveFilter] = useState<FilterType>('Hoy');
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    const isPro = useProfileStore(state => state.isPro);
 
     // --- 1. LÓGICA DE FILTRADO ---
     const filteredTrips = useMemo(() => {
@@ -98,26 +103,26 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                     <div className="grid grid-cols-2 gap-3">
                         {/* Ganancia Neta */}
                         <div className="card-metric-flat">
-                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-tighter mb-1">
+                            <p className="text-xs text-white/40 uppercase font-bold tracking-tighter mb-1">
                                 Plata limpia
                             </p>
                             <p className="text-2xl trip-value-positive">
                                 ${totalMargin.toLocaleString('es-AR')}
                             </p>
-                            <p className="text-[10px] text-white/30 mt-1">
+                            <p className="text-xs text-white/30 mt-1">
                                 ~${avgMarginPerTrip}/viaje
                             </p>
                         </div>
 
                         {/* Ingresos Totales */}
                         <div className="card-metric-flat">
-                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-tighter mb-1">
+                            <p className="text-xs text-white/40 uppercase font-bold tracking-tighter mb-1">
                                 Recaudación
                             </p>
                             <p className="text-2xl trip-value-fare">
                                 ${totalFare.toLocaleString('es-AR')}
                             </p>
-                            <p className="text-[10px] text-white/30 mt-1">
+                            <p className="text-xs text-white/30 mt-1">
                                 {tripCount} {tripCount === 1 ? 'viaje' : 'viajes'}
                             </p>
                         </div>
@@ -127,18 +132,25 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                 {/* --- SELECTOR DE FILTROS (UI Chips) --- */}
                 <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                     {[
-                        { id: 'all', label: 'Todo' },
                         { id: 'Hoy', label: 'Hoy' },
                         { id: 'Ayer', label: 'Ayer' },
-                        { id: 'Semana', label: 'Semana' },
-                        { id: 'Mes', label: 'Mes' }
+                        { id: 'Semana', label: 'Semana', locked: !isPro },
+                        { id: 'Mes', label: 'Mes', locked: !isPro },
+                        { id: 'all', label: 'Todo', locked: !isPro }
                     ].map((f) => (
                         <button
                             key={f.id}
-                            onClick={() => setActiveFilter(f.id as FilterType)}
-                            className={activeFilter === f.id ? 'filter-chip-active' : 'filter-chip-inactive'}
+                            onClick={() => {
+                                if (f.locked) {
+                                    setShowUpgradeModal(true);
+                                } else {
+                                    setActiveFilter(f.id as FilterType);
+                                }
+                            }}
+                            className={`${activeFilter === f.id ? 'filter-chip-active' : 'filter-chip-inactive'} relative pr-8`}
                         >
                             {f.label}
+                            {f.locked && <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-white/30" />}
                         </button>
                     ))}
                 </div>
@@ -157,11 +169,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                             <div className="flex items-center justify-between px-2">
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-3.5 h-3.5 text-nodo-petrol" />
-                                    <h3 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">{date}</h3>
+                                    <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">{date}</h3>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full">
                                     <TrendingUp className="w-3 h-3 text-green-400" />
-                                    <span className="text-[10px] font-black text-green-400 uppercase tracking-tighter">
+                                    <span className="text-xs font-black text-green-400 uppercase tracking-tighter">
                                         +${data.dailyNet.toLocaleString('es-AR')}
                                     </span>
                                 </div>
@@ -175,23 +187,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                                     return (
                                         <div key={trip.id} className={`glass-card rounded-2xl p-4 border transition-all duration-300 flex items-center justify-between group ${isLoss ? 'border-red-500/30 bg-red-500/[0.02]' : 'border-white/5'}`}>
                                             <div className="flex gap-4 items-center">
-                                                {/* <div className={`w-12 h-10 rounded-xl flex items-center justify-center border font-black text-[10px] ${isLoss ? 'bg-red-500/20 border-red-500/40 text-red-400' : 'bg-white/[0.03] border-white/5 text-white/40'}`}>
+                                                {/* <div className={`w-12 h-10 rounded-xl flex items-center justify-center border font-black text-xs ${isLoss ? 'bg-red-500/20 border-red-500/40 text-red-400' : 'bg-white/[0.03] border-white/5 text-white/40'}`}>
                           {isLoss ? <AlertTriangle className="w-4 h-4" /> : new Date(trip.timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
                         </div> */}
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-base font-black text-white tracking-tight">${trip.fare.toLocaleString()}</span>
-                                                        <span className={`text-[10px] font-bold ${isLoss ? 'trip-value-negative' : 'trip-value-positive'}`}>${trip.margin.toLocaleString()}</span>
+                                                        <span className={`text-xs font-bold ${isLoss ? 'trip-value-negative' : 'trip-value-positive'}`}>${trip.margin.toLocaleString()}</span>
                                                     </div>
                                                     <div className="flex items-center gap-3 mt-1 opacity-30">
                                                         <div className="flex items-center gap-1">
                                                             <Navigation className="w-2.5 h-2.5" />
-                                                            <span className="text-[9px] font-bold uppercase">{trip.distance} KM</span>
+                                                            <span className="text-xs font-bold uppercase">{trip.distance} KM</span>
                                                         </div>
                                                         {trip.duration && (
                                                             <div className="flex items-center gap-1">
                                                                 <Clock className="w-2.5 h-2.5" />
-                                                                <span className="text-[9px] font-bold uppercase">{trip.duration} MIN</span>
+                                                                <span className="text-xs font-bold uppercase">{trip.duration} MIN</span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -215,6 +227,12 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                     ))
                 )}
             </div>
+
+            <SubscriptionModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                featureName="el Historial Completo"
+            />
         </div>
     );
 };

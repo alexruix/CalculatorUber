@@ -259,7 +259,7 @@
 
   /* Sólo para información no crítica */
   .caption {
-    @apply text-[11px] text-white/40 font-bold uppercase tracking-widest leading-none;
+    @apply text-xs text-white/40 font-bold uppercase tracking-widest leading-none;
   }
 
 
@@ -332,25 +332,25 @@
      ========================================================================= */
 
   .badge-neutral {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
   }
 
   /* text-sky-300 (#7dd3fc) sobre fondo ~#0c1a25 → ~8:1 ✅ */
   .badge-accent {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-sky-500/15 text-sky-300 border-sky-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-sky-500/15 text-sky-300 border-sky-500/25;
   }
 
   /* text-green-300 (#86efac) → ~8:1 ✅ */
   .badge-success {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-green-500/15 text-green-300 border-green-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-green-500/15 text-green-300 border-green-500/25;
   }
 
   .badge-warning {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-amber-500/15 text-amber-300 border-amber-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-amber-500/15 text-amber-300 border-amber-500/25;
   }
 
   .badge-error {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-red-500/15 text-red-300 border-red-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-red-500/15 text-red-300 border-red-500/25;
   }
 
 
@@ -475,13 +475,13 @@
 
   /* Activo — texto negro sobre blanco, máximo contraste */
   .filter-chip-active {
-    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white text-black border border-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white text-black border border-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
     box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
   }
 
   /* Inactivo — fondo sutil, texto legible white/55 (~6:1 ✅) */
   .filter-chip-inactive {
-    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white/[0.06] text-white/55 border border-white/10 hover:bg-white/[0.12] hover:text-white/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white/[0.06] text-white/55 border border-white/10 hover:bg-white/[0.12] hover:text-white/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
 
@@ -524,7 +524,7 @@
   }
 
   .field-suffix {
-    @apply absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-black text-white/35 pointer-events-none;
+    @apply absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-white/35 pointer-events-none;
   }
 
 

@@ -43,6 +43,7 @@ export const useProfitability = (
         totalCost: 0,
         netMargin: 0,
         profitPerKm: 0,
+        roi: 0,
         status: 'neutral'
       };
     }

@@ -3,49 +3,49 @@ import {
   Car, DollarSign, Settings, Fuel, Wrench,
   ShieldCheck, AlertTriangle, Info, CheckCircle2
 } from 'lucide-react';
-import type { ExpenseToggle } from '../../types/calculator.types';
+import type { ExpenseToggle } from '../../../../types/calculator.types';
 
 interface ProfileTabProps {
-  vehicleName:        string;
-  setVehicleName:     (value: string) => void;
-  kmPerLiter:         number;
-  setKmPerLiter:      (value: number) => void;
-  maintPerKm:         number;
-  setMaintPerKm:      (value: number) => void;
-  fuelPrice:          number;
-  setFuelPrice:       (value: number) => void;
-  expenseSettings:    ExpenseToggle[];
+  vehicleName: string;
+  setVehicleName: (value: string) => void;
+  kmPerLiter: number;
+  setKmPerLiter: (value: number) => void;
+  maintPerKm: number;
+  setMaintPerKm: (value: number) => void;
+  fuelPrice: number;
+  setFuelPrice: (value: number) => void;
+  expenseSettings: ExpenseToggle[];
   setExpenseSettings: (value: ExpenseToggle[]) => void;
   onSaveConfig: (config: {
-    vehicleName:     string;
-    kmPerLiter:      number;
-    maintPerKm:      number;
-    fuelPrice:       number;
+    vehicleName: string;
+    kmPerLiter: number;
+    maintPerKm: number;
+    fuelPrice: number;
     expenseSettings: ExpenseToggle[];
   }) => void;
-  onResetAll:  () => void;
-  totalTrips:  number;
+  onResetAll: () => void;
+  totalTrips: number;
   driverLevel: number;
 }
 
 // ─── Metadatos de cada gasto ─────────────────────────────────────────────────
 const EXPENSE_META: Record<string, { label: string; Icon: React.ElementType }> = {
-  fuel:         { label: 'Combustible',  Icon: Fuel       },
-  maintenance:  { label: 'Mantenimiento', Icon: Wrench     },
-  amortization: { label: 'Amortización',  Icon: ShieldCheck },
+  fuel: { label: 'Combustible', Icon: Fuel },
+  maintenance: { label: 'Mantenimiento', Icon: Wrench },
+  amortization: { label: 'Amortización', Icon: ShieldCheck },
 };
 
 // ─── Componente ──────────────────────────────────────────────────────────────
 export const ProfileTab: React.FC<ProfileTabProps> = ({
   vehicleName, setVehicleName,
-  kmPerLiter,  setKmPerLiter,
-  maintPerKm,  setMaintPerKm,
-  fuelPrice,   setFuelPrice,
+  kmPerLiter, setKmPerLiter,
+  maintPerKm, setMaintPerKm,
+  fuelPrice, setFuelPrice,
   expenseSettings, setExpenseSettings,
   onSaveConfig, onResetAll,
   totalTrips, driverLevel,
 }) => {
-  const [isEditing,        setIsEditing]        = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
 
   const handleToggleExpense = (id: string) => {
@@ -66,8 +66,8 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
   // Descripción dinámica de cada gasto (depende de valores actuales)
   const expenseDescription = (id: string): string => {
-    if (id === 'fuel')         return 'Lo que vas gastando al andar';
-    if (id === 'maintenance')  return `$${maintPerKm}/km para lavado y gastos corrientes`;
+    if (id === 'fuel') return 'Lo que vas gastando al andar';
+    if (id === 'maintenance') return `$${maintPerKm}/km para lavado y gastos corrientes`;
     if (id === 'amortization') return 'Ahorro para llevarlo al mecánico';
     return '';
   };
@@ -263,9 +263,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <legend className="sr-only">Selección de gastos a incluir en el cálculo</legend>
 
             {expenseSettings.map(expense => {
-              const meta   = EXPENSE_META[expense.id];
-              const Icon   = meta?.Icon ?? Fuel;
-              const isOn   = expense.enabled;
+              const meta = EXPENSE_META[expense.id];
+              const Icon = meta?.Icon ?? Fuel;
+              const isOn = expense.enabled;
               const descId = `expense-desc-${expense.id}`;
 
               return (

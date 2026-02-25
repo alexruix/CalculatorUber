@@ -102,6 +102,8 @@ export interface SessionInsights {
   badges: Badge[];
   /** Nivel del conductor */
   driverLevel: number;
+  pointsToNextLevel: number;
+  totalPoints: number;
 }
 
 
