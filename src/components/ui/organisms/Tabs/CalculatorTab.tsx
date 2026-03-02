@@ -12,17 +12,19 @@ import { MiniSummary } from '../../molecules/MiniSummary';
 
 export const CalculatorTab: React.FC = () => {
     // Stores
-    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings } = useProfileStore();
+    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings, vertical } = useProfileStore();
     const {
-        fare, distTrip, distPickup, duration,
+        fare, distTrip, distPickup, duration, tip, waitTime, tolls,
         isHeavyTraffic, setIsHeavyTraffic,
         sessionTrips, addTrip, resetInputs
     } = useCalculatorStore();
 
     // Logic
     const metrics = useProfitability(
-        fare, distTrip, distPickup, kmPerLiter,
-        maintPerKm, fuelPrice, isHeavyTraffic, expenseSettings
+        { fare, distTrip, distPickup, tip, waitTime, tolls },
+        vertical,
+        { kmPerLiter, maintPerKm, fuelPrice, expenseSettings },
+        isHeavyTraffic
     );
 
     const totalMargin = useMemo(() => sessionTrips.reduce((acc, t) => acc + t.margin, 0), [sessionTrips]);
@@ -36,7 +38,11 @@ export const CalculatorTab: React.FC = () => {
             margin: metrics.netMargin,
             distance: parseFloat(distTrip) + (parseFloat(distPickup) || 0),
             duration: parseFloat(duration),
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            vertical: vertical || undefined,
+            tip: parseFloat(tip) || 0,
+            waitTime: parseFloat(waitTime) || 0,
+            tolls: parseFloat(tolls) || 0,
         };
         addTrip(newTrip);
         resetInputs();

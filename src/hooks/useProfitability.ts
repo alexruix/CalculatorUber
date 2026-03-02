@@ -1,43 +1,30 @@
 import { useMemo } from 'react';
-import type { TripMetrics, ExpenseToggle } from '../types/calculator.types';
+import type { TripMetrics, ExpenseToggle, TripDataInput, VerticalType } from '../types/calculator.types';
 
-/**
- * Hook principal para cálculos de rentabilidad
- * Maneja toda la lógica de negocio del calculador
- * 
- * @param fare - Tarifa del viaje (string del input)
- * @param distTrip - Distancia del viaje en KM
- * @param distPickup - Distancia hasta el pasajero en KM
- * @param kmPerLiter - Eficiencia del vehículo (km/L)
- * @param maintPerKm - Costo de mantenimiento por KM
- * @param fuelPrice - Precio del combustible por litro
- * @param isHeavyTraffic - Si hay tráfico pesado (reduce eficiencia 20%)
- * @param expenseSettings - Configuración de gastos activos
- * @returns Métricas calculadas de rentabilidad
- * 
- * @example
- * const metrics = useProfitability('3500', '12', '2', 9, 10, 1600, false, expenseSettings);
- */
 export const useProfitability = (
-  fare: string,
-  distTrip: string,
-  distPickup: string,
-  kmPerLiter: number,
-  maintPerKm: number,
-  fuelPrice: number,
-  isHeavyTraffic: boolean,
-  expenseSettings: ExpenseToggle[]
+  tripData: TripDataInput,
+  vertical: VerticalType | null,
+  profile: {
+    kmPerLiter: number;
+    maintPerKm: number;
+    fuelPrice: number;
+    expenseSettings: ExpenseToggle[];
+  },
+  isHeavyTraffic: boolean
 ): TripMetrics => {
 
   return useMemo(() => {
     // Parse inputs
-    const f = parseFloat(fare) || 0;
-    const dT = parseFloat(distTrip) || 0;
-    const dP = parseFloat(distPickup) || 0;
+    const f = parseFloat(tripData.fare) || 0;
+    const dT = parseFloat(tripData.distTrip) || 0;
+    const dP = parseFloat(tripData.distPickup) || 0;
+    const tip = parseFloat(tripData.tip || '0') || 0;
+    const tolls = parseFloat(tripData.tolls || '0') || 0;
+    
     const totalDist = dT + dP;
 
     // Validación básica
-    if (!f || !dT) {
+    if (!f || !dT || !vertical) {
       return {
         isValid: false,
         totalCost: 0,
@@ -47,6 +34,8 @@ export const useProfitability = (
         status: 'neutral'
       };
     }
+
+    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings } = profile;
 
     // Ajuste de eficiencia según tráfico
     // En tráfico pesado, el consumo aumenta (eficiencia disminuye 20%)
@@ -67,23 +56,31 @@ export const useProfitability = (
 
     // Cálculos finales
     const totalCost = fuelCost + maintCost + amortizationCost;
-    const netMargin = f - totalCost;
-    const profitPerKm = totalDist > 0 ? netMargin / totalDist : 0;
+    
+    let netMargin = 0;
+    let roiValue = 0;
 
-    // Si el ROI es 1.5, significa que por cada $1 gastado, ganaste $1.50 de ganancia limpia.
-    const roi = totalCost > 0 ? netMargin / totalCost : 0;
+    if (vertical === 'transport') {
+      netMargin = f - totalCost;
+      roiValue = totalCost > 0 ? netMargin / totalCost : 0;
+    } else if (vertical === 'delivery') {
+      netMargin = (f + tip) - totalCost;
+      roiValue = totalCost > 0 ? netMargin / totalCost : 0;
+    } else if (vertical === 'logistics') {
+      netMargin = f - tolls - totalCost;
+      roiValue = totalCost > 0 ? netMargin / totalCost : 0;
+    }
+
+    const profitPerKm = totalDist > 0 ? netMargin / totalDist : 0;
 
     // 🚀 LÓGICA DINÁMICA: Determinación del status basada en el Costo Operativo
     // Esto soluciona el Pain Point de vehículos pesados como la Hilux
     let status: TripMetrics['status'] = 'poor';
 
     if (netMargin > 0) {
-      // Calculamos la relación Beneficio/Costo (ROI)
-      const roi = netMargin / totalCost;
-
-      if (roi >= 1.8) {
+      if (roiValue >= 1.8) {
         status = 'excellent'; // Ganas 1.8x veces más de lo que gastas
-      } else if (roi >= 1) {
+      } else if (roiValue >= 1) {
         status = 'fair'; // Margen aceptable sobre el gasto
       }
     }
@@ -93,9 +90,9 @@ export const useProfitability = (
       totalCost,
       netMargin: Math.round(netMargin),
       profitPerKm: Math.round(profitPerKm),
-      roi: parseFloat(roi.toFixed(2)),
+      roi: parseFloat(roiValue.toFixed(2)),
       status
     };
-  }, [fare, distTrip, distPickup, kmPerLiter, maintPerKm, fuelPrice, isHeavyTraffic, expenseSettings]);
+  }, [tripData, vertical, profile.kmPerLiter, profile.maintPerKm, profile.fuelPrice, profile.expenseSettings, isHeavyTraffic]);
 };
 

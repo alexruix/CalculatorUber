@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Car, Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info } from 'lucide-react';
+import { Car, Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info, Package, Bike, Truck } from 'lucide-react';
 import { useProfileStore } from '../../../store/useProfileStore';
 import { Field } from '../molecules/Field';
 import { Input } from '../atoms/Input';
@@ -15,7 +15,7 @@ interface FieldErrors {
 }
 
 export const OnboardingFlow: React.FC = () => {
-    const [step, setStep] = useState<1 | 2>(1);
+    const [step, setStep] = useState<1 | 2 | 3>(1);
     const [errors, setErrors] = useState<FieldErrors>({});
     const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -28,6 +28,7 @@ export const OnboardingFlow: React.FC = () => {
     const [maintPerKm, setMaintPerKm] = useState(storeProfile.maintPerKm === 10 ? '' : String(storeProfile.maintPerKm));
     const [fuelPrice, setFuelPrice] = useState(storeProfile.fuelPrice === 1600 ? '' : String(storeProfile.fuelPrice));
     const [expenseSettings, setExpenseSettings] = useState(storeProfile.expenseSettings);
+    const [vertical, setVertical] = useState(storeProfile.vertical);
 
     useEffect(() => {
         headingRef.current?.focus();
@@ -35,21 +36,30 @@ export const OnboardingFlow: React.FC = () => {
 
     const validate = (): boolean => {
         const next: FieldErrors = {};
-        if (!vehicleName.trim()) next.vehicleName = 'Requerido para tu perfil.';
-        const kpl = parseFloat(kmPerLiter);
-        if (!kmPerLiter || isNaN(kpl) || kpl <= 0 || kpl > 50) next.kmPerLiter = 'Valor inválido.';
-        const fp = parseFloat(fuelPrice);
-        if (!fuelPrice || isNaN(fp) || fp <= 0) next.fuelPrice = 'Precio inválido.';
-        const mnt = parseFloat(maintPerKm);
-        if (!maintPerKm || isNaN(mnt) || mnt < 0) next.maintPerKm = 'Costo inválido.';
+        if (step === 2) {
+            if (!vehicleName.trim()) next.vehicleName = 'Requerido para tu perfil.';
+            const kpl = parseFloat(kmPerLiter);
+            if (!kmPerLiter || isNaN(kpl) || kpl <= 0 || kpl > 50) next.kmPerLiter = 'Valor inválido.';
+            const fp = parseFloat(fuelPrice);
+            if (!fuelPrice || isNaN(fp) || fp <= 0) next.fuelPrice = 'Precio inválido.';
+            const mnt = parseFloat(maintPerKm);
+            if (!maintPerKm || isNaN(mnt) || mnt < 0) next.maintPerKm = 'Costo inválido.';
+        }
 
         setErrors(next);
         return Object.keys(next).length === 0;
     };
 
-    const handleStep1Submit = (e: React.FormEvent) => {
+    const handleStep1Select = (v: typeof vertical) => {
+        setVertical(v);
+        // Validation contextual: if Bike, adjust maintenance default? 
+        // For now just proceed
+        setStep(2);
+    };
+
+    const handleStep2Submit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) setStep(2);
+        if (validate()) setStep(3);
     };
 
     const handleFinish = (e: React.FormEvent) => {
@@ -60,6 +70,7 @@ export const OnboardingFlow: React.FC = () => {
             maintPerKm: parseFloat(maintPerKm),
             fuelPrice: parseFloat(fuelPrice),
             expenseSettings,
+            vertical,
         });
     };
 
@@ -78,20 +89,71 @@ export const OnboardingFlow: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-3 mb-10">
-                    <div className={`w-16 h-1.5 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
-                    <div className={`w-16 h-1.5 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 3 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
                 </div>
 
                 {step === 1 && (
-                    <form onSubmit={handleStep1Submit} noValidate className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+                    <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+                        <div className="text-center mb-2">
+                            <h2 ref={headingRef} tabIndex={-1} className="heading-2 mb-1">Elegí tu rubro</h2>
+                            <p className="caption">Personalizaremos tu radar</p>
+                        </div>
+
+                        <div className="grid gap-4">
+                            <button
+                                onClick={() => handleStep1Select('transport')}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'transport' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                            >
+                                <IconWrap size="lg" theme={vertical === 'transport' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
+                                    <Car className={`w-6 h-6 ${vertical === 'transport' ? 'text-sky-400' : 'text-white/40'}`} />
+                                </IconWrap>
+                                <div className="text-center">
+                                    <span className="heading-3 block">Transporte</span>
+                                    <span className="caption opacity-60">Uber, Didi, Cabify</span>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => handleStep1Select('delivery')}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'delivery' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                            >
+                                <IconWrap size="lg" theme={vertical === 'delivery' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
+                                    <Bike className={`w-6 h-6 ${vertical === 'delivery' ? 'text-sky-400' : 'text-white/40'}`} />
+                                </IconWrap>
+                                <div className="text-center">
+                                    <span className="heading-3 block">Delivery</span>
+                                    <span className="caption opacity-60">Rappi, PedidosYa</span>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => handleStep1Select('logistics')}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'logistics' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                            >
+                                <IconWrap size="lg" theme={vertical === 'logistics' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
+                                    <Truck className={`w-6 h-6 ${vertical === 'logistics' ? 'text-sky-400' : 'text-white/40'}`} />
+                                </IconWrap>
+                                <div className="text-center">
+                                    <span className="heading-3 block">Logística</span>
+                                    <span className="caption opacity-60">Envíos Extra, Cargas</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <form onSubmit={handleStep2Submit} noValidate className="space-y-6 animate-in slide-in-from-right-8 duration-500">
                         <div className="card-main space-y-6 relative overflow-hidden">
                             <div className="flex items-center gap-4 mb-4 relative z-10">
                                 <IconWrap size="lg" theme="accent">
                                     <Car className="w-6 h-6 text-sky-400" />
                                 </IconWrap>
                                 <div>
-                                    <h2 id="step1-heading" ref={headingRef} tabIndex={-1} className="heading-2">Tu vehiculo</h2>
-                                    <p className="caption text-sky-400 mt-0.5">Paso 1 de 2</p>
+                                    <h2 id="step2-heading" ref={headingRef} tabIndex={-1} className="heading-2">Tu vehiculo</h2>
+                                    <p className="caption text-sky-400 mt-0.5">Paso 2 de 3</p>
                                 </div>
                             </div>
 
@@ -147,13 +209,18 @@ export const OnboardingFlow: React.FC = () => {
                             </div>
                         </div>
 
-                        <Button type="submit" variant="primary">
-                            Siguiente <ChevronRight className="w-5 h-5" />
-                        </Button>
+                        <div className="flex gap-3">
+                            <Button type="button" onClick={() => setStep(1)} variant="ghost" className="flex-1">
+                                Atrás
+                            </Button>
+                            <Button type="submit" variant="primary" className="flex-[2]">
+                                Siguiente <ChevronRight className="w-5 h-5" />
+                            </Button>
+                        </div>
                     </form>
                 )}
 
-                {step === 2 && (
+                {step === 3 && (
                     <form onSubmit={handleFinish} className="space-y-6 animate-in slide-in-from-right-8 duration-500">
                         <div className="card-main space-y-6">
                             <div className="flex items-center gap-4 mb-2">
@@ -161,8 +228,8 @@ export const OnboardingFlow: React.FC = () => {
                                     <CheckCircle2 className="w-6 h-6 text-sky-400" />
                                 </IconWrap>
                                 <div>
-                                    <h2 id="step2-heading" ref={headingRef} tabIndex={-1} className="heading-2">Gastos activos</h2>
-                                    <p className="caption text-sky-400 mt-0.5">Paso 2 de 2</p>
+                                    <h2 id="step3-heading" ref={headingRef} tabIndex={-1} className="heading-2">Gastos activos</h2>
+                                    <p className="caption text-sky-400 mt-0.5">Paso 3 de 3</p>
                                 </div>
                             </div>
 
@@ -195,10 +262,10 @@ export const OnboardingFlow: React.FC = () => {
                         </div>
 
                         <div className="flex gap-3">
-                            <Button type="button" onClick={() => setStep(1)} variant="ghost" className="flex-1">
+                            <Button type="button" onClick={() => setStep(2)} variant="ghost" className="flex-1">
                                 Atrás
                             </Button>
-                            <Button type="submit" variant="primary" className="flex-[2]">
+                            <Button type="submit" variant="primary" className="flex-2">
                                 Iniciar Radar
                             </Button>
                         </div>

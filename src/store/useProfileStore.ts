@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ExpenseToggle } from '../types/calculator.types';
+import type { ExpenseToggle, VerticalType } from '../types/calculator.types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -12,6 +12,7 @@ interface ProfileState {
     maintPerKm: number;
     fuelPrice: number;
     expenseSettings: ExpenseToggle[];
+    vertical: VerticalType | null;
     user: User | null;
 
     // Actions
@@ -33,6 +34,7 @@ const initialProfileState = {
         { id: 'maintenance', label: 'Mantenimiento', enabled: true },
         { id: 'amortization', label: 'Amortización Vehicular', enabled: false },
     ],
+    vertical: null,
 };
 
 export const useProfileStore = create<ProfileState>()(
@@ -65,6 +67,7 @@ export const useProfileStore = create<ProfileState>()(
                             maintPerKm: Number(data.maint_per_km),
                             fuelPrice: Number(data.fuel_price),
                             expenseSettings: data.expense_settings || initialProfileState.expenseSettings,
+                            vertical: data.vertical || null,
                         });
                     }
                 }
@@ -83,6 +86,7 @@ export const useProfileStore = create<ProfileState>()(
                         maint_per_km: state.maintPerKm,
                         fuel_price: state.fuelPrice,
                         expense_settings: state.expenseSettings,
+                        vertical: state.vertical,
                         subscription_tier: state.isPro ? 'pro' : 'free'
                     };
 

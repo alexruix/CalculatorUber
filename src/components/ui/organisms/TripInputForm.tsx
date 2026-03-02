@@ -1,10 +1,12 @@
 import React from 'react';
 import { DollarSign, Navigation, Navigation2, Clock, Minus, Plus, NotebookPen } from 'lucide-react';
 import { useCalculatorStore } from '../../../store/useCalculatorStore';
+import { useProfileStore } from '../../../store/useProfileStore';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { GlassCard } from '../molecules/GlassCard';
 import { Badge } from '../atoms/Badge';
+import { Coins, Map as MapIcon } from 'lucide-react';
 
 interface TripInputFormProps {
     onSave: () => void;
@@ -12,11 +14,14 @@ interface TripInputFormProps {
 }
 
 export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid }) => {
+    const { vertical } = useProfileStore();
     const {
         fare, setFare,
         distTrip, setDistTrip,
         distPickup, setDistPickup,
-        duration, setDuration
+        duration, setDuration,
+        tip, setTip,
+        tolls, setTolls
     } = useCalculatorStore();
 
     const quickDistances = [0, 0.5, 1.5, 3];
@@ -28,21 +33,47 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
 
     return (
         <div className="card-main space-y-6">
-            <div className="field-wrapper">
-                <label className="label-base ml-2">Total cobrado (App)</label>
-                <div className="flex items-center gap-3">
-                    <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, -500)} aria-label="Restar 500">
-                        <Minus className="w-5 h-5" />
-                    </Button>
-                    <div className="field-input-wrapper flex-1">
-                        <DollarSign className="field-icon-left" aria-hidden="true" />
-                        <Input type="number" inputMode="decimal" placeholder="0" value={fare} onChange={(e) => setFare(e.target.value)} className="pl-12 text-3xl font-black text-center" />
+            <div className={`grid gap-4 ${vertical === 'delivery' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className="field-wrapper">
+                    <label className="label-base ml-2">{vertical === 'logistics' ? 'Pago del Bloque' : 'Tarifa sugerida app'}</label>
+                    <div className="flex items-center gap-3">
+                        {vertical !== 'delivery' && (
+                            <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, -500)} aria-label="Restar 500">
+                                <Minus className="w-5 h-5" />
+                            </Button>
+                        )}
+                        <div className="field-input-wrapper flex-1">
+                            <DollarSign className="field-icon-left" aria-hidden="true" />
+                            <Input type="number" inputMode="decimal" placeholder="0" value={fare} onChange={(e) => setFare(e.target.value)} className={`pl-12 font-black text-center ${vertical === 'delivery' ? 'text-2xl py-6' : 'text-3xl'}`} />
+                        </div>
+                        {vertical !== 'delivery' && (
+                            <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, 500)} aria-label="Sumar 500">
+                                <Plus className="w-5 h-5" />
+                            </Button>
+                        )}
                     </div>
-                    <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, 500)} aria-label="Sumar 500">
-                        <Plus className="w-5 h-5" />
-                    </Button>
                 </div>
+
+                {vertical === 'delivery' && (
+                    <div className="field-wrapper">
+                        <label className="label-base ml-2">Propina Estimada</label>
+                        <div className="field-input-wrapper flex-1">
+                            <Coins className="field-icon-left text-nodo-accent" aria-hidden="true" />
+                            <Input type="number" inputMode="decimal" placeholder="0" value={tip} onChange={(e) => setTip(e.target.value)} className="pl-12 text-2xl py-6 font-black text-center border-nodo-accent/30 bg-nodo-accent/5" />
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {vertical === 'logistics' && (
+                <div className="field-wrapper">
+                    <label className="label-base ml-2">Gastos de Peaje / Estacionamiento</label>
+                    <div className="field-input-wrapper">
+                        <MapIcon className="field-icon-left" aria-hidden="true" />
+                        <Input type="number" inputMode="decimal" placeholder="0" value={tolls} onChange={(e) => setTolls(e.target.value)} className="pl-12 text-lg font-bold" />
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="field-wrapper">

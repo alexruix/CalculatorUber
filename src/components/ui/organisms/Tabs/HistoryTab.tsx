@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import {
     History, Trash2, X, Navigation, Clock, Calendar,
-    TrendingUp, AlertTriangle, Check, RotateCcw, Filter, Lock
+    TrendingUp, AlertTriangle, Check, RotateCcw, Filter, Lock,
+    Bike, Package, Truck, Car as CarIcon, Coins, Map as MapIcon
 } from 'lucide-react';
 import type { SavedTrip } from '../../../../types/calculator.types';
 import { useProfileStore } from '../../../../store/useProfileStore';
@@ -206,7 +207,31 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                                                                 <span className="text-xs font-bold uppercase">{trip.duration} MIN</span>
                                                             </div>
                                                         )}
+                                                        {trip.vertical && (
+                                                            <div className="flex items-center gap-1 ml-auto">
+                                                                {trip.vertical === 'delivery' && <Bike className="w-3 h-3 text-sky-400" />}
+                                                                {trip.vertical === 'logistics' && <Truck className="w-3 h-3 text-sky-400" />}
+                                                                {trip.vertical === 'transport' && <CarIcon className="w-3 h-3 text-sky-400" />}
+                                                            </div>
+                                                        )}
                                                     </div>
+
+                                                    {(trip.tip || trip.tolls) && (
+                                                        <div className="flex items-center gap-3 mt-1.5 pt-1.5 border-t border-white/5">
+                                                            {(trip.tip ?? 0) > 0 && (
+                                                                <div className="flex items-center gap-1">
+                                                                    <Coins className="w-2.5 h-2.5 text-nodo-accent" />
+                                                                    <span className="text-[10px] font-black uppercase text-nodo-accent">Propina: ${trip.tip}</span>
+                                                                </div>
+                                                            )}
+                                                            {(trip.tolls ?? 0) > 0 && (
+                                                                <div className="flex items-center gap-1">
+                                                                    <MapIcon className="w-2.5 h-2.5 text-white/40" />
+                                                                    <span className="text-[10px] font-black uppercase text-white/40">Gasto: ${trip.tolls}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex items-center">

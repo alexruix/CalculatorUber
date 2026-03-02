@@ -12,6 +12,9 @@ interface CalculatorState {
     distTrip: string;
     distPickup: string;
     duration: string;
+    tip: string;
+    waitTime: string;
+    tolls: string;
 
     // Controles de entorno
     isHeavyTraffic: boolean;
@@ -25,6 +28,9 @@ interface CalculatorState {
     setDistTrip: (val: string) => void;
     setDistPickup: (val: string) => void;
     setDuration: (val: string) => void;
+    setTip: (val: string) => void;
+    setWaitTime: (val: string) => void;
+    setTolls: (val: string) => void;
     setIsHeavyTraffic: (val: boolean) => void;
     setActiveTab: (tab: TabId) => void;
 
@@ -44,6 +50,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             distTrip: '',
             distPickup: '',
             duration: '',
+            tip: '',
+            waitTime: '',
+            tolls: '',
             isHeavyTraffic: false,
             activeTab: 'calculator',
             sessionTrips: [],
@@ -52,6 +61,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             setDistTrip: (val) => set({ distTrip: val }),
             setDistPickup: (val) => set({ distPickup: val }),
             setDuration: (val) => set({ duration: val }),
+            setTip: (val) => set({ tip: val }),
+            setWaitTime: (val) => set({ waitTime: val }),
+            setTolls: (val) => set({ tolls: val }),
             setIsHeavyTraffic: (val) => set({ isHeavyTraffic: val }),
             setActiveTab: (val) => set({ activeTab: val }),
 
@@ -67,6 +79,9 @@ export const useCalculatorStore = create<CalculatorState>()(
                         margin: trip.margin,
                         distance: trip.distance,
                         duration: trip.duration,
+                        vertical: trip.vertical,
+                        tip: trip.tip,
+                        tolls: trip.tolls,
                         timestamp: new Date().toISOString() // Or use trip timestamp if it had one
                     });
                 }
@@ -107,6 +122,9 @@ export const useCalculatorStore = create<CalculatorState>()(
                             margin: Number(dbTrip.margin),
                             distance: Number(dbTrip.distance),
                             duration: Number(dbTrip.duration),
+                            vertical: dbTrip.vertical,
+                            tip: Number(dbTrip.tip || 0),
+                            tolls: Number(dbTrip.tolls || 0),
                             timestamp: dbTrip.timestamp,
                         }));
                         set({ sessionTrips: loadedTrips });
@@ -114,7 +132,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                 }
             },
 
-            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '' }),
+            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', tip: '', waitTime: '', tolls: '' }),
         }),
         {
             name: 'nodo_session_v1', // Replaces useSessionStorage custom hook

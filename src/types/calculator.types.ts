@@ -4,6 +4,20 @@
  */
 
 /**
+ * Vertical settings
+ */
+export type VerticalType = 'transport' | 'delivery' | 'logistics';
+
+export interface TripDataInput {
+  fare: string;
+  distTrip: string;
+  distPickup: string;
+  tip?: string;
+  waitTime?: string;
+  tolls?: string;
+}
+
+/**
  * Métricas calculadas de rentabilidad de un viaje
  */
 export interface TripMetrics {
@@ -34,6 +48,11 @@ export interface SavedTrip {
   timestamp: number;
   distance: number;
   duration: number;
+  /** New segment fields */
+  vertical?: VerticalType;
+  tip?: number;
+  waitTime?: number;
+  tolls?: number;
 }
 
 /**

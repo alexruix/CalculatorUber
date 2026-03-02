@@ -1,49 +1,37 @@
-import React, { useState } from 'react';
-import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
-import { Car, ChevronRight, Mail, Lock, AlertCircle } from 'lucide-react';
-import { useProfileStore } from '../../../store/useProfileStore';
+import { Car, ChevronRight, Mail, Lock, AlertCircle, Eye, EyeOff, Inbox, ArrowLeft } from 'lucide-react';
+import { useAuthForm } from '../../../hooks/useAuthForm';
+import { isSupabaseConfigured } from '../../../lib/supabase';
 
 interface AuthScreenProps {
     onSuccess: () => void;
 }
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
-    const [isLogin, setIsLogin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        view, setView, email, setEmail, password, setPassword,
+        loading, error, handleAuth, toggleView, showPassword, setShowPassword
+    } = useAuthForm(onSuccess);
 
-    const handleAuth = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!isSupabaseConfigured()) {
-            // Si no hay variables de entorno, simulamos el ingreso para dev/demo
-            setError(null);
-            useProfileStore.getState().setProfile({ isConfigured: true }); // Mock config
-            onSuccess();
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            if (isLogin) {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-            } else {
-                const { error } = await supabase.auth.signUp({ email, password });
-                if (error) throw error;
-                // Dependiendo de la config de Supabase, puede requerir confirmación por mail
-                alert('Revisa tu correo para confirmar tu cuenta');
-            }
-            onSuccess();
-        } catch (err: any) {
-            setError(err.message || 'Ocurrió un error en la autenticación');
-        } finally {
-            setLoading(false);
-        }
-    };
+    if (view === 'check-email') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 py-12 animate-in fade-in zoom-in-95 duration-500 text-center">
+                <div className="w-20 h-20 bg-sky-500/20 rounded-[2.5rem] flex items-center justify-center mb-8 border border-sky-500/30">
+                    <Inbox className="w-10 h-10 text-sky-400" />
+                </div>
+                <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">¡Casi listo!</h1>
+                <p className="text-sm font-medium text-white/60 leading-relaxed mb-10 max-w-xs">
+                    Enviamos un enlace de confirmación a <b className="text-white">{email}</b>.
+                    Verificá tu casilla para activar tu cuenta.
+                </p>
+                <button
+                    onClick={() => setView('login')}
+                    className="flex items-center gap-2 text-xs font-black text-sky-400 uppercase tracking-widest hover:text-sky-300 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Volver al ingreso
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-12 animate-in fade-in duration-700">
@@ -51,10 +39,10 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
                 <Car className="w-10 h-10 text-nodo-wine" />
             </div>
 
-            <div className="text-center mb-10 w-full max-w-sm">
-                <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-3">Manejate</h1>
-                <p className="text-sm font-medium text-white/50 leading-relaxed px-4">
-                    Tu radar de rentabilidad. Ingresá para guardar todo en la nube.
+            <div className={`text-center mb-10 w-full max-w-sm transition-all duration-500 ${loading ? 'opacity-50 grayscale' : ''}`}>
+                <h1 className="text-2xl font-black text-white uppercase tracking-[0.2em] mb-3">Manejate</h1>
+                <p className="text-xs font-bold text-white/30 uppercase tracking-widest">
+                    {view === 'login' ? 'Tu radar de rentabilidad' : 'Unite a la comunidad'}
                 </p>
             </div>
 
@@ -68,20 +56,27 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Correo electrónico"
                             required
-                            className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-4 text-sm text-white focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all"
+                            className="input-base input-focus pl-12 pr-4 text-sm"
                         />
                     </div>
                     <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-white transition-colors" />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Contraseña"
                             required
                             minLength={6}
-                            className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-4 text-sm text-white focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all"
+                            className="input-base input-focus pl-12 pr-12 text-sm"
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/20 hover:text-white transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                     </div>
                 </div>
 
@@ -95,18 +90,27 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="btn-primary w-full h-14 gap-2 shadow-[0_0_30px_rgba(233,69,96,0.3)] disabled:opacity-50 disabled:cursor-not-allowed group mt-6"
+                    className="btn-primary w-full h-14 gap-2 shadow-[0_10px_40px_-10px_rgba(233,69,96,0.5)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group mt-6"
                 >
-                    {loading ? 'Cargando...' : isLogin ? 'Ingresar a mi cuenta' : 'Crear mi cuenta'}
-                    {!loading && <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                    {loading ? (
+                        <span className="flex items-center gap-2">
+                            <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Procesando...
+                        </span>
+                    ) : (
+                        <>
+                            {view === 'login' ? 'Ingresar a mi cuenta' : 'Crear mi cuenta'}
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
                 </button>
             </form>
 
             <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="mt-8 text-xs font-bold text-white/40 uppercase tracking-widest hover:text-white transition-colors"
+                onClick={toggleView}
+                className="mt-8 text-[11px] font-black text-white/30 uppercase tracking-[0.2em] hover:text-sky-400 transition-colors"
             >
-                {isLogin ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Iniciá sesión'}
+                {view === 'login' ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Iniciá sesión'}
             </button>
 
             {!isSupabaseConfigured() && (
