@@ -73,6 +73,18 @@ export const useAuthForm = (onSuccess: () => void) => {
         }
     };
 
+    const handleGuestEntry = async () => {
+        setLoading(true);
+        setError(null);
+        
+        // Simular un pequeño delay de carga
+        setTimeout(() => {
+            useProfileStore.getState().setProfile({ isConfigured: true });
+            onSuccess();
+            setLoading(false);
+        }, 800);
+    };
+
     const toggleView = () => {
         setView(prev => prev === 'login' ? 'signup' : 'login');
         setError(null);
@@ -88,6 +100,7 @@ export const useAuthForm = (onSuccess: () => void) => {
         loading,
         error,
         handleAuth,
+        handleGuestEntry,
         toggleView,
         showPassword,
         setShowPassword
