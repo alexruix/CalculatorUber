@@ -6,6 +6,7 @@ import type { User } from '@supabase/supabase-js';
 
 interface ProfileState {
     isConfigured: boolean;
+    isFetchingProfile: boolean;
     isPro: boolean;
     vehicleName: string;
     kmPerLiter: number;
@@ -16,14 +17,16 @@ interface ProfileState {
     user: User | null;
 
     // Actions
-    setProfile: (data: Partial<Omit<ProfileState, 'setProfile' | 'resetProfile' | 'initProfile' | 'setUser'>>) => void;
+    setProfile: (data: Partial<Omit<ProfileState, 'setProfile' | 'resetProfile' | 'initProfile' | 'setUser' | 'logout'>>) => void;
     resetProfile: () => void;
     initProfile: () => Promise<void>;
     setUser: (user: User | null) => void;
+    logout: () => Promise<void>;
 }
 
 const initialProfileState = {
     isConfigured: false,
+    isFetchingProfile: false,
     isPro: false,
     vehicleName: 'Name',
     kmPerLiter: 9,
@@ -46,30 +49,43 @@ export const useProfileStore = create<ProfileState>()(
             initProfile: async () => {
                 if (!isSupabaseConfigured()) return;
 
-                const { data: { session } } = await supabase.auth.getSession();
-                const currentUser = session?.user || null;
-                set({ user: currentUser });
+                set({ isFetchingProfile: true });
 
-                if (currentUser) {
-                    // Fetch profile from supabase
-                    const { data, error } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', currentUser.id)
-                        .single();
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const currentUser = session?.user || null;
 
-                    if (data && !error) {
-                        set({
-                            isConfigured: true,
-                            isPro: data.subscription_tier === 'pro',
-                            vehicleName: data.vehicle_name,
-                            kmPerLiter: Number(data.km_per_liter),
-                            maintPerKm: Number(data.maint_per_km),
-                            fuelPrice: Number(data.fuel_price),
-                            expenseSettings: data.expense_settings || initialProfileState.expenseSettings,
-                            vertical: data.vertical || null,
-                        });
+                    if (currentUser) {
+                        // Fetch profile from supabase
+                        const { data, error } = await supabase
+                            .from('profiles')
+                            .select('*')
+                            .eq('id', currentUser.id)
+                            .single();
+
+                        if (data && !error) {
+                            set({
+                                user: currentUser,
+                                isConfigured: true,
+                                isPro: data.subscription_tier === 'pro',
+                                vehicleName: data.vehicle_name,
+                                kmPerLiter: Number(data.km_per_liter),
+                                maintPerKm: Number(data.maint_per_km),
+                                fuelPrice: Number(data.fuel_price),
+                                expenseSettings: data.expense_settings || initialProfileState.expenseSettings,
+                                vertical: data.vertical || null,
+                                isFetchingProfile: false
+                            });
+                        } else {
+                            // Current user exists but no profile yet (new user) or error
+                            set({ user: currentUser, isConfigured: false, isFetchingProfile: false });
+                        }
+                    } else {
+                        // No user
+                        set({ user: null, isFetchingProfile: false });
                     }
+                } catch (e) {
+                    set({ isFetchingProfile: false });
                 }
             },
             setProfile: async (data) => {
@@ -93,15 +109,24 @@ export const useProfileStore = create<ProfileState>()(
                     await supabase
                         .from('profiles')
                         .upsert(profileData)
-                        .eq('id', currentUser.id);
                 }
             },
             resetProfile: () => set((state) => ({ ...initialProfileState, user: state.user })), // Keep user on reset
+            logout: async () => {
+                if (isSupabaseConfigured()) {
+                    await supabase.auth.signOut();
+                }
+                set({ ...initialProfileState, user: null });
+                // Limpiar storage local y recargar para limpiar otros stores (como useCalculatorStore)
+                localStorage.removeItem('nodo_config_v1');
+                localStorage.removeItem('calculator-storage');
+                window.location.reload();
+            },
         }),
         {
             name: 'nodo_config_v1', // Replaces custom localStorage handling
             partialize: (state) => Object.fromEntries(
-                Object.entries(state).filter(([key]) => !['user'].includes(key))
+                Object.entries(state).filter(([key]) => !['user', 'isFetchingProfile'].includes(key))
             ) as ProfileState,
         }
     )

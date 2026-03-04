@@ -11,6 +11,7 @@ const getTheme = (status: TripMetrics['status']): ProfitabilityTheme => {
         excellent: { card: 'score-card-excellent', text: 'text-green-400', label: 'EXCELENTE' },
         fair: { card: 'score-card-fair', text: 'text-amber-400', label: 'SIRVE' },
         poor: { card: 'score-card-poor', text: 'text-red-400', label: 'AL HORNO' },
+        danger: { card: 'score-card-danger', text: 'text-red-400', label: 'PIERDE' },
         neutral: { card: 'score-card-neutral', text: 'text-white/20', label: 'ESPERANDO DATOS' }
     };
     return themes[status];

@@ -8,7 +8,7 @@ import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { OnboardingFlow } from '../organisms/OnboardingFlow';
 import { AuthScreen } from '../organisms/AuthScreen';
 import { CalculatorTab } from '../organisms/Tabs/CalculatorTab';
-import { isSupabaseConfigured } from '../../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
 
 // Refactored Tabs
 import { BottomTabNavigation } from '../organisms/BottomNavigation';
@@ -19,18 +19,18 @@ import { ProfileTab } from '../organisms/Tabs/ProfileTab';
 const CalculatorApp: React.FC = () => {
 
   // Global State Access (Replacement of massive useState block)
-  const { isConfigured, user, initProfile } = useProfileStore();
+  const { isConfigured, user, initProfile, isFetchingProfile } = useProfileStore();
   const { sessionTrips, activeTab, setActiveTab, clearSession, deleteTrip, initTrips } = useCalculatorStore();
 
   // Profile Store items mainly used by original ProfileTab component
   const {
-    vehicleName, setProfile, resetProfile,
+    vehicleName, setProfile, resetProfile, logout,
     kmPerLiter, maintPerKm, fuelPrice, expenseSettings
   } = useProfileStore();
 
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Initialize Supabase data on mount
+  // Initialize Supabase data on mount e interceptar cambios de sesión
   useEffect(() => {
     const initializeApp = async () => {
       await initProfile();
@@ -38,14 +38,31 @@ const CalculatorApp: React.FC = () => {
       setIsInitializing(false);
     };
     initializeApp();
+
+    if (isSupabaseConfigured()) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          useProfileStore.getState().setUser(null);
+        } else if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+          await initProfile();
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
   }, [initProfile, initTrips]);
 
   const driverLevel = useMemo(() => Math.floor(sessionTrips.length / 5) + 1, [sessionTrips]);
 
-  if (isInitializing) {
+  if (isInitializing || isFetchingProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <span className="text-white/50 text-xs font-black uppercase tracking-widest animate-pulse">Cargando Taller...</span>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black gap-4">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <span className="text-white/50 text-xs font-black uppercase tracking-widest animate-pulse">
+          Sincronizando...
+        </span>
       </div>
     );
   }
@@ -112,6 +129,7 @@ const CalculatorApp: React.FC = () => {
               expenseSettings={expenseSettings} setExpenseSettings={(v) => setProfile({ expenseSettings: v as any })}
               onSaveConfig={(updates) => setProfile(updates)}
               onResetAll={() => { resetProfile(); localStorage.clear(); window.location.reload(); }}
+              onLogout={() => logout()}
               totalTrips={sessionTrips.length}
               driverLevel={driverLevel}
             />

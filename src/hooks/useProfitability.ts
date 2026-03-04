@@ -77,11 +77,18 @@ export const useProfitability = (
     // Esto soluciona el Pain Point de vehículos pesados como la Hilux
     let status: TripMetrics['status'] = 'poor';
 
-    if (netMargin > 0) {
-      if (roiValue >= 1.8) {
-        status = 'excellent'; // Ganas 1.8x veces más de lo que gastas
-      } else if (roiValue >= 1) {
-        status = 'fair'; // Margen aceptable sobre el gasto
+    if (netMargin < 0) {
+      // 🚨 CASO CRÍTICO: El costo operativo supera la tarifa
+      status = 'danger'; 
+    } else if (netMargin > 0) {
+      const currentRoi = totalCost > 0 ? netMargin / totalCost : 0;
+
+      if (currentRoi >= 1.8) {
+        status = 'excellent';
+      } else if (currentRoi >= 1) {
+        status = 'fair';
+      } else {
+        status = 'poor';
       }
     }
 

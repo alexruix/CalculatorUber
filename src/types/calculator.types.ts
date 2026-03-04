@@ -31,7 +31,7 @@ export interface TripMetrics {
   profitPerKm: number;
   roi: number;
   /** Estado de rentabilidad basado en umbrales */
-  status: 'excellent' | 'fair' | 'poor' | 'neutral';
+  status: 'excellent' | 'fair' | 'poor' | 'danger' | 'neutral';
 }
 
 /**

@@ -24,6 +24,7 @@ interface ProfileTabProps {
     expenseSettings: ExpenseToggle[];
   }) => void;
   onResetAll: () => void;
+  onLogout: () => void;
   totalTrips: number;
   driverLevel: number;
 }
@@ -42,7 +43,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   maintPerKm, setMaintPerKm,
   fuelPrice, setFuelPrice,
   expenseSettings, setExpenseSettings,
-  onSaveConfig, onResetAll,
+  onSaveConfig, onResetAll, onLogout,
   totalTrips, driverLevel,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -338,12 +339,25 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </section>
 
 
-      {/* ── 4. ZONA CRÍTICA: Reseteo ──────────────────────────────────────── */}
+      {/* ── 4. ZONA DE CUENTA ──────────────────────────────────────── */}
       <section
-        className="px-4 pt-6 pb-10"
-        aria-labelledby="danger-heading"
+        className="px-4 pt-6 pb-10 space-y-4"
+        aria-labelledby="account-heading"
       >
-        <div className="p-8 border-2 border-red-500/20 rounded-[2.5rem] bg-red-500/[0.03] text-center">
+        <h3 id="account-heading" className="heading-3 px-1 mb-4 text-white/50">
+          Cuenta
+        </h3>
+
+        {/* Botón de Cerrar Sesión (Acción segura) */}
+        <button
+          onClick={onLogout}
+          className="btn-secondary w-full"
+        >
+          Cerrar Sesión
+        </button>
+
+        {/* Zona Peligrosa */}
+        <div className="p-8 border-2 border-red-500/20 rounded-[2.5rem] bg-red-500/[0.03] text-center mt-6">
           <AlertTriangle
             className="w-8 h-8 text-red-400 mx-auto mb-4"
             aria-hidden="true"
@@ -360,11 +374,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             Esta acción eliminará permanentemente tu configuración y todos los viajes guardados.
           </p>
 
-          {/*
-            Estado de confirmación en UI propia — reemplaza al confirm() nativo
-            que es inaccesible (no funciona con lectores de pantalla ni en algunos
-            entornos como iOS PWA).
-          */}
           {!isConfirmingReset ? (
             <button
               onClick={() => setIsConfirmingReset(true)}
@@ -378,7 +387,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                 ¿Estás seguro? No hay vuelta atrás.
               </p>
               <div className="flex gap-3">
-                {/* btn-ghost: fondo transparente, texto white/60, borde sutil */}
                 <button
                   onClick={() => setIsConfirmingReset(false)}
                   className="btn-ghost"
