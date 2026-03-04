@@ -144,6 +144,7 @@ const handleGoogleLogin = async () => {
         } finally {
             setLoading(false);
         }
+    };
 
     const toggleView = () => {
         setView(prev => prev === 'login' ? 'signup' : 'login');
@@ -161,7 +162,7 @@ const handleGoogleLogin = async () => {
         setConfirmPassword,
         loading,
         error,
-        handleAuth, 
+        handleAuth,
         handleGoogleLogin,
         handleResetPassword,
         handleUpdatePassword,
@@ -170,5 +171,4 @@ const handleGoogleLogin = async () => {
         showPassword,
         setShowPassword
     };
-}}
-;
+};

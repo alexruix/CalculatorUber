@@ -18,42 +18,26 @@ interface AuthScreenProps {
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
   const {
-    view,
-    setView,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
-    loading,
-    error,
-    handleAuth,
-    handleGoogleLogin,
-    handleResetPassword,
-    handleUpdatePassword,
-    handleGuestEntry,
-    toggleView,
-    showPassword,
-    setShowPassword,
+    view, setView, email, setEmail, password, setPassword,
+    confirmPassword, setConfirmPassword,
+    loading, error, handleAuth, handleGoogleLogin,
+    handleResetPassword, handleUpdatePassword,
+    toggleView, showPassword, setShowPassword
   } = useAuthForm(onSuccess);
 
-  if (view === "check-email") {
+  if (view === 'check-email') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 py-12 animate-in fade-in zoom-in-95 duration-500 text-center">
         <div className="w-20 h-20 bg-sky-500/20 rounded-[2.5rem] flex items-center justify-center mb-8 border border-sky-500/30">
           <Inbox className="w-10 h-10 text-sky-400" />
         </div>
-        <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">
-          ¡Casi listo!
-        </h1>
+        <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">¡Casi listo!</h1>
         <p className="text-sm font-medium text-white/60 leading-relaxed mb-10 max-w-xs">
-          Enviamos un enlace de confirmación a{" "}
-          <b className="text-white">{email}</b>. Verificá tu casilla para
-          activar tu cuenta.
+          Enviamos un enlace de confirmación a <b className="text-white">{email}</b>.
+          Verificá tu casilla para activar tu cuenta.
         </p>
         <button
-          onClick={() => setView("login")}
+          onClick={() => setView('login')}
           className="flex items-center gap-2 text-xs font-black text-sky-400 uppercase tracking-widest hover:text-sky-300 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Volver al ingreso
@@ -62,15 +46,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
     );
   }
 
-  if (view === "forgot-password") {
+  if (view === 'forgot-password') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 py-12 animate-in fade-in duration-500 text-center">
         <div className="w-20 h-20 bg-nodo-wine/20 rounded-[2.5rem] flex items-center justify-center mb-8 border border-nodo-wine/30">
           <AlertCircle className="w-10 h-10 text-nodo-wine" />
         </div>
-        <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">
-          Recuperar Clave
-        </h1>
+        <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">Recuperar Clave</h1>
         <p className="text-sm font-medium text-white/50 leading-relaxed max-w-xs mb-8">
           Ingresá el correo con el que te registraste y te enviaremos un link.
         </p>
@@ -98,12 +80,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
             disabled={loading}
             className="btn-primary w-full h-14 mt-6"
           >
-            {loading ? "Enviando..." : "Enviar link"}
+            {loading ? 'Enviando...' : 'Enviar link'}
           </button>
         </form>
 
         <button
-          onClick={() => setView("login")}
+          onClick={() => setView('login')}
           className="mt-8 text-[11px] font-black text-white/40 uppercase tracking-[0.2em] hover:text-white transition-colors"
         >
           Volver al login
@@ -112,36 +94,20 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
     );
   }
 
-  const isResetLayout = view === "reset-password";
+  const isResetLayout = view === 'reset-password';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-12 animate-in fade-in duration-700">
-      <div
-        className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-8 border ${isResetLayout
-            ? "bg-sky-500/20 border-sky-500/30"
-            : "bg-nodo-wine/20 border-nodo-wine/30"
-          }`}
-      >
-        {isResetLayout ? (
-          <Lock className="w-10 h-10 text-sky-400" />
-        ) : (
-          <Car className="w-10 h-10 text-nodo-wine" />
-        )}
+      <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-8 border ${isResetLayout ? 'bg-sky-500/20 border-sky-500/30' : 'bg-nodo-wine/20 border-nodo-wine/30'}`}>
+        {isResetLayout ? <Lock className="w-10 h-10 text-sky-400" /> : <Car className="w-10 h-10 text-nodo-wine" />}
       </div>
 
-      <div
-        className={`text-center mb-10 w-full max-w-sm transition-all duration-500 ${loading ? "opacity-50 grayscale" : ""
-          }`}
-      >
+      <div className={`text-center mb-10 w-full max-w-sm transition-all duration-500 ${loading ? 'opacity-50 grayscale' : ''}`}>
         <h1 className="text-2xl font-black text-white uppercase tracking-[0.2em] mb-3">
-          {isResetLayout ? "Nueva Clave" : "Manejate"}
+          {isResetLayout ? 'Nueva Clave' : 'Manejate'}
         </h1>
         <p className="text-xs font-bold text-white/30 uppercase tracking-widest">
-          {isResetLayout
-            ? "Elegí una contraseña segura"
-            : view === "login"
-              ? "Tu radar de rentabilidad"
-              : "Unite a la comunidad"}
+          {isResetLayout ? 'Elegí una contraseña segura' : view === 'login' ? 'Tu radar de rentabilidad' : 'Unite a la comunidad'}
         </p>
       </div>
 
@@ -155,28 +121,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
               disabled={loading}
               className="w-full flex items-center justify-center gap-3 h-14 bg-white text-black font-black uppercase tracking-widest text-[13px] rounded-2xl hover:bg-white/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  fill="#EA4335"
-                />
+              <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 <path d="M1 1h22v22H1z" fill="none" />
               </svg>
               Continuar con Google
@@ -185,18 +134,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
 
           <div className="flex items-center gap-4 mb-6 w-full max-w-sm opacity-60">
             <div className="h-px bg-white/20 flex-1"></div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
-              O usá tu email
-            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">O usá tu email</span>
             <div className="h-px bg-white/20 flex-1"></div>
           </div>
         </>
       )}
 
-      <form
-        onSubmit={isResetLayout ? handleUpdatePassword : handleAuth}
-        className="w-full max-w-sm space-y-4"
-      >
+      <form onSubmit={isResetLayout ? handleUpdatePassword : handleAuth} className="w-full max-w-sm space-y-4">
         <div className="space-y-3">
           {!isResetLayout && (
             <div className="relative group">
@@ -228,15 +172,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/20 hover:text-white transition-colors"
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
 
-            {(view === "signup" || isResetLayout) && (
+            {(view === 'signup' || isResetLayout) && (
               <div className="relative animate-in slide-in-from-top-2 duration-300">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-white transition-colors" />
                 <input
@@ -251,11 +191,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
               </div>
             )}
 
-            {view === "login" && (
+            {view === 'login' && (
               <div className="flex justify-end mt-1">
                 <button
                   type="button"
-                  onClick={() => setView("forgot-password")}
+                  onClick={() => setView('forgot-password')}
                   className="text-[11px] text-white/50 hover:text-white font-bold transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
@@ -284,11 +224,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
             </span>
           ) : (
             <>
-              {isResetLayout
-                ? "Actualizar clave"
-                : view === "login"
-                  ? "Ingresar a mi cuenta"
-                  : "Crear mi cuenta"}
+              {isResetLayout ? 'Actualizar clave' : view === 'login' ? 'Ingresar a mi cuenta' : 'Crear mi cuenta'}
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </>
           )}
@@ -296,26 +232,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
       </form>
 
       {!isResetLayout && (
-        <div className="w-full max-w-sm space-y-4 mt-8">
-          {view === "login" && (
-            <button
-              onClick={handleGuestEntry}
-              disabled={loading}
-              className="w-full h-12 flex items-center justify-center gap-2 text-[11px] font-black text-white/50 uppercase tracking-[0.2em] hover:text-white transition-colors border border-white/10 rounded-xl hover:bg-white/5 active:scale-95 disabled:opacity-50"
-            >
-              Ingresar como invitado
-            </button>
-          )}
-
-          <button
-            onClick={toggleView}
-            className="w-full text-[11px] font-black text-white/30 uppercase tracking-[0.2em] hover:text-sky-400 transition-colors"
-          >
-            {view === "login"
-              ? "¿No tenés cuenta? Registrate"
-              : "¿Ya tenés cuenta? Iniciá sesión"}
-          </button>
-        </div>
+        <button
+          onClick={toggleView}
+          className="mt-8 text-[11px] font-black text-white/30 uppercase tracking-[0.2em] hover:text-sky-400 transition-colors"
+        >
+          {view === 'login' ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Iniciá sesión'}
+        </button>
       )}
 
       {!isSupabaseConfigured() && (
