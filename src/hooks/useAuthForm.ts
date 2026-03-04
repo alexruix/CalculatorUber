@@ -102,7 +102,6 @@ const handleGoogleLogin = async () => {
         }
     };
 
-<<<<<<< HEAD
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateEmail(email)) {
@@ -171,4 +170,5 @@ const handleGoogleLogin = async () => {
         showPassword,
         setShowPassword
     };
-};
+}}
+;
