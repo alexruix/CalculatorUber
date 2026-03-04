@@ -4,7 +4,7 @@ import type { SavedTrip } from '../types/calculator.types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useProfileStore } from './useProfileStore';
 
-export type TabId = 'calculator' | 'history' | 'analysis' | 'profile';
+export type TabId = 'simulator' | 'calculator' | 'history' | 'analysis' | 'profile';
 
 interface CalculatorState {
     // Inputs del form
@@ -54,7 +54,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             waitTime: '',
             tolls: '',
             isHeavyTraffic: false,
-            activeTab: 'calculator',
+            activeTab: 'simulator',
             sessionTrips: [],
 
             setFare: (val) => set({ fare: val }),
@@ -82,7 +82,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                         vertical: trip.vertical,
                         tip: trip.tip,
                         tolls: trip.tolls,
-                        timestamp: new Date().toISOString() // Or use trip timestamp if it had one
+                        timestamp: trip.timestamp.toString() // Save numeric Unix timestamp as string
                     });
                 }
             },
@@ -125,7 +125,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                             vertical: dbTrip.vertical,
                             tip: Number(dbTrip.tip || 0),
                             tolls: Number(dbTrip.tolls || 0),
-                            timestamp: dbTrip.timestamp,
+                            timestamp: Number(dbTrip.timestamp), // Convert string back to numeric timestamp
                         }));
                         set({ sessionTrips: loadedTrips });
                     }

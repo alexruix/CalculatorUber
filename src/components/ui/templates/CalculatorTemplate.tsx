@@ -8,6 +8,7 @@ import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { OnboardingFlow } from '../organisms/OnboardingFlow';
 import { AuthScreen } from '../organisms/AuthScreen';
 import { CalculatorTab } from '../organisms/Tabs/CalculatorTab';
+import { ShiftSimulatorTab } from '../organisms/Tabs/ShiftSimulatorTab';
 import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
 
 // Refactored Tabs
@@ -95,6 +96,10 @@ const CalculatorApp: React.FC = () => {
 
       {/* Contenedor Principal de Pestañas */}
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
+        {activeTab === 'simulator' && (
+          <ShiftSimulatorTab />
+        )}
+
         {activeTab === 'calculator' && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <CalculatorTab />

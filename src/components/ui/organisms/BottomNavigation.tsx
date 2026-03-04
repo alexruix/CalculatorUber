@@ -1,7 +1,7 @@
 import React from 'react';
-import { Calculator, BarChart3, History, User } from 'lucide-react';
+import { Calculator, BarChart3, History, User, Zap } from 'lucide-react';
 
-export type TabId = 'calculator' | 'history' | 'analysis' | 'profile';
+export type TabId = 'simulator' | 'calculator' | 'history' | 'analysis' | 'profile';
 
 interface Tab {
   id: TabId;
@@ -16,10 +16,11 @@ interface BottomTabNavigationProps {
 }
 
 const tabs: Tab[] = [
-  { id: 'calculator', label: '', icon: Calculator },
-  { id: 'history', label: '', icon: History },
-  { id: 'analysis', label: '', icon: BarChart3 },
-  { id: 'profile', label: '', icon: User },
+  { id: 'simulator', label: 'Turno', icon: Zap },
+  { id: 'calculator', label: 'Cierre', icon: Calculator },
+  { id: 'history', label: 'Historial', icon: History },
+  { id: 'analysis', label: 'Análisis', icon: BarChart3 },
+  { id: 'profile', label: 'Perfil', icon: User },
 ];
 
 export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
