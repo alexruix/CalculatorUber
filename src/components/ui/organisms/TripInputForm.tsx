@@ -4,7 +4,7 @@
  * Mobile First: inputs con altura mínima de 48px, botones de ±
  * con touch targets correctos, layout en grid responsive.
  *
- * Textos provienen de /data/ui-strings.ts (SHIFT_FORM namespace).
+ * Textos provienen de /data/ui-strings.ts (TRIP_FORM namespace).
  */
 import React, { useEffect } from 'react';
 import { DollarSign, Navigation, Clock, Coins, Map as MapIcon, TimerReset, NotebookPen, Minus, Plus } from '../../../lib/icons';
@@ -14,7 +14,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { GlassCard } from '../molecules/GlassCard';
-import { SHIFT_FORM } from '../../../data/ui-strings';
+import { TRIP_FORM } from '../../../data/ui-strings';
 
 interface TripInputFormProps {
     onSave: () => void;
@@ -28,7 +28,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
         distTrip, setDistTrip,
         distPickup, setDistPickup,
         duration, setDuration,
-        activeTime, setActiveTime,
+        startTime, setStartTime,
         tip, setTip,
         tolls, setTolls
     } = useCalculatorStore();
@@ -42,7 +42,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
         setter(Math.max(0, current + step).toString());
     };
 
-    const f = SHIFT_FORM.fields;
+    const f = TRIP_FORM.fields;
 
     return (
         <div className="card-main space-y-5">
@@ -50,10 +50,10 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
             <div className="text-center pb-3 border-b border-white/5">
                 <h3 className="font-black text-white uppercase tracking-widest"
                     style={{ fontSize: 'var(--text-label)' }}>
-                    {SHIFT_FORM.sectionTitle}
+                    {TRIP_FORM.sectionTitle}
                 </h3>
                 <p className="text-white/40 mt-0.5" style={{ fontSize: 'var(--text-caption)' }}>
-                    {SHIFT_FORM.sectionSubtitle}
+                    {TRIP_FORM.sectionSubtitle}
                 </p>
             </div>
 
@@ -108,10 +108,10 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
                 </div>
             </div>
 
-            {/* Horas: Conectado + En viaje  */}
+            {/* Horas y Minutos */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="field-wrapper">
-                    <Label htmlFor="field-duration">{f.duration.label}</Label>
+                    <Label htmlFor="field-duration" required>{f.duration.label}</Label>
                     <div className="field-input-wrapper mt-2">
                         <TimerReset className="field-icon-left text-white/30" aria-hidden="true" />
                         <Input
@@ -125,22 +125,22 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
                     </div>
                 </div>
                 <div className="field-wrapper">
-                    <Label htmlFor="field-active">{f.activeTime.label}</Label>
+                    <Label htmlFor="field-starttime">{f.startTime.label}</Label>
                     <div className="field-input-wrapper mt-2">
-                        <Clock className="field-icon-left text-nodo-accent" aria-hidden="true" />
+                        <Clock className="field-icon-left text-info" aria-hidden="true" />
                         <Input
-                            id="field-active"
-                            type="number"
-                            placeholder={f.activeTime.placeholder}
-                            value={activeTime}
-                            onChange={(e) => setActiveTime(e.target.value)}
-                            className="pl-12 font-black border-nodo-accent/30 bg-nodo-accent/5"
-                            aria-describedby="active-hint"
+                            id="field-starttime"
+                            type="time"
+                            placeholder={f.startTime.placeholder}
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="pl-12 font-black border-info/30 bg-info/5 appearance-none"
+                            aria-describedby="starttime-hint"
                         />
                     </div>
-                    <p id="active-hint" className="mt-1 ml-1 text-white/25 leading-tight"
+                    <p id="starttime-hint" className="mt-1 ml-1 text-white/25 leading-tight"
                         style={{ fontSize: 'var(--text-micro)' }}>
-                        {f.activeTime.hint}
+                        {f.startTime.hint}
                     </p>
                 </div>
             </div>
@@ -178,16 +178,13 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
                             className="pl-10"
                         />
                     </div>
-                    <p className="mt-1 ml-1 text-white/25" style={{ fontSize: 'var(--text-micro)' }}>
-                        {f.expenses.hint}
-                    </p>
                 </div>
             </div>
 
             {/* CTA */}
             <Button disabled={!isValid} onClick={onSave} variant="primary">
                 <NotebookPen className="w-5 h-5" aria-hidden="true" />
-                {SHIFT_FORM.saveButton}
+                {TRIP_FORM.saveButton}
             </Button>
         </div>
     );

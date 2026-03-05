@@ -10,7 +10,7 @@
 import React from 'react';
 import { NAV_TABS } from '../../../data/nav.data';
 
-export type TabId = 'simulator' | 'calculator' | 'history' | 'analysis' | 'profile';
+export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
 
 interface BottomTabNavigationProps {
   activeTab: TabId;
@@ -29,7 +29,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
       aria-label="Navegación principal de la aplicación"
     >
       {/* Grid de 5 columnas: layout fijo para mobile */}
-      <div className="max-w-md mx-auto grid grid-cols-5 h-[3.75rem] sm:h-20">
+      <div className="max-w-md mx-auto grid grid-cols-5 h-15 sm:h-20">
         {NAV_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -44,7 +44,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                 transition-colors duration-200
                 /* touch target mínimo 44px via padding */
                 px-1 py-2
-                ${isActive ? 'text-brand-sea' : 'text-white/30 hover:text-white/50'}
+                ${isActive ? 'text-info' : 'text-white/30 hover:text-white/50'}
               `}
             >
               {/* Indicador superior — Fluent 2 pill */}
@@ -54,7 +54,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                   absolute top-0 h-0.5 rounded-b-full
                   transition-all duration-300
                   ${isActive
-                    ? 'w-8 bg-brand-sea shadow-[0_0_8px_var(--color-brand-sea)]'
+                    ? 'w-8 bg-info shadow-[0_0_8px_var(--color-info)]'
                     : 'w-0 bg-transparent'}
                 `}
               />
@@ -67,9 +67,9 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                 />
 
                 {/* Badge de notificación */}
-                {tab.id === 'analysis' && badgeCount > 0 && (
+                {tab.id === 'close' && badgeCount > 0 && (
                   <span
-                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 bg-nodo-wine border border-black rounded-full flex items-center justify-center px-1"
+                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 bg-error border border-black rounded-full flex items-center justify-center px-1"
                     aria-label={`${badgeCount} registros pendientes`}
                   >
                     <span className="text-[10px] font-black text-white leading-none">

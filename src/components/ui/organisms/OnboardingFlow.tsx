@@ -101,9 +101,9 @@ export const OnboardingFlow: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-3 mb-10">
-                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
-                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
-                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 3 ? 'bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.5)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-info shadow-[0_0_15px_var(--color-info-glow)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-info shadow-[0_0_15px_var(--color-info-glow)]' : 'bg-white/10'}`} />
+                    <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= 3 ? 'bg-info shadow-[0_0_15px_var(--color-info-glow)]' : 'bg-white/10'}`} />
                 </div>
 
                 {step === 1 && (
@@ -116,10 +116,10 @@ export const OnboardingFlow: React.FC = () => {
                         <div className="grid gap-4">
                             <button
                                 onClick={() => handleStep1Select('transport')}
-                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'transport' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'transport' ? 'border-info bg-info/10' : ''}`}
                             >
                                 <IconWrap size="lg" theme={vertical === 'transport' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
-                                    <Car className={`w-6 h-6 ${vertical === 'transport' ? 'text-sky-400' : 'text-white/40'}`} />
+                                    <Car className={`w-6 h-6 ${vertical === 'transport' ? 'text-info' : 'text-white/40'}`} />
                                 </IconWrap>
                                 <div className="text-center">
                                     <span className="heading-3 block">Transporte</span>
@@ -129,10 +129,10 @@ export const OnboardingFlow: React.FC = () => {
 
                             <button
                                 onClick={() => handleStep1Select('delivery')}
-                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'delivery' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'delivery' ? 'border-info bg-info/10' : ''}`}
                             >
                                 <IconWrap size="lg" theme={vertical === 'delivery' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
-                                    <Bike className={`w-6 h-6 ${vertical === 'delivery' ? 'text-sky-400' : 'text-white/40'}`} />
+                                    <Bike className={`w-6 h-6 ${vertical === 'delivery' ? 'text-info' : 'text-white/40'}`} />
                                 </IconWrap>
                                 <div className="text-center">
                                     <span className="heading-3 block">Delivery</span>
@@ -142,10 +142,10 @@ export const OnboardingFlow: React.FC = () => {
 
                             <button
                                 onClick={() => handleStep1Select('logistics')}
-                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'logistics' ? 'border-sky-500 bg-sky-500/10' : ''}`}
+                                className={`card-metric-interactive flex flex-col items-center gap-3 p-6 group transition-all ${vertical === 'logistics' ? 'border-info bg-info/10' : ''}`}
                             >
                                 <IconWrap size="lg" theme={vertical === 'logistics' ? 'accent' : 'neutral'} className="group-hover:scale-110 transition-transform">
-                                    <Truck className={`w-6 h-6 ${vertical === 'logistics' ? 'text-sky-400' : 'text-white/40'}`} />
+                                    <Truck className={`w-6 h-6 ${vertical === 'logistics' ? 'text-info' : 'text-white/40'}`} />
                                 </IconWrap>
                                 <div className="text-center">
                                     <span className="heading-3 block">Logística</span>
@@ -161,11 +161,11 @@ export const OnboardingFlow: React.FC = () => {
                         <div className="card-main space-y-6 relative overflow-hidden">
                             <div className="flex items-center gap-4 mb-4 relative z-10">
                                 <IconWrap size="lg" theme="accent">
-                                    <Car className="w-6 h-6 text-sky-400" />
+                                    <Car className="w-6 h-6 text-info" />
                                 </IconWrap>
                                 <div>
                                     <h2 id="step2-heading" ref={headingRef} tabIndex={-1} className="heading-2">Tu vehiculo</h2>
-                                    <p className="caption text-sky-400 mt-0.5">Paso 2 de 3</p>
+                                    <p className="caption text-info mt-0.5">Paso 2 de 3</p>
                                 </div>
                             </div>
 
@@ -231,7 +231,7 @@ export const OnboardingFlow: React.FC = () => {
                                 </Field>
 
                                 {/* Amortización — campos opcionales pero recomendados */}
-                                <div className="rounded-2xl border border-white/5 bg-white/[.02] p-4 space-y-4">
+                                <div className="rounded-2xl border border-white/5 bg-white/2 p-4 space-y-4">
                                     <p className="text-xs font-black text-white/30 uppercase tracking-widest">Amortización vehicular <span className="text-white/15">(opcional)</span></p>
                                     <p className="text-[11px] text-white/30">
                                         Con estos datos calculamos el costo real de desgaste de tu vehículo por km, separado del mantenimiento.
@@ -262,7 +262,7 @@ export const OnboardingFlow: React.FC = () => {
                             <Button type="button" onClick={() => setStep(1)} variant="ghost" className="flex-1">
                                 Atrás
                             </Button>
-                            <Button type="submit" variant="primary" className="flex-[2]">
+                            <Button type="submit" variant="primary" className="flex-2">
                                 Siguiente <ChevronRight className="w-5 h-5" />
                             </Button>
                         </div>
@@ -274,16 +274,16 @@ export const OnboardingFlow: React.FC = () => {
                         <div className="card-main space-y-6">
                             <div className="flex items-center gap-4 mb-2">
                                 <IconWrap size="lg" theme="accent">
-                                    <CheckCircle2 className="w-6 h-6 text-sky-400" />
+                                    <CheckCircle2 className="w-6 h-6 text-info" />
                                 </IconWrap>
                                 <div>
                                     <h2 id="step3-heading" ref={headingRef} tabIndex={-1} className="heading-2">Gastos activos</h2>
-                                    <p className="caption text-sky-400 mt-0.5">Paso 3 de 3</p>
+                                    <p className="caption text-info mt-0.5">Paso 3 de 3</p>
                                 </div>
                             </div>
 
                             <div className="card-section flex items-start gap-3">
-                                <Info className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" aria-hidden="true" />
+                                <Info className="w-5 h-5 text-info shrink-0 mt-0.5" aria-hidden="true" />
                                 <p className="feedback-info">El radar manejate usará estos datos para calcular tu ROI en tiempo real.</p>
                             </div>
 
@@ -304,7 +304,7 @@ export const OnboardingFlow: React.FC = () => {
                                         }
                                         icon={
                                             <IconWrap size="md" theme={expense.enabled ? 'accent' : 'neutral'} aria-hidden="true">
-                                                <CheckCircle2 className={`w-4 h-4 ${expense.enabled ? 'text-sky-300' : 'text-white/20'}`} />
+                                                <CheckCircle2 className={`w-4 h-4 ${expense.enabled ? 'text-info' : 'text-white/20'}`} />
                                             </IconWrap>
                                         }
                                     />

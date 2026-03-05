@@ -64,7 +64,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                     onClick={swapVehicle}
                     className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all active:scale-95"
                 >
-                    {vertical === 'transport' ? <Car className="w-3.5 h-3.5 text-sky-400" /> : <Bike className="w-3.5 h-3.5 text-amber-400" />}
+                    {vertical === 'transport' ? <Car className="w-3.5 h-3.5 text-info" /> : <Bike className="w-3.5 h-3.5 text-warning" />}
                     {vehicleName || 'Vehículo'}
                     <RefreshCw className="w-3 h-3 text-white/40 ml-1" />
                 </button>
@@ -72,10 +72,10 @@ export const ShiftSimulatorTab: React.FC = () => {
 
             {/* HEADER HERO - EL NÚMERO MÁGICO */}
             <div className="glass-card rounded-4xl p-6 border border-white/10 text-center relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 opacity-50" />
+                <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-error via-warning to-success opacity-50" />
 
                 <div className="w-12 h-12 bg-white/5 rounded-2xl mx-auto flex items-center justify-center mb-4">
-                    <Zap className="w-6 h-6 text-nodo-wine" />
+                    <Zap className="w-6 h-6 text-error" />
                 </div>
 
                 <h2 className="text-sm text-white/50 uppercase tracking-widest font-black mb-1">Costo Operativo</h2>
@@ -99,50 +99,50 @@ export const ShiftSimulatorTab: React.FC = () => {
 
                 <div className="grid gap-3">
                     {/* GREEN LAYER */}
-                    <div className="glass-card p-4 rounded-3xl border border-green-500/20 bg-green-500/[0.03] flex items-center gap-4 relative overflow-hidden">
-                        <div className="w-2 h-full absolute left-0 top-0 bg-green-500/50" />
-                        <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-                            <div className="w-4 h-4 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]" />
+                    <div className="glass-card p-4 rounded-3xl border border-success/20 bg-success/3 flex items-center gap-4 relative overflow-hidden">
+                        <div className="w-2 h-full absolute left-0 top-0 bg-success/50" />
+                        <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-success shadow-[0_0_10px_var(--color-success-glow)]" />
                         </div>
                         <div className="flex-1">
                             <h4 className="text-white font-black uppercase text-sm">Viaje Ideal</h4>
-                            <p className="text-xs text-green-100/50 leading-tight mt-0.5">Ganás más del doble</p>
+                            <p className="text-xs text-success/50 leading-tight mt-0.5">Ganás más del doble</p>
                         </div>
                         <div className="text-right">
                             <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Pedir más de</span>
-                            <span className="text-xl font-black text-green-400">${Math.round(greenMin)} <span className="text-xs opacity-50">/km</span></span>
+                            <span className="text-xl font-black text-success">${Math.round(greenMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
 
                     {/* YELLOW LAYER */}
-                    <div className="glass-card p-4 rounded-3xl border border-yellow-500/20 bg-yellow-500/[0.03] flex items-center gap-4 relative overflow-hidden">
-                        <div className="w-2 h-full absolute left-0 top-0 bg-yellow-500/50" />
-                        <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center shrink-0">
-                            <div className="w-4 h-4 rounded-full bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
+                    <div className="glass-card p-4 rounded-3xl border border-warning/20 bg-warning/3 flex items-center gap-4 relative overflow-hidden">
+                        <div className="w-2 h-full absolute left-0 top-0 bg-warning/50" />
+                        <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-warning shadow-[0_0_10px_var(--color-warning-glow)]" />
                         </div>
                         <div className="flex-1">
                             <h4 className="text-white font-black uppercase text-sm">Viaje Normal</h4>
-                            <p className="text-xs text-yellow-100/50 leading-tight mt-0.5">Cubre gastos y deja margen</p>
+                            <p className="text-xs text-warning/50 leading-tight mt-0.5">Cubre gastos y deja margen</p>
                         </div>
                         <div className="text-right">
                             <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Ronda los</span>
-                            <span className="text-xl font-black text-yellow-400">${Math.round(yellowMin)} <span className="text-xs opacity-50">/km</span></span>
+                            <span className="text-xl font-black text-warning">${Math.round(yellowMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
 
                     {/* RED LAYER */}
-                    <div className="glass-card p-4 rounded-3xl border border-red-500/20 bg-red-500/[0.03] flex items-center gap-4 relative overflow-hidden opacity-80">
-                        <div className="w-2 h-full absolute left-0 top-0 bg-red-500/50" />
-                        <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
-                            <div className="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                    <div className="glass-card p-4 rounded-3xl border border-error/20 bg-error/3 flex items-center gap-4 relative overflow-hidden opacity-80">
+                        <div className="w-2 h-full absolute left-0 top-0 bg-error/50" />
+                        <div className="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-error shadow-[0_0_10px_var(--color-error-glow)]" />
                         </div>
                         <div className="flex-1">
                             <h4 className="text-white font-black uppercase text-sm">Viaje Trampa</h4>
-                            <p className="text-xs text-red-100/50 leading-tight mt-0.5">Estás pagando por trabajar</p>
+                            <p className="text-xs text-error/50 leading-tight mt-0.5">Estás pagando por trabajar</p>
                         </div>
                         <div className="text-right">
                             <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Menos de</span>
-                            <span className="text-xl font-black text-red-400">${Math.round(yellowMin - 1)} <span className="text-xs opacity-50">/km</span></span>
+                            <span className="text-xl font-black text-error">${Math.round(yellowMin - 1)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ export const ShiftSimulatorTab: React.FC = () => {
             {/* TIRE SIMULATION */}
             <div className="glass-card rounded-3xl p-5 border border-white/5 space-y-4">
                 <div className="flex items-center gap-2">
-                    <Car className="w-4 h-4 text-nodo-accent" />
+                    <Car className="w-4 h-4 text-success" />
                     <h3 className="text-xs font-black text-white uppercase tracking-widest">Simular Distancia</h3>
                 </div>
 
@@ -167,7 +167,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                         step="1"
                         value={simulatedDistance}
                         onChange={(e) => setSimulatedDistance(Number(e.target.value))}
-                        className="w-full accent-nodo-accent bg-white/10 rounded-full h-2 appearance-none outline-none"
+                        className="w-full accent-success bg-white/10 rounded-full h-2 appearance-none outline-none"
                     />
                     <div className="flex justify-between text-[10px] text-white/30 uppercase font-black mt-2">
                         <span>Corto (1km)</span>
@@ -182,8 +182,8 @@ export const ShiftSimulatorTab: React.FC = () => {
                     </div>
                     <ArrowRight className="w-5 h-5 text-white/20" />
                     <div className="text-right">
-                        <span className="block text-[10px] uppercase text-green-400/50 font-bold mb-1">Para clavar un viaje ideal:</span>
-                        <span className="text-2xl font-black text-green-400">${simGreen}</span>
+                        <span className="block text-[10px] uppercase text-success/50 font-bold mb-1">Para clavar un viaje ideal:</span>
+                        <span className="text-2xl font-black text-success">${simGreen}</span>
                     </div>
                 </div>
             </div>

@@ -33,7 +33,7 @@ export const Field: React.FC<FieldProps> = ({
             <label htmlFor={id} className="label-base ml-1">
                 {label}
                 {required && (
-                    <span className="text-sky-500 ml-1" aria-hidden="true">*</span>
+                    <span className="text-info ml-1" aria-hidden="true">*</span>
                 )}
             </label>
 

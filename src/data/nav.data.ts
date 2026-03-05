@@ -5,7 +5,7 @@
  * Al separar los datos del presentacional, cambiar labels o el
  * orden de tabs no requiere tocar el componente.
  */
-import { Calculator, BarChart3, History, User, Zap } from '../lib/icons';
+import { NotebookPen, TimerReset, History, User, Home } from '../lib/icons';
 import type { LucideIcon } from '../lib/icons';
 import type { TabId } from '../components/ui/organisms/BottomNavigation';
 
@@ -19,9 +19,9 @@ export interface NavTab {
 }
 
 export const NAV_TABS: NavTab[] = [
-  { id: 'simulator',  label: 'Turno',    icon: Zap         },
-  { id: 'calculator', label: 'Cierre',   icon: Calculator  },
-  { id: 'history',    label: 'Historial', icon: History    },
-  { id: 'analysis',   label: 'Análisis', icon: BarChart3, hideOnXS: true },
-  { id: 'profile',    label: 'Perfil',   icon: User        },
+  { id: 'home',    label: 'Inicio',    icon: Home         },
+  { id: 'trips',   label: 'Viajes', icon: NotebookPen },
+  { id: 'close',   label: 'Cierre',    icon: TimerReset  },
+  { id: 'history', label: 'Historial', icon: History     },
+  { id: 'profile', label: 'Perfil',    icon: User        },
 ];

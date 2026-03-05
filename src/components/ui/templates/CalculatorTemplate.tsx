@@ -12,10 +12,10 @@ import { PartyPopper } from '../../../lib/icons';
 import { TabSkeleton } from "../molecules/TabSkeleton";
 
 // Lazy Loaded Tabs (Code Splitting)
-const CalculatorTab = lazy(() => import("../organisms/Tabs/CalculatorTab").then(m => ({ default: m.CalculatorTab })));
+const TripsTab = lazy(() => import("../organisms/Tabs/TripsTab").then(m => ({ default: m.TripsTab })));
+const ShiftCloseTab = lazy(() => import("../organisms/Tabs/ShiftCloseTab").then(m => ({ default: m.ShiftCloseTab })));
 const ShiftSimulatorTab = lazy(() => import("../organisms/Tabs/ShiftSimulatorTab").then(m => ({ default: m.ShiftSimulatorTab })));
 const HistoryTab = lazy(() => import("../organisms/Tabs/HistoryTab").then(m => ({ default: m.HistoryTab })));
-const SessionAnalysis = lazy(() => import("../organisms/Tabs/SessionAnalysis").then(m => ({ default: m.SessionAnalysis })));
 const ProfileTab = lazy(() => import("../organisms/Tabs/ProfileTab").then(m => ({ default: m.ProfileTab })));
 
 // Refactored Tabs
@@ -114,12 +114,16 @@ const CalculatorApp: React.FC = () => {
       {/* Contenedor Principal de Pestañas */}
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
         <Suspense fallback={<TabSkeleton />}>
-          {activeTab === "simulator" && <ShiftSimulatorTab />}
+          {activeTab === "home" && <ShiftSimulatorTab />}
 
-          {activeTab === "calculator" && (
+          {activeTab === "trips" && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <CalculatorTab />
+              <TripsTab />
             </div>
+          )}
+
+          {activeTab === "close" && (
+            <ShiftCloseTab onNavigateTrips={() => setActiveTab('trips')} />
           )}
 
           {activeTab === "history" && (
@@ -130,17 +134,6 @@ const CalculatorApp: React.FC = () => {
               }}
               onDeleteTrip={deleteTrip}
             />
-          )}
-
-          {activeTab === "analysis" && (
-            <div className="space-y-6 animate-in fade-in duration-500">
-              <SessionAnalysis
-                trips={sessionTrips}
-                onClear={() => {
-                  if (confirm("¿Borrar historial?")) clearSession();
-                }}
-              />
-            </div>
           )}
 
           {activeTab === "profile" && (

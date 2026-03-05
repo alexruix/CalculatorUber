@@ -31,7 +31,7 @@ export const Label: React.FC<LabelProps> = ({
     <label className={cn(sizeMap[size], 'ml-1 select-none', className)} {...props}>
         {children}
         {required && (
-            <span className="ml-1 text-red-400" aria-hidden="true">*</span>
+            <span className="ml-1 text-error" aria-hidden="true">*</span>
         )}
     </label>
 );

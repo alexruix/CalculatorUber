@@ -75,7 +75,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
             />
 
             {/* Modal Content */}
-            <div className="relative bg-nodo-wine/10 border border-nodo-wine/30 rounded-[2.5rem] w-full max-w-sm p-8 flex flex-col items-center text-center shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="relative bg-error/10 border border-error/30 rounded-4xl w-full max-w-sm p-8 flex flex-col items-center text-center shadow-2xl animate-in zoom-in-95 duration-300">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-white/40 hover:text-white bg-white/5 rounded-full transition-colors"
@@ -83,12 +83,12 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
                     <X className="w-5 h-5" />
                 </button>
 
-                <div className="w-16 h-16 bg-gradient-to-tr from-nodo-wine to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-nodo-wine/20">
+                <div className="w-16 h-16 bg-linear-to-tr from-error to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-error/20">
                     <Star className="w-8 h-8 text-white fill-white/20" />
                 </div>
 
                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">
-                    Manejate <span className="text-nodo-wine">PRO</span>
+                    Manejate <span className="text-error">PRO</span>
                 </h2>
 
                 <p className="text-sm font-medium text-white/50 leading-relaxed mb-8">
@@ -123,7 +123,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
                     <button
                         onClick={handleUpgrade}
                         disabled={isLoading}
-                        className="btn-primary w-full h-14 text-sm gap-2 shadow-[0_0_30px_rgba(233,69,96,0.3)] bg-gradient-to-r from-nodo-wine to-red-600 border-none group disabled:opacity-50"
+                        className="btn-primary w-full h-14 text-sm gap-2 shadow-[0_0_30px_rgba(233,69,96,0.3)] bg-linear-to-r from-error to-red-600 border-none group disabled:opacity-50"
                     >
                         {isLoading ? (
                             <span className="animate-pulse">Asegurando conexión...</span>

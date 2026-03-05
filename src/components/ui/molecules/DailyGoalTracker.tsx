@@ -92,11 +92,10 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
       {/* Progress section — only shown if goal is set */}
       {dailyGoal > 0 && (
         <div
-          className={`p-4 rounded-3xl border transition-all duration-500 ${
-            isReached
-              ? "bg-green-500/10 border-green-500/30"
+          className={`p-4 rounded-3xl border transition-all duration-500 ${isReached
+              ? "bg-success/10 border-success/30"
               : "bg-white/3 border-white/[0.07]"
-          }`}
+            }`}
           role="status"
           aria-label={`Progreso diario: ${progressPct}% de la meta alcanzado`}
         >
@@ -107,7 +106,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
                 Ganado hoy
               </p>
               <p
-                className={`text-2xl font-black ${isReached ? "text-green-400" : "text-white"}`}
+                className={`text-2xl font-black ${isReached ? "text-success" : "text-white"}`}
               >
                 ${todayNet.toLocaleString("es-AR")}
               </p>
@@ -117,7 +116,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
                 {isReached ? "¡Meta!" : "Faltan"}
               </p>
               <p
-                className={`text-base font-black ${isReached ? "text-green-400" : "text-white/60"}`}
+                className={`text-base font-black ${isReached ? "text-success" : "text-white/60"}`}
               >
                 {isReached ? "🎯" : `$${remaining.toLocaleString("es-AR")}`}
               </p>

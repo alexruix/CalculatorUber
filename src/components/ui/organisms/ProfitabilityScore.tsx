@@ -20,10 +20,10 @@ interface ProfitabilityScoreProps {
 
 const getTheme = (status: TripMetrics['status']): ProfitabilityTheme => {
     const themes: Record<TripMetrics['status'], ProfitabilityTheme> = {
-        excellent: { card: 'score-card-excellent', text: 'text-green-400', label: PROFITABILITY.statusLabels.excellent },
-        fair: { card: 'score-card-fair', text: 'text-amber-400', label: PROFITABILITY.statusLabels.fair },
-        poor: { card: 'score-card-poor', text: 'text-red-400', label: PROFITABILITY.statusLabels.poor },
-        danger: { card: 'score-card-danger', text: 'text-red-400', label: PROFITABILITY.statusLabels.danger },
+        excellent: { card: 'score-card-excellent', text: 'text-success', label: PROFITABILITY.statusLabels.excellent },
+        fair: { card: 'score-card-fair', text: 'text-warning', label: PROFITABILITY.statusLabels.fair },
+        poor: { card: 'score-card-poor', text: 'text-error', label: PROFITABILITY.statusLabels.poor },
+        danger: { card: 'score-card-poor', text: 'text-error', label: PROFITABILITY.statusLabels.danger },
         neutral: { card: 'score-card-neutral', text: 'text-white/20', label: PROFITABILITY.statusLabels.neutral },
     };
     return themes[status];
@@ -64,7 +64,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
             />
 
             {/* Estado */}
-            <span className={`text-[var(--text-micro)] font-black tracking-widest uppercase ${theme.text}`}>
+            <span className={`text-(--text-micro) font-black tracking-widest uppercase ${theme.text}`}>
                 {theme.label}
             </span>
 
@@ -81,7 +81,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
 
             {/* Métricas secundarias */}
             {metrics.isValid && (
-                <div className="mt-3 flex items-center justify-center gap-3 text-[var(--text-caption)] text-white/60 font-medium relative z-10 flex-wrap">
+                <div className="mt-3 flex items-center justify-center gap-3 text-(--text-caption) font-medium relative z-10 flex-wrap">
                     <span>
                         {PROFITABILITY.netLabel}:{' '}
                         <b className="text-white font-black">
@@ -91,7 +91,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
                     <span className="opacity-20" aria-hidden="true">|</span>
                     <span>
                         {PROFITABILITY.costLabel}:{' '}
-                        <b className="text-red-400/80 font-black">
+                        <b className="text-error/80 font-black">
                             ${Math.round(metrics.totalCost).toLocaleString('es-AR')}
                         </b>
                     </span>
@@ -101,7 +101,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
             {/* ROI + Insight */}
             {metrics.isValid && (
                 <div className="mt-5 pt-4 border-t border-white/5 flex flex-col items-center animate-in fade-in slide-in-from-top-2 duration-700">
-                    <p className="caption tracking-widest text-[var(--text-micro)]">
+                    <p className="caption tracking-widest text-(--text-micro)">
                         {roiLabel}
                     </p>
                     <p className="text-white font-black text-lg mt-1">
@@ -110,7 +110,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
                             {PROFITABILITY.roiUnit}
                         </span>
                     </p>
-                    <p className="text-[var(--text-caption)] text-white/20 mt-1.5 max-w-[220px] leading-relaxed font-bold tracking-tight">
+                    <p className="text-(--text-caption) mt-1.5 max-w-[220px] leading-relaxed font-bold tracking-tight">
                         {getInsight(metrics.roi, vertical)}
                     </p>
                 </div>

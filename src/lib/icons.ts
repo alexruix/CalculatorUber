@@ -58,5 +58,6 @@ export {
   Truck,
   User,
   X,
-  Zap
+  Zap,
+  Home
 } from 'lucide-react';

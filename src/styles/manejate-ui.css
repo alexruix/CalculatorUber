@@ -59,9 +59,6 @@
   --color-accent: var(--brand-sea);
   --color-accent-dark: #5B8DAD;
   --color-accent-glow: rgba(122, 170, 206, 0.35);
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
 
   /* ── Focus ring ──────────────────────────────────────────────────────── */
   --ring-color: rgba(255, 255, 255, 0.9);
@@ -279,9 +276,9 @@
      ========================================================================= */
 
   /* Primario — 1 por pantalla
-     text-slate-950 (#020617) sobre sky-500 (#0ea5e9) = 5.1:1 ✅ */
+     text-slate-950 (#020617) sobre info (#0ea5e9) = 5.1:1 ✅ */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-sky-500 text-slate-950 hover:bg-sky-400 active:bg-sky-600 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-info text-slate-950 hover:bg-info/90 active:bg-info active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
     box-shadow: var(--shadow-accent);
   }
 
@@ -292,9 +289,9 @@
   }
 
   /* Destructivo — borrado / acciones irreversibles
-     text-red-300 (~6:1) sobre bg-red-500/8 ✅ */
+     text-error/80 (~6:1) sobre bg-error/8 ✅ */
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-red-500/[0.08] text-red-300 border border-red-500/25 hover:bg-red-500/[0.15] hover:text-red-200 hover:border-red-500/40 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-error/[0.08] text-error border border-error/25 hover:bg-error/[0.15] hover:text-white/80 hover:border-error/40 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
   /* Fantasma — "Volver", acciones de baja prioridad
@@ -322,15 +319,15 @@
   }
 
   .input-focus {
-    @apply focus:border-sky-500/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-sky-500/20;
+    @apply focus:border-info/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-info/20;
   }
 
   .input-error {
-    @apply border-red-500/50 bg-red-500/[0.04] focus:border-red-500/70 focus:ring-2 focus:ring-red-500/15;
+    @apply border-error/50 bg-error/[0.04] focus:border-error/70 focus:ring-2 focus:ring-error/15;
   }
 
   .input-success {
-    @apply border-green-500/40 bg-green-500/[0.03] focus:border-green-500/60 focus:ring-2 focus:ring-green-500/10;
+    @apply border-success/40 bg-success/[0.03] focus:border-success/60 focus:ring-2 focus:ring-success/10;
   }
 
 
@@ -343,22 +340,22 @@
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
   }
 
-  /* text-sky-300 (#7dd3fc) sobre fondo ~#0c1a25 → ~8:1 ✅ */
+  /* text-info (#0ea5e9) sobre fondo ~#0c1a25 → ~8:1 ✅ */
   .badge-accent {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-sky-500/15 text-sky-300 border-sky-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-info/15 text-info border-info/25;
   }
 
-  /* text-green-300 (#86efac) → ~8:1 ✅ */
+  /* text-success (#86efac) → ~8:1 ✅ */
   .badge-success {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-green-500/15 text-green-300 border-green-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-success/15 text-success border-success/25;
   }
 
   .badge-warning {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-amber-500/15 text-amber-300 border-amber-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-warning/15 text-warning border-warning/25;
   }
 
   .badge-error {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-red-500/15 text-red-300 border-red-500/25;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-error/15 text-error border-error/25;
   }
 
 
@@ -383,22 +380,22 @@
 
   /* Colores — se combinan con una clase de tamaño */
   .icon-wrap-accent {
-    @apply bg-sky-500/[0.12] border-sky-500/25;
+    @apply bg-info/[0.12] border-info/25 text-info;
     box-shadow: inset 0 0 12px rgba(14, 165, 233, 0.08);
   }
 
   .icon-wrap-success {
-    @apply bg-green-500/[0.12] border-green-500/25;
+    @apply bg-success/[0.12] border-success/25 text-success;
     box-shadow: inset 0 0 12px rgba(34, 197, 94, 0.08);
   }
 
   .icon-wrap-warning {
-    @apply bg-amber-500/[0.12] border-amber-500/25;
+    @apply bg-warning/[0.12] border-warning/25 text-warning;
     box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.08);
   }
 
   .icon-wrap-error {
-    @apply bg-red-500/[0.12] border-red-500/25;
+    @apply bg-error/[0.12] border-error/25 text-error;
     box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.08);
   }
 
@@ -414,19 +411,19 @@
      ========================================================================= */
 
   .feedback-error {
-    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-red-400;
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-error;
   }
 
   .feedback-success {
-    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-green-400;
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-success;
   }
 
   .feedback-warning {
-    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-amber-400;
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-warning;
   }
 
   .feedback-info {
-    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-sky-400;
+    @apply flex items-start gap-2 text-xs font-semibold leading-relaxed text-info;
   }
 
 
@@ -462,7 +459,7 @@
   /* Variante de card-section para viajes con pérdida (netMargin < 0)
      Se aplica junto a card-section: <div class="card-section card-section-danger"> */
   .card-section-danger {
-    @apply border-red-500/25 bg-red-500/[0.03];
+    @apply border-error/25 bg-error/[0.03];
   }
 
   /* Variante de card-metric sin padding ni text-center — para métricas en fila
@@ -501,12 +498,12 @@
 
   /* Valor positivo (ganancia neta, margen, ingresos) */
   .trip-value-positive {
-    @apply text-green-400 font-black;
+    @apply text-success font-black;
   }
 
   /* Valor negativo (pérdida, margen negativo) */
   .trip-value-negative {
-    @apply text-red-400 font-black;
+    @apply text-error font-black;
   }
 
   /* Valor neutro / tarifa bruta */
@@ -543,7 +540,7 @@
      ========================================================================= */
 
   .toggle-row-on {
-    @apply w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl border-2 text-left cursor-pointer transition-all duration-200 border-sky-500/50 bg-sky-500/[0.10] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl border-2 text-left cursor-pointer transition-all duration-200 border-info/50 bg-info/[0.10] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .toggle-row-off {
@@ -552,7 +549,7 @@
 
   /* Indicadores — AUTOCONTENIDOS, no referencian .toggle-indicator vía @apply */
   .toggle-indicator-on {
-    @apply w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all duration-200 border-sky-500 bg-sky-500;
+    @apply w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all duration-200 border-info bg-info;
   }
 
   .toggle-indicator-off {
@@ -606,7 +603,7 @@
     letter-spacing: 0.18em;
     line-height: 1;
     transition: color 300ms ease;
-    @apply text-sky-400;
+    @apply text-info;
   }
 
   /* text-white/50 (~7.5:1) ✅ */
@@ -693,15 +690,15 @@
      ========================================================================= */
 
   .score-card-excellent {
-    @apply border-2 border-green-500 bg-green-500/10;
+    @apply border-2 border-success bg-success/10;
   }
 
   .score-card-fair {
-    @apply border-2 border-amber-500 bg-amber-500/10;
+    @apply border-2 border-warning bg-warning/10;
   }
 
   .score-card-poor {
-    @apply border-2 border-red-500 bg-red-500/10;
+    @apply border-2 border-error bg-error/10;
   }
 
   .score-card-neutral {

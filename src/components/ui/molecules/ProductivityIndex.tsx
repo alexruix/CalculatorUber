@@ -31,7 +31,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-nodo-accent" aria-hidden="true" />
+                    <Zap className="w-4 h-4 text-success" aria-hidden="true" />
                     <h3
                         className="font-black text-white uppercase tracking-widest"
                         style={{ fontSize: 'var(--text-micro)' }}
@@ -58,24 +58,24 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                         width: `${activePercent}%`,
                         transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)`, /* Fluent decelerate */
                     }}
-                    className="bg-nodo-accent h-full relative"
+                    className="bg-success h-full relative"
                 >
                     <div className="absolute inset-0 bg-white/20 animate-[pulse_2s_ease-in-out_infinite] motion-reduce:animate-none" />
                 </div>
                 <div
                     style={{ width: `${idlePercent}%`, transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)` }}
-                    className="bg-[#111] border-y border-r border-red-500/20 h-full"
+                    className="bg-[#111] border-y border-r border-error/20 h-full"
                 />
             </div>
 
             {/* Leyenda */}
             <div className="flex justify-between" style={{ fontSize: 'var(--text-caption)' }}>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-nodo-accent shrink-0" aria-hidden="true" />
+                    <div className="w-2 h-2 rounded-full bg-success shrink-0" aria-hidden="true" />
                     <span className="text-white/60 font-bold">{PRODUCTIVITY.producing(fmt(activeTime))}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-red-500/50 shrink-0" aria-hidden="true" />
+                    <div className="w-2 h-2 rounded-full bg-error/50 shrink-0" aria-hidden="true" />
                     <span className="text-white/60 font-bold">{PRODUCTIVITY.idle(fmt(idleTime))}</span>
                 </div>
             </div>
@@ -87,7 +87,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                         style={{ fontSize: 'var(--text-micro)' }}>
                         {PRODUCTIVITY.ephLabel}
                     </span>
-                    <span className="text-base font-black text-brand-sea">
+                    <span className="text-base font-black text-info">
                         ${eph.toLocaleString('es-AR')}
                         <span className="text-xs opacity-50">/hr</span>
                     </span>

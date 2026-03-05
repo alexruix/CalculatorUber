@@ -1,40 +1,50 @@
 import React, { useMemo } from 'react';
-import { AlertTriangle, RotateCcw, Activity } from '../../../../lib/icons';
+import { AlertTriangle, RotateCcw } from '../../../../lib/icons';
 import { useProfileStore } from '../../../../store/useProfileStore';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
 import { useProfitability } from '../../../../hooks/useProfitability';
 import type { SavedTrip } from '../../../../types/calculator.types';
 
-// Components
+// Componentes
 import { ProfitabilityScore } from '../ProfitabilityScore';
 import { TripInputForm } from '../TripInputForm';
 import { MiniSummary } from '../../molecules/MiniSummary';
-import { ProductivityIndex } from '../../molecules/ProductivityIndex';
 
-export const CalculatorTab: React.FC = () => {
-    // Stores
+export const TripsTab: React.FC = () => {
     const { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings, vertical } = useProfileStore();
     const {
-        fare, distTrip, duration, activeTime, tip, tolls,
+        fare, distTrip, duration, startTime, tip, tolls,
         sessionTrips, addTrip, resetInputs
     } = useCalculatorStore();
 
-    // Logic — pass amortizationPerKm separately from maintPerKm
+    // Convertimos duration (minutos) a horas para la lógica interna de rentabilidad (preview)
+    const durationHours = (parseFloat(duration) || 0) / 60;
+
     const metrics = useProfitability(
-        { fare, distTrip, distPickup: '0', tip, tolls, activeTime },
+        { fare, distTrip, distPickup: '0', tip, tolls, activeTime: durationHours.toString() },
         vertical,
         { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings }
     );
 
-    const totalMargin = useMemo(() => sessionTrips.reduce((acc, t) => acc + t.margin, 0), [sessionTrips]);
+    // Filtramos los viajes para mostrar en el MiniSummary SÓLO los de hoy
+    const tripsToday = useMemo(() => {
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        return sessionTrips.filter(t => t.timestamp >= startOfToday);
+    }, [sessionTrips]);
+
+    const totalMargin = useMemo(() => tripsToday.reduce((acc, t) => acc + t.margin, 0), [tripsToday]);
+    const tripCount = tripsToday.length;
+
+    // Calculamos el EPH de hoy
     const totalEPH = useMemo(() => {
-        const withTime = sessionTrips.filter(t => (t.activeTime || 0) > 0);
+        const withTime = tripsToday.filter(t => (t.duration || 0) > 0);
         if (!withTime.length) return 0;
         const totalNet = withTime.reduce((acc, t) => acc + t.margin, 0);
-        const totalTime = withTime.reduce((acc, t) => acc + (t.activeTime || 0), 0);
-        return totalTime > 0 ? Math.round(totalNet / totalTime) : 0;
-    }, [sessionTrips]);
-    const tripCount = sessionTrips.length;
+        const totalMins = withTime.reduce((acc, t) => acc + (t.duration || 0), 0);
+        const hours = totalMins / 60;
+        return hours > 0 ? Math.round(totalNet / hours) : 0;
+    }, [tripsToday]);
 
     const saveTrip = () => {
         if (!metrics.isValid) return;
@@ -43,8 +53,8 @@ export const CalculatorTab: React.FC = () => {
             fare: parseFloat(fare),
             margin: metrics.netMargin,
             distance: parseFloat(distTrip) || 0,
-            duration: parseFloat(duration) || 0,
-            activeTime: parseFloat(activeTime) || 0,
+            duration: parseFloat(duration) || 0, // se guarda en minutos
+            startTime: startTime || undefined,
             timestamp: Date.now(),
             vertical: vertical || undefined,
             tip: parseFloat(tip) || 0,
@@ -56,13 +66,13 @@ export const CalculatorTab: React.FC = () => {
 
     return (
         <div className="pb-32 space-y-5 animate-in fade-in duration-500">
-            {/* 1. Score de Rentabilidad */}
-            <div className="sticky top-0 z-20 bg-black/80 supports-[backdrop-filter]:backdrop-blur-md -mx-4 px-4 py-4 border-b border-white/5">
+            {/* 1. Score de Rentabilidad (Preview) */}
+            <div className="sticky top-0 z-20 bg-black/80 supports-backdrop-filter:backdrop-blur-md -mx-4 px-4 py-4 border-b border-white/5">
                 <ProfitabilityScore metrics={metrics} />
             </div>
 
             <div className="space-y-6">
-                {/* 2. Resumen acumulado de turnos */}
+                {/* 2. Resumen acumulado de turnos de HOY */}
                 {tripCount > 0 && (
                     <MiniSummary totalMargin={totalMargin} tripCount={tripCount} eph={totalEPH} />
                 )}
@@ -77,16 +87,7 @@ export const CalculatorTab: React.FC = () => {
                     </div>
                 )}
 
-                {/* 4. Índice de Productividad */}
-                {parseFloat(activeTime) > 0 && parseFloat(duration) > 0 && (
-                    <ProductivityIndex
-                        activeTime={parseFloat(activeTime)}
-                        totalTime={parseFloat(duration)}
-                        eph={metrics.profitPerHour}
-                    />
-                )}
-
-                {/* 5. Formulario de Ingreso */}
+                {/* 4. Formulario de Ingreso */}
                 <TripInputForm onSave={saveTrip} isValid={metrics.isValid} />
 
                 {/* Acción de Limpieza */}

@@ -7,7 +7,8 @@
  *
  * Namespaces:
  *  · PROFITABILITY  → ProfitabilityScore
- *  · SHIFT_FORM     → TripInputForm (Cierre de Turno)
+ *  · TRIP_FORM      → TripInputForm (Mis Viajes)
+ *  · SHIFT_CLOSE    → ShiftCloseForm (Cierre de Turno)
  *  · HISTORY        → HistoryTab
  *  · ONBOARDING     → OnboardingFlow
  *  · COMMON         → Strings reutilizables
@@ -73,44 +74,69 @@ export const PROFITABILITY = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────
-// SHIFT FORM — Cierre de Turno
+// TRIP FORM — Mis Viajes
 // ─────────────────────────────────────────────────────────────
-export const SHIFT_FORM = {
-  sectionTitle:   'Carga Diaria',
-  sectionSubtitle: 'Resumen final de tu jornada de trabajo',
+export const TRIP_FORM = {
+  sectionTitle:   'Carga tu viaje',
+  sectionSubtitle: 'Datos tal cual figuran en el historial de la app',
 
   fields: {
     fare: {
-      label:       'Recaudación Total',
-      adjustMinus: 'Restar 5000',
-      adjustPlus:  'Sumar 5000',
+      label:       'Tarifa cobrada',
+      adjustMinus: 'Restar 1000',
+      adjustPlus:  'Sumar 1000',
     },
     distance: {
-      label:       'Kilómetros Totales',
-      placeholder: 'KM de tu odómetro',
+      label:       'Kilómetros del viaje',
+      placeholder: 'Ej: 12.5',
     },
     duration: {
-      label:       'Horas Conectado',
-      placeholder: 'Hs totales',
+      label:       'Duración (minutos)',
+      placeholder: 'Ej: 45',
     },
-    activeTime: {
-      label:       'Horas en Viaje',
-      placeholder: 'Hs activas',
-      hint:        'Del resumen de tu app (Uber, Rappi, etc.)',
+    startTime: {
+      label:       'Hora de inicio',
+      placeholder: 'HH:MM (Opcional)',
+      hint:        'Para calcular tiempo de espera entre viajes',
     },
     tips: {
       label:       'Propinas',
       placeholder: '0',
     },
     expenses: {
-      label:       'Gastos Extras',
+      label:       'Peajes/Extras del viaje',
       placeholder: '0',
-      hint:        'Peajes, comida, etc.',
     },
   },
 
-  saveButton: 'Cerrar Turno',
+  saveButton: 'Guardar Viaje',
   clearButton: 'Limpiar Formulario',
+} as const;
+
+// ─────────────────────────────────────────────────────────────
+// SHIFT CLOSE — Cierre de Turno
+// ─────────────────────────────────────────────────────────────
+export const SHIFT_CLOSE = {
+  sectionTitle: 'Cierre de Jornada',
+  sectionSubtitle: 'Tirá los números finales para tu balance',
+  
+  fields: {
+    shiftStartTime: { label: 'Hora de inicio del turno', placeholder: 'HH:MM' },
+    shiftEndTime: { label: 'Hora de fin del turno', placeholder: 'HH:MM' },
+    odometerStart: { label: 'KM Odómetro Inicial', placeholder: 'Ej: 125000 (Opcional)' },
+    odometerEnd: { label: 'KM Odómetro Final', placeholder: 'Ej: 125150 (Opcional)' },
+    extraExpenses: { label: 'Gastos extras del día', placeholder: 'Comida, café, etc. (Opcional)', hint: 'Se restan de tu ganancia final' },
+  },
+  
+  saveButton: 'Cerrar Jornada',
+  clearButton: 'Limpiar Cierre',
+  
+  excessiveIdleWarning: {
+    title: (percent: number) => `Detectamos mucho tiempo muerto (${percent}%)`,
+    body: '¿Te olvidaste de cargar algún viaje?',
+    addTripBtn: '+ Cargar viaje perdido',
+    dismissBtn: 'No, todo bien'
+  }
 } as const;
 
 // ─────────────────────────────────────────────────────────────

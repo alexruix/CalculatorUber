@@ -23,6 +23,12 @@
   /* Alias para componentes que usan text-nodo-accent */
   --color-nodo-accent: #7AAACE;
 
+  /* ── Semantic State Colors (Fluent 2) ───────────────────────── */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+
   /* ── Superficies (Dark Mode / Conducción) ─────────────────── */
   --color-dark-bg: #0a0a0a;
   --color-dark-card: #151515;

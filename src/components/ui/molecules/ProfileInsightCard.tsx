@@ -42,7 +42,7 @@ export const ProfileInsightCard: React.FC<ProfileInsightCardProps> = ({
         className="icon-wrap-md icon-wrap-accent shrink-0 mt-0.5"
         aria-hidden="true"
       >
-        <Zap size={18} className="text-sky-300" />
+        <Zap size={18} className="text-info" />
       </div>
 
       <div className="flex-1 min-w-0">

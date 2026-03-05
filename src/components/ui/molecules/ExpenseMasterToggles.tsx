@@ -75,7 +75,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
       {/* Live preview pill */}
       <div className="flex items-center justify-between px-1 mb-2">
         <span className="label-base">Incluir en el Costo</span>
-        <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.10] rounded-2xl px-4 py-2">
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-4 py-2">
           <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">
             Costo/KM
           </span>
@@ -122,7 +122,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
                 >
                   <Icon
                     size={18}
-                    className={isOn ? "text-sky-300" : "text-white/40"}
+                    className={isOn ? "text-info" : "text-white/40"}
                   />
                 </div>
 
@@ -140,11 +140,10 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
                 {/* Preview of cost impact when toggling */}
                 {diff !== 0 && (
                   <span
-                    className={`text-[10px] font-black uppercase tracking-tight flex items-center gap-0.5 ${
-                      isOn
-                        ? "text-green-400" // turning OFF → cost goes down → green
-                        : "text-red-400" // turning ON  → cost goes up   → red
-                    }`}
+                    className={`text-[10px] font-black uppercase tracking-tight flex items-center gap-0.5 ${isOn
+                      ? "text-success" // turning OFF → cost goes down → green
+                      : "text-error" // turning ON  → cost goes up   → red
+                      }`}
                     aria-hidden="true"
                   >
                     {isOn ? (
@@ -172,10 +171,10 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
       {/* Education note */}
       <div
         role="note"
-        className="flex items-start gap-3 p-3.5 bg-white/[0.03] rounded-2xl border border-white/[0.07]"
+        className="flex items-start gap-3 p-3.5 bg-white/3 rounded-2xl border border-white/7"
       >
         <span
-          className="text-sky-400 text-lg leading-none shrink-0"
+          className="text-info text-lg leading-none shrink-0"
           aria-hidden="true"
         >
           💡

@@ -1,24 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { SavedTrip } from '../types/calculator.types';
+import type { SavedTrip, ShiftClose } from '../types/calculator.types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useProfileStore } from './useProfileStore';
 
-export type TabId = 'simulator' | 'calculator' | 'history' | 'analysis' | 'profile';
+export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
 
 interface CalculatorState {
-    // Inputs del form
+    // Inputs del form del VIAJE
     fare: string;
     distTrip: string;
     distPickup: string;
     duration: string;
-    activeTime: string;
     tip: string;
-    waitTime: string;
     tolls: string;
+    startTime: string; // "HH:MM"
 
-    // Controles de entorno
-    isHeavyTraffic: boolean;
+    // Datos del CIERRE de turno
+    shiftClose: ShiftClose | null;
 
     // Sesión y navegación
     activeTab: TabId;
@@ -29,11 +28,10 @@ interface CalculatorState {
     setDistTrip: (val: string) => void;
     setDistPickup: (val: string) => void;
     setDuration: (val: string) => void;
-    setActiveTime: (val: string) => void;
     setTip: (val: string) => void;
-    setWaitTime: (val: string) => void;
     setTolls: (val: string) => void;
-    setIsHeavyTraffic: (val: boolean) => void;
+    setStartTime: (val: string) => void;
+    setShiftClose: (data: ShiftClose | null) => void;
     setActiveTab: (tab: TabId) => void;
 
     // Trip management
@@ -52,27 +50,53 @@ export const useCalculatorStore = create<CalculatorState>()(
             distTrip: '',
             distPickup: '',
             duration: '',
-            activeTime: '',
             tip: '',
-            waitTime: '',
             tolls: '',
-            isHeavyTraffic: false,
-            activeTab: 'simulator',
+            startTime: '',
+            shiftClose: null,
+            activeTab: 'home',
             sessionTrips: [],
 
             setFare: (val) => set({ fare: val }),
             setDistTrip: (val) => set({ distTrip: val }),
             setDistPickup: (val) => set({ distPickup: val }),
             setDuration: (val) => set({ duration: val }),
-            setActiveTime: (val) => set({ activeTime: val }),
             setTip: (val) => set({ tip: val }),
-            setWaitTime: (val) => set({ waitTime: val }),
             setTolls: (val) => set({ tolls: val }),
-            setIsHeavyTraffic: (val) => set({ isHeavyTraffic: val }),
+            setStartTime: (val) => set({ startTime: val }),
+            setShiftClose: (data) => set({ shiftClose: data }),
             setActiveTab: (val) => set({ activeTab: val }),
 
             addTrip: async (trip) => {
-                set((state) => ({ sessionTrips: [trip, ...state.sessionTrips] }));
+                set((state) => {
+                    // Auto-calcular avgSpeed
+                    const km = trip.distance || 0;
+                    const mins = trip.duration || 0;
+                    const avgSpeed = (km > 0 && mins > 0) ? km / (mins / 60) : 0;
+
+                    // Auto-calcular waitMinutes desde el viaje anterior si hay startTime
+                    let waitMinutes = 0;
+                    if (trip.startTime && state.sessionTrips.length > 0) {
+                        const prevTrip = state.sessionTrips[0]; // están ordenados por id desc
+                        if (prevTrip.startTime) {
+                            const [prevH, prevM] = prevTrip.startTime.split(':').map(Number);
+                            const prevEndTotalMins = prevH * 60 + prevM + prevTrip.duration;
+                            
+                            const [currH, currM] = trip.startTime.split(':').map(Number);
+                            let currStartTotalMins = currH * 60 + currM;
+                            
+                            // Si cruzó la medianoche
+                            if (currStartTotalMins < prevEndTotalMins && (prevEndTotalMins - currStartTotalMins) > 12 * 60) {
+                                currStartTotalMins += 24 * 60;
+                            }
+                            
+                            waitMinutes = Math.max(0, currStartTotalMins - prevEndTotalMins);
+                        }
+                    }
+
+                    const enrichedTrip = { ...trip, avgSpeed, waitMinutes };
+                    return { sessionTrips: [enrichedTrip, ...state.sessionTrips] }
+                });
 
                 const user = useProfileStore.getState().user;
                 if (user && isSupabaseConfigured()) {
@@ -86,8 +110,8 @@ export const useCalculatorStore = create<CalculatorState>()(
                         vertical: trip.vertical,
                         tip: trip.tip,
                         tolls: trip.tolls,
-                        // Note: To persist activeTime permanently we'd need a DB column, for now it only persists locally
                         timestamp: trip.timestamp.toString() // Save numeric Unix timestamp as string
+                        // Falta persistir startTime, avgSpeed y waitMinutes en base de datos si se requiere
                     });
                 }
             },
@@ -137,11 +161,11 @@ export const useCalculatorStore = create<CalculatorState>()(
                 }
             },
 
-            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', activeTime: '', tip: '', waitTime: '', tolls: '' }),
+            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', tip: '', tolls: '', startTime: '' }),
         }),
         {
             name: 'nodo_session_v1', // Replaces useSessionStorage custom hook
-            partialize: (state) => ({ sessionTrips: state.sessionTrips }), // Only persist the trips array
+            partialize: (state) => ({ sessionTrips: state.sessionTrips, shiftClose: state.shiftClose }), // Persist trips and shiftClose
         }
     )
 );
