@@ -3,7 +3,7 @@ import {
   TrendingUp, TrendingDown, Minus, Trophy, Zap, Clock,
   Target, Lightbulb, Award, ChevronDown, ChevronUp, Star,
   BarChart3, Activity, Trash2, Rocket, BrainCircuit
-} from 'lucide-react';
+} from '../../../../lib/icons';
 import type { SavedTrip } from '../../../../types/calculator.types';
 import { useSessionInsights } from '../../../../hooks/useSessionInsights';
 import { PremiumGate } from '../../templates/PremiumGate';

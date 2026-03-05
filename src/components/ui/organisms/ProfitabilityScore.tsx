@@ -1,6 +1,18 @@
+/**
+ * ProfitabilityScore.tsx
+ * ─────────────────────────────────────────────────────────────
+ * Componente 100% presentacional. No contiene strings de negocio.
+ * Todos los textos provienen de /data/ui-strings.ts.
+ *
+ * Fluent 2:
+ * · Semáforo de rentabilidad (Excellent / Fair / Poor / Danger)
+ * · Tipografía via clases DS (@theme tokens)
+ * · Touch target correctos para mobile
+ */
 import React from 'react';
 import { useProfileStore } from '../../../store/useProfileStore';
 import type { TripMetrics, ProfitabilityTheme } from '../../../types/calculator.types';
+import { PROFITABILITY } from '../../../data/ui-strings';
 
 interface ProfitabilityScoreProps {
     metrics: TripMetrics;
@@ -8,64 +20,98 @@ interface ProfitabilityScoreProps {
 
 const getTheme = (status: TripMetrics['status']): ProfitabilityTheme => {
     const themes: Record<TripMetrics['status'], ProfitabilityTheme> = {
-        excellent: { card: 'score-card-excellent', text: 'text-green-400', label: 'EXCELENTE' },
-        fair: { card: 'score-card-fair', text: 'text-amber-400', label: 'SIRVE' },
-        poor: { card: 'score-card-poor', text: 'text-red-400', label: 'AL HORNO' },
-        danger: { card: 'score-card-danger', text: 'text-red-400', label: 'PIERDE' },
-        neutral: { card: 'score-card-neutral', text: 'text-white/20', label: 'ESPERANDO DATOS' }
+        excellent: { card: 'score-card-excellent', text: 'text-green-400', label: PROFITABILITY.statusLabels.excellent },
+        fair: { card: 'score-card-fair', text: 'text-amber-400', label: PROFITABILITY.statusLabels.fair },
+        poor: { card: 'score-card-poor', text: 'text-red-400', label: PROFITABILITY.statusLabels.poor },
+        danger: { card: 'score-card-danger', text: 'text-red-400', label: PROFITABILITY.statusLabels.danger },
+        neutral: { card: 'score-card-neutral', text: 'text-white/20', label: PROFITABILITY.statusLabels.neutral },
     };
     return themes[status];
+};
+
+/** Devuelve el mensaje de insight contextual según ROI y vertical */
+const getInsight = (roi: number, vertical: string | null): string => {
+    if (roi >= 1.8) {
+        return vertical === 'delivery'
+            ? PROFITABILITY.insights.excellent.delivery
+            : PROFITABILITY.insights.excellent.default;
+    }
+    if (roi >= 1) return PROFITABILITY.insights.fair.default;
+    return vertical === 'transport'
+        ? PROFITABILITY.insights.poor.transport
+        : PROFITABILITY.insights.poor.default;
 };
 
 export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics }) => {
     const { vertical } = useProfileStore();
     const theme = getTheme(metrics.status);
 
+    const roiLabel = vertical === 'delivery'
+        ? PROFITABILITY.roiLabel.delivery
+        : PROFITABILITY.roiLabel.default;
+
     return (
         <div
-            className={`${theme.card} rounded-3xl p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden`}
+            className={`${theme.card} rounded-3xl p-5 sm:p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden`}
             role="status"
             aria-live="polite"
+            aria-label={`Estado de rentabilidad: ${theme.label}`}
         >
-            <div className={`absolute -right-4 -top-4 w-24 h-24 blur-3xl rounded-full opacity-20 ${theme.text.replace('text-', 'bg-')}`} />
+            {/* Glow decorativo — no visible en reduced-motion */}
+            <div
+                className={`absolute -right-4 -top-4 w-24 h-24 blur-3xl rounded-full opacity-20 ${theme.text.replace('text-', 'bg-')} motion-reduce:hidden`}
+                aria-hidden="true"
+            />
 
-            <span className={`text-xs font-black tracking-[0.2em] uppercase ${theme.text}`}>
+            {/* Estado */}
+            <span className={`text-[var(--text-micro)] font-black tracking-widest uppercase ${theme.text}`}>
                 {theme.label}
             </span>
 
+            {/* Valor principal — Ganancia por KM */}
             <div className="flex items-baseline justify-center gap-1 mt-2 relative z-10">
-                <span className="text-6xl font-black tracking-tighter text-white">
-                    ${metrics.isValid ? metrics.profitPerKm : 0}
+                <span
+                    className="font-black tracking-tighter text-white"
+                    style={{ fontSize: 'clamp(3rem,10vw,3.75rem)' }}
+                >
+                    {PROFITABILITY.currency}{metrics.isValid ? metrics.profitPerKm : 0}
                 </span>
-                <span className={`text-xl font-black ${theme.text}`}>/KM</span>
+                <span className={`text-xl font-black ${theme.text}`}>{PROFITABILITY.perKm}</span>
             </div>
 
+            {/* Métricas secundarias */}
             {metrics.isValid && (
-                <div className="mt-3 text-xs text-white/60 space-x-2 font-medium relative z-10">
+                <div className="mt-3 flex items-center justify-center gap-3 text-[var(--text-caption)] text-white/60 font-medium relative z-10 flex-wrap">
                     <span>
-                        En mano: <b className="text-white">${metrics.netMargin.toLocaleString('es-AR')}</b>
+                        {PROFITABILITY.netLabel}:{' '}
+                        <b className="text-white font-black">
+                            ${metrics.netMargin.toLocaleString('es-AR')}
+                        </b>
                     </span>
-                    <span className="opacity-30">|</span>
+                    <span className="opacity-20" aria-hidden="true">|</span>
                     <span>
-                        Costo: <b className="text-red-400/80">${Math.round(metrics.totalCost).toLocaleString('es-AR')}</b>
+                        {PROFITABILITY.costLabel}:{' '}
+                        <b className="text-red-400/80 font-black">
+                            ${Math.round(metrics.totalCost).toLocaleString('es-AR')}
+                        </b>
                     </span>
                 </div>
             )}
 
+            {/* ROI + Insight */}
             {metrics.isValid && (
-                <div className="mt-6 pt-4 border-t border-white/5 flex flex-col items-center animate-in fade-in slide-in-from-top-2 duration-700">
-                    <p className="caption tracking-[0.2em]">
-                        {vertical === 'delivery' ? 'RETORNO TOTAL (INC. PROPINA)' : 'FACTOR DE RENTABILIDAD'}
+                <div className="mt-5 pt-4 border-t border-white/5 flex flex-col items-center animate-in fade-in slide-in-from-top-2 duration-700">
+                    <p className="caption tracking-widest text-[var(--text-micro)]">
+                        {roiLabel}
                     </p>
                     <p className="text-white font-black text-lg mt-1">
-                        {metrics.roi}x <span className="text-xs opacity-40 font-bold uppercase tracking-widest">ROI</span>
+                        {metrics.roi}x{' '}
+                        <span className="text-xs opacity-40 font-bold uppercase tracking-widest">
+                            {PROFITABILITY.roiUnit}
+                        </span>
                     </p>
-                    <p className="text-xs text-white/20 mt-1.5 max-w-[220px] leading-relaxed font-bold tracking-tight">
-                        {metrics.roi >= 1.8
-                            ? (vertical === 'delivery' ? "¡Propina salvadora! Este viaje es oro puro." : "Una joyita. Meté un par más de estos y cortás temprano.")
-                            : metrics.roi >= 1
-                                ? "Suma y no castiga el auto. Es por acá, seguí metiéndole."
-                                : (vertical === 'transport' ? "Ojo que es un viaje trampa. Casi ni cubrís los gastos." : "Margen muy ajustado. Evalúa si el esfuerzo vale la pena.")}
+                    <p className="text-[var(--text-caption)] text-white/20 mt-1.5 max-w-[220px] leading-relaxed font-bold tracking-tight">
+                        {getInsight(metrics.roi, vertical)}
                     </p>
                 </div>
             )}

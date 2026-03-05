@@ -1,5 +1,5 @@
 import React, { type ReactElement, type ReactNode } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '../../../lib/icons';
 
 interface FieldProps {
     id: string;

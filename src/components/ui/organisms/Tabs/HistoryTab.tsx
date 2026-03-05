@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import {
     History, Trash2, X, Navigation, Clock, Calendar,
     TrendingUp, AlertTriangle, Check, RotateCcw, Filter, Lock,
     Bike, Package, Truck, Car as CarIcon, Coins, Map as MapIcon
-} from 'lucide-react';
+} from '../../../../lib/icons';
 import type { SavedTrip } from '../../../../types/calculator.types';
 import { useProfileStore } from '../../../../store/useProfileStore';
-import { SubscriptionModal } from '../SubscriptionModal';
+
+const SubscriptionModal = lazy(() => import('../SubscriptionModal').then(m => ({ default: m.SubscriptionModal })));
 
 interface HistoryTabProps {
     trips: SavedTrip[];
@@ -69,7 +70,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                 </div>
                 <h2 className="text-xl font-black text-white mb-2 uppercase">Sin registros</h2>
                 <p className="text-xs text-white/40 uppercase tracking-widest leading-relaxed">
-                    Los viajes que guardes aparecerán aquí organizados por fecha.
+                    Los turnos que guardes aparecerán aquí organizados por fecha.
                 </p>
             </div>
         );
@@ -88,7 +89,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
 
                     <div className="flex items-center justify-between mb-6 relative">
                         <div>
-                            <h2 className="text-xl font-black text-white uppercase">Tus viajes</h2>
+                            <h2 className="text-xl font-black text-white uppercase">Tus turnos</h2>
                             <p className="text-sm text-nodo-petrol  mt-1">
                                 {/* {activeFilter === 'all' ? 'Todo' : `${activeFilter}`} */}
                             </p>
@@ -111,7 +112,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                                 ${totalMargin.toLocaleString('es-AR')}
                             </p>
                             <p className="text-xs text-white/30 mt-1">
-                                ~${avgMarginPerTrip}/viaje
+                                ~${avgMarginPerTrip}/turno
                             </p>
                         </div>
 
@@ -124,7 +125,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                                 ${totalFare.toLocaleString('es-AR')}
                             </p>
                             <p className="text-xs text-white/30 mt-1">
-                                {tripCount} {tripCount === 1 ? 'viaje' : 'viajes'}
+                                {tripCount} {tripCount === 1 ? 'turno' : 'turnos'}
                             </p>
                         </div>
                     </div>
@@ -253,11 +254,15 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ trips, onClearHistory, o
                 )}
             </div>
 
-            <SubscriptionModal
-                isOpen={showUpgradeModal}
-                onClose={() => setShowUpgradeModal(false)}
-                featureName="el Historial Completo"
-            />
+            <Suspense fallback={null}>
+                {showUpgradeModal && (
+                    <SubscriptionModal
+                        isOpen={showUpgradeModal}
+                        onClose={() => setShowUpgradeModal(false)}
+                        featureName="el Historial Completo"
+                    />
+                )}
+            </Suspense>
         </div>
     );
 };

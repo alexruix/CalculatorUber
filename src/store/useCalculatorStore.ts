@@ -12,6 +12,7 @@ interface CalculatorState {
     distTrip: string;
     distPickup: string;
     duration: string;
+    activeTime: string;
     tip: string;
     waitTime: string;
     tolls: string;
@@ -28,6 +29,7 @@ interface CalculatorState {
     setDistTrip: (val: string) => void;
     setDistPickup: (val: string) => void;
     setDuration: (val: string) => void;
+    setActiveTime: (val: string) => void;
     setTip: (val: string) => void;
     setWaitTime: (val: string) => void;
     setTolls: (val: string) => void;
@@ -50,6 +52,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             distTrip: '',
             distPickup: '',
             duration: '',
+            activeTime: '',
             tip: '',
             waitTime: '',
             tolls: '',
@@ -61,6 +64,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             setDistTrip: (val) => set({ distTrip: val }),
             setDistPickup: (val) => set({ distPickup: val }),
             setDuration: (val) => set({ duration: val }),
+            setActiveTime: (val) => set({ activeTime: val }),
             setTip: (val) => set({ tip: val }),
             setWaitTime: (val) => set({ waitTime: val }),
             setTolls: (val) => set({ tolls: val }),
@@ -82,6 +86,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                         vertical: trip.vertical,
                         tip: trip.tip,
                         tolls: trip.tolls,
+                        // Note: To persist activeTime permanently we'd need a DB column, for now it only persists locally
                         timestamp: trip.timestamp.toString() // Save numeric Unix timestamp as string
                     });
                 }
@@ -132,7 +137,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                 }
             },
 
-            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', tip: '', waitTime: '', tolls: '' }),
+            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', activeTime: '', tip: '', waitTime: '', tolls: '' }),
         }),
         {
             name: 'nodo_session_v1', // Replaces useSessionStorage custom hook

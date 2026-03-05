@@ -1,12 +1,20 @@
-import React from 'react';
-import { DollarSign, Navigation, Navigation2, Clock, Minus, Plus, NotebookPen } from 'lucide-react';
+/**
+ * TripInputForm.tsx — Formulario de Cierre de Turno
+ * ─────────────────────────────────────────────────────────────
+ * Mobile First: inputs con altura mínima de 48px, botones de ±
+ * con touch targets correctos, layout en grid responsive.
+ *
+ * Textos provienen de /data/ui-strings.ts (SHIFT_FORM namespace).
+ */
+import React, { useEffect } from 'react';
+import { DollarSign, Navigation, Clock, Coins, Map as MapIcon, TimerReset, NotebookPen, Minus, Plus } from '../../../lib/icons';
 import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { useProfileStore } from '../../../store/useProfileStore';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
+import { Label } from '../atoms/Label';
 import { GlassCard } from '../molecules/GlassCard';
-import { Badge } from '../atoms/Badge';
-import { Coins, Map as MapIcon } from 'lucide-react';
+import { SHIFT_FORM } from '../../../data/ui-strings';
 
 interface TripInputFormProps {
     onSave: () => void;
@@ -20,109 +28,166 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
         distTrip, setDistTrip,
         distPickup, setDistPickup,
         duration, setDuration,
+        activeTime, setActiveTime,
         tip, setTip,
         tolls, setTolls
     } = useCalculatorStore();
 
-    const quickDistances = [0, 0.5, 1.5, 3];
+    useEffect(() => {
+        if (distPickup !== '0') setDistPickup('0');
+    }, [distPickup, setDistPickup]);
 
     const adjustValue = (value: string, setter: (v: string) => void, step: number) => {
         const current = parseFloat(value) || 0;
         setter(Math.max(0, current + step).toString());
     };
 
+    const f = SHIFT_FORM.fields;
+
     return (
-        <div className="card-main space-y-6">
-            <div className={`grid gap-4 ${vertical === 'delivery' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <div className="card-main space-y-5">
+            {/* Header de sección */}
+            <div className="text-center pb-3 border-b border-white/5">
+                <h3 className="font-black text-white uppercase tracking-widest"
+                    style={{ fontSize: 'var(--text-label)' }}>
+                    {SHIFT_FORM.sectionTitle}
+                </h3>
+                <p className="text-white/40 mt-0.5" style={{ fontSize: 'var(--text-caption)' }}>
+                    {SHIFT_FORM.sectionSubtitle}
+                </p>
+            </div>
+
+            {/* Recaudación Total — con stepper de ±5000 */}
+            <div className="field-wrapper">
+                <Label htmlFor="field-fare" required>{f.fare.label}</Label>
+                <div className="flex items-center gap-2 mt-2">
+                    <Button
+                        variant="icon"
+                        className="border border-white/10 shrink-0"
+                        onClick={() => adjustValue(fare, setFare, -5000)}
+                        aria-label={f.fare.adjustMinus}
+                    >
+                        <Minus className="w-5 h-5" />
+                    </Button>
+                    <div className="field-input-wrapper flex-1">
+                        <DollarSign className="field-icon-left" aria-hidden="true" />
+                        <Input
+                            id="field-fare"
+                            type="number"
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={fare}
+                            onChange={(e) => setFare(e.target.value)}
+                            className="pl-12 font-black text-center text-2xl sm:text-3xl"
+                        />
+                    </div>
+                    <Button
+                        variant="icon"
+                        className="border border-white/10 shrink-0"
+                        onClick={() => adjustValue(fare, setFare, 5000)}
+                        aria-label={f.fare.adjustPlus}
+                    >
+                        <Plus className="w-5 h-5" />
+                    </Button>
+                </div>
+            </div>
+
+            {/* Kilómetros */}
+            <div className="field-wrapper">
+                <Label htmlFor="field-dist">{f.distance.label}</Label>
+                <div className="field-input-wrapper mt-2">
+                    <Navigation className="field-icon-left" aria-hidden="true" />
+                    <Input
+                        id="field-dist"
+                        type="number"
+                        placeholder={f.distance.placeholder}
+                        value={distTrip}
+                        onChange={(e) => setDistTrip(e.target.value)}
+                        className="pl-12 text-xl font-black text-center"
+                    />
+                </div>
+            </div>
+
+            {/* Horas: Conectado + En viaje  */}
+            <div className="grid grid-cols-2 gap-3">
                 <div className="field-wrapper">
-                    <label className="label-base ml-2">{vertical === 'logistics' ? 'Pago del Bloque' : 'Tarifa sugerida app'}</label>
-                    <div className="flex items-center gap-3">
-                        {vertical !== 'delivery' && (
-                            <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, -500)} aria-label="Restar 500">
-                                <Minus className="w-5 h-5" />
-                            </Button>
-                        )}
-                        <div className="field-input-wrapper flex-1">
-                            <DollarSign className="field-icon-left" aria-hidden="true" />
-                            <Input type="number" inputMode="decimal" placeholder="0" value={fare} onChange={(e) => setFare(e.target.value)} className={`pl-12 font-black text-center ${vertical === 'delivery' ? 'text-2xl py-6' : 'text-3xl'}`} />
-                        </div>
-                        {vertical !== 'delivery' && (
-                            <Button variant="icon" className="border border-white/10" onClick={() => adjustValue(fare, setFare, 500)} aria-label="Sumar 500">
-                                <Plus className="w-5 h-5" />
-                            </Button>
-                        )}
+                    <Label htmlFor="field-duration">{f.duration.label}</Label>
+                    <div className="field-input-wrapper mt-2">
+                        <TimerReset className="field-icon-left text-white/30" aria-hidden="true" />
+                        <Input
+                            id="field-duration"
+                            type="number"
+                            placeholder={f.duration.placeholder}
+                            value={duration}
+                            onChange={(e) => setDuration(e.target.value)}
+                            className="pl-12 font-black"
+                        />
                     </div>
                 </div>
+                <div className="field-wrapper">
+                    <Label htmlFor="field-active">{f.activeTime.label}</Label>
+                    <div className="field-input-wrapper mt-2">
+                        <Clock className="field-icon-left text-nodo-accent" aria-hidden="true" />
+                        <Input
+                            id="field-active"
+                            type="number"
+                            placeholder={f.activeTime.placeholder}
+                            value={activeTime}
+                            onChange={(e) => setActiveTime(e.target.value)}
+                            className="pl-12 font-black border-nodo-accent/30 bg-nodo-accent/5"
+                            aria-describedby="active-hint"
+                        />
+                    </div>
+                    <p id="active-hint" className="mt-1 ml-1 text-white/25 leading-tight"
+                        style={{ fontSize: 'var(--text-micro)' }}>
+                        {f.activeTime.hint}
+                    </p>
+                </div>
+            </div>
 
+            {/* Propinas (Delivery) + Gastos Extras */}
+            <div className="grid grid-cols-2 gap-3">
                 {vertical === 'delivery' && (
                     <div className="field-wrapper">
-                        <label className="label-base ml-2">Propina Estimada</label>
-                        <div className="field-input-wrapper flex-1">
-                            <Coins className="field-icon-left text-nodo-accent" aria-hidden="true" />
-                            <Input type="number" inputMode="decimal" placeholder="0" value={tip} onChange={(e) => setTip(e.target.value)} className="pl-12 text-2xl py-6 font-black text-center border-nodo-accent/30 bg-nodo-accent/5" />
+                        <Label htmlFor="field-tips">{f.tips.label}</Label>
+                        <div className="field-input-wrapper mt-2">
+                            <Coins className="field-icon-left" aria-hidden="true" />
+                            <Input
+                                id="field-tips"
+                                type="number"
+                                inputMode="decimal"
+                                placeholder={f.tips.placeholder}
+                                value={tip}
+                                onChange={(e) => setTip(e.target.value)}
+                                className="pl-10"
+                            />
                         </div>
                     </div>
                 )}
-            </div>
-
-            {vertical === 'logistics' && (
-                <div className="field-wrapper">
-                    <label className="label-base ml-2">Gastos de Peaje / Estacionamiento</label>
-                    <div className="field-input-wrapper">
+                <div className={vertical === 'delivery' ? 'field-wrapper' : 'field-wrapper col-span-2'}>
+                    <Label htmlFor="field-expenses">{f.expenses.label}</Label>
+                    <div className="field-input-wrapper mt-2">
                         <MapIcon className="field-icon-left" aria-hidden="true" />
-                        <Input type="number" inputMode="decimal" placeholder="0" value={tolls} onChange={(e) => setTolls(e.target.value)} className="pl-12 text-lg font-bold" />
+                        <Input
+                            id="field-expenses"
+                            type="number"
+                            inputMode="decimal"
+                            placeholder={f.expenses.placeholder}
+                            value={tolls}
+                            onChange={(e) => setTolls(e.target.value)}
+                            className="pl-10"
+                        />
                     </div>
-                </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-                <div className="field-wrapper">
-                    <label className="label-base ml-2">Recorrido</label>
-                    <div className="field-input-wrapper">
-                        <Navigation className="field-icon-left" aria-hidden="true" />
-                        <Input type="number" placeholder="KM" value={distTrip} onChange={(e) => setDistTrip(e.target.value)} className="pl-9 text-lg" />
-                    </div>
-                </div>
-                <div className="field-wrapper">
-                    <label className="label-base ml-2">Minutos de reloj</label>
-                    <div className="field-input-wrapper">
-                        <Clock className="field-icon-left" aria-hidden="true" />
-                        <Input type="number" placeholder="0" value={duration} onChange={(e) => setDuration(e.target.value)} className="pl-9 text-lg" />
-                    </div>
+                    <p className="mt-1 ml-1 text-white/25" style={{ fontSize: 'var(--text-micro)' }}>
+                        {f.expenses.hint}
+                    </p>
                 </div>
             </div>
 
-            <GlassCard
-                summary={
-                    <>
-                        <div className="flex items-center gap-2">
-                            <Navigation2 className="w-4 h-4 text-white/20" />
-                            <span className="text-sm font-bold text-white">Distancia hasta el pasajero</span>
-                        </div>
-                        {parseFloat(distPickup) > 0 && <Badge variant="accent">{distPickup} KM</Badge>}
-                    </>
-                }
-            >
-                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    {quickDistances.map((val) => (
-                        <button key={val} onClick={() => setDistPickup(val.toString())} className={distPickup === val.toString() ? 'filter-chip-active' : 'filter-chip-inactive'}>
-                            {val === 0 ? 'EN EL LUGAR' : `${val} KM`}
-                        </button>
-                    ))}
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button variant="icon" className="border border-white/10 w-10 h-10" onClick={() => adjustValue(distPickup, setDistPickup, -0.5)}>
-                        <Minus className="w-4 h-4" />
-                    </Button>
-                    <Input type="number" placeholder="Manual" value={distPickup} onChange={(e) => setDistPickup(e.target.value)} className="flex-1 text-sm text-center" />
-                    <Button variant="icon" className="border border-white/10 w-10 h-10" onClick={() => adjustValue(distPickup, setDistPickup, 0.5)}>
-                        <Plus className="w-4 h-4" />
-                    </Button>
-                </div>
-            </GlassCard>
-
+            {/* CTA */}
             <Button disabled={!isValid} onClick={onSave} variant="primary">
-                <NotebookPen className="w-5 h-5" /> Anotar viaje
+                <NotebookPen className="w-5 h-5" aria-hidden="true" />
+                {SHIFT_FORM.saveButton}
             </Button>
         </div>
     );

@@ -43,17 +43,25 @@
   --text-placeholder: rgba(255, 255, 255, 0.35);
   --text-disabled: rgba(255, 255, 255, 0.30);
 
-  /* ── Brand ───────────────────────────────────────────────────────────── */
-  --color-accent: #0ea5e9;
-  /* sky-500  */
-  --color-accent-dark: #0284c7;
-  /* sky-600  */
+  /* ── Brand Manejate 2.0 ────────────────────────────────────────────── */
+  --brand-navy: #355872;
+  /* Nav, header, backgrounds de cards */
+  --brand-sea: #7AAACE;
+  /* CTA primarios, links activos      */
+  --brand-blue: #9CD5FF;
+  /* Badges Premium, tooltips, info    */
+  --brand-cold: #F7F8F0;
+  /* Texto sobre fondos oscuros        */
+  --brand-black: #232323;
+  /* Fondo base de pantalla            */
+
+  /* Aliases semánticos → nueva paleta */
+  --color-accent: var(--brand-sea);
+  --color-accent-dark: #5B8DAD;
+  --color-accent-glow: rgba(122, 170, 206, 0.35);
   --color-success: #22c55e;
-  /* green-500 */
   --color-warning: #f59e0b;
-  /* amber-500 */
   --color-error: #ef4444;
-  /* red-500  */
 
   /* ── Focus ring ──────────────────────────────────────────────────────── */
   --ring-color: rgba(255, 255, 255, 0.9);
@@ -428,7 +436,7 @@
      ========================================================================= */
 
   .card-main {
-    @apply relative overflow-hidden bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/[0.08] rounded-[2rem] p-8 shadow-2xl;
+    @apply relative overflow-hidden bg-[#1a1a1a] border border-white/[0.08] rounded-[2rem] p-8 shadow-2xl supports-[backdrop-filter]:bg-[#0a0a0a]/80 supports-[backdrop-filter]:backdrop-blur-2xl;
   }
 
   .card-section {
@@ -663,7 +671,7 @@
 
   /* Header sticky estándar */
   .app-header {
-    @apply sticky top-0 z-50 border-b border-white/5 bg-black/50 backdrop-blur-md;
+    @apply sticky top-0 z-50 border-b border-white/5 bg-[#111] supports-[backdrop-filter]:bg-black/50 supports-[backdrop-filter]:backdrop-blur-md;
   }
 
 
@@ -674,7 +682,7 @@
 
   /* glass-card — card con blur y borde, sin padding fijo (se añade en HTML) */
   .glass-card {
-    @apply bg-[#151515]/60 backdrop-blur-xl border border-white/[0.08];
+    @apply bg-[#1a1a1a] border border-white/[0.08] supports-[backdrop-filter]:bg-[#151515]/60 supports-[backdrop-filter]:backdrop-blur-xl;
   }
 
 
@@ -720,9 +728,15 @@
   }
 
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px);
+    background: #1a1a1a;
     border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+    }
   }
 
   .divider {

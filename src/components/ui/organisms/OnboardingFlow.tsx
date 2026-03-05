@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Car, Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info, Package, Bike, Truck } from 'lucide-react';
+import { Car, Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info, Package, Bike, Truck } from '../../../lib/icons';
 import { useProfileStore } from '../../../store/useProfileStore';
 import { Field } from '../molecules/Field';
 import { Input } from '../atoms/Input';
@@ -12,6 +12,8 @@ interface FieldErrors {
     kmPerLiter?: string;
     fuelPrice?: string;
     maintPerKm?: string;
+    vehicleValue?: string;
+    vehicleLifetimeKm?: string;
 }
 
 export const OnboardingFlow: React.FC = () => {
@@ -19,14 +21,16 @@ export const OnboardingFlow: React.FC = () => {
     const [errors, setErrors] = useState<FieldErrors>({});
     const headingRef = useRef<HTMLHeadingElement>(null);
 
-    // Initial state from store
     const storeProfile = useProfileStore();
 
-    // Local state for the form
-    const [vehicleName, setVehicleName] = useState(storeProfile.vehicleName === 'Name' ? '' : storeProfile.vehicleName);
-    const [kmPerLiter, setKmPerLiter] = useState(storeProfile.kmPerLiter === 9 ? '' : String(storeProfile.kmPerLiter));
-    const [maintPerKm, setMaintPerKm] = useState(storeProfile.maintPerKm === 10 ? '' : String(storeProfile.maintPerKm));
-    const [fuelPrice, setFuelPrice] = useState(storeProfile.fuelPrice === 1600 ? '' : String(storeProfile.fuelPrice));
+    // Local form state with smart defaults
+    const [driverName, setDriverName] = useState(storeProfile.driverName || '');
+    const [vehicleName, setVehicleName] = useState(storeProfile.vehicleName || '');
+    const [kmPerLiter, setKmPerLiter] = useState(storeProfile.kmPerLiter === 10 ? '' : String(storeProfile.kmPerLiter));
+    const [maintPerKm, setMaintPerKm] = useState(storeProfile.maintPerKm === 15 ? '' : String(storeProfile.maintPerKm));
+    const [vehicleValue, setVehicleValue] = useState(storeProfile.vehicleValue === 3000000 ? '' : String(storeProfile.vehicleValue));
+    const [vehicleLifetimeKm, setVehicleLifetimeKm] = useState(storeProfile.vehicleLifetimeKm === 200000 ? '' : String(storeProfile.vehicleLifetimeKm));
+    const [fuelPrice, setFuelPrice] = useState(storeProfile.fuelPrice === 1400 ? '' : String(storeProfile.fuelPrice));
     const [expenseSettings, setExpenseSettings] = useState(storeProfile.expenseSettings);
     const [vertical, setVertical] = useState(storeProfile.vertical);
 
@@ -39,13 +43,16 @@ export const OnboardingFlow: React.FC = () => {
         if (step === 2) {
             if (!vehicleName.trim()) next.vehicleName = 'Requerido para tu perfil.';
             const kpl = parseFloat(kmPerLiter);
-            if (!kmPerLiter || isNaN(kpl) || kpl <= 0 || kpl > 50) next.kmPerLiter = 'Valor inválido.';
+            if (!kmPerLiter || isNaN(kpl) || kpl <= 0 || kpl > 50) next.kmPerLiter = 'Valor inválido (1-50)';
             const fp = parseFloat(fuelPrice);
-            if (!fuelPrice || isNaN(fp) || fp <= 0) next.fuelPrice = 'Precio inválido.';
+            if (!fuelPrice || isNaN(fp) || fp <= 0) next.fuelPrice = 'Precio inválido';
             const mnt = parseFloat(maintPerKm);
-            if (!maintPerKm || isNaN(mnt) || mnt < 0) next.maintPerKm = 'Costo inválido.';
+            if (!maintPerKm || isNaN(mnt) || mnt < 0) next.maintPerKm = 'Costo inválido';
+            const vv = parseFloat(vehicleValue);
+            if (vehicleValue && (isNaN(vv) || vv < 0)) next.vehicleValue = 'Valor inválido';
+            const vkm = parseFloat(vehicleLifetimeKm);
+            if (vehicleLifetimeKm && (isNaN(vkm) || vkm < 1000)) next.vehicleLifetimeKm = 'Mínimo 1000 km';
         }
-
         setErrors(next);
         return Object.keys(next).length === 0;
     };
@@ -64,10 +71,15 @@ export const OnboardingFlow: React.FC = () => {
 
     const handleFinish = (e: React.FormEvent) => {
         e.preventDefault();
+        const vv = parseFloat(vehicleValue) || 3000000;
+        const vkm = parseFloat(vehicleLifetimeKm) || 200000;
         storeProfile.setProfile({
+            driverName: driverName.trim(),
             vehicleName: vehicleName.trim(),
             kmPerLiter: parseFloat(kmPerLiter),
             maintPerKm: parseFloat(maintPerKm),
+            vehicleValue: vv,
+            vehicleLifetimeKm: vkm,
             fuelPrice: parseFloat(fuelPrice),
             expenseSettings,
             vertical,
@@ -158,7 +170,18 @@ export const OnboardingFlow: React.FC = () => {
                             </div>
 
                             <div className="space-y-5 relative z-10">
-                                <Field id="vehicle-name" label="Modelo o apodo" hint="Ej: Fiat Cronos, Moto 150cc" error={errors.vehicleName} required>
+                                {/* Nombre del conductor — para personalizar mensajes */}
+                                <Field id="driver-name" label="Tu nombre o apodo" hint="Así te saludaremos al iniciar la jornada">
+                                    <Input
+                                        type="text"
+                                        value={driverName}
+                                        onChange={e => setDriverName(e.target.value)}
+                                        placeholder="Ej: Carlos, Caro"
+                                        autoComplete="given-name"
+                                    />
+                                </Field>
+
+                                <Field id="vehicle-name" label="Modelo o apodo del vehículo" hint="Ej: Fiat Cronos, Moto 150cc" error={errors.vehicleName} required>
                                     <Input
                                         type="text"
                                         value={vehicleName}
@@ -182,7 +205,7 @@ export const OnboardingFlow: React.FC = () => {
                                                 setFuelPrice(e.target.value);
                                                 if (errors.fuelPrice) setErrors(prev => ({ ...prev, fuelPrice: undefined }));
                                             }}
-                                            min="1" step="10" placeholder="1600"
+                                            min="1" step="10" placeholder="1400"
                                         />
                                     </Field>
                                     <Field id="km-per-liter" label="Consumo (km/l)" error={errors.kmPerLiter} required icon={Fuel}>
@@ -193,19 +216,45 @@ export const OnboardingFlow: React.FC = () => {
                                                 setKmPerLiter(e.target.value);
                                                 if (errors.kmPerLiter) setErrors(prev => ({ ...prev, kmPerLiter: undefined }));
                                             }}
-                                            min="1" max="50" step="0.5" placeholder="9"
+                                            min="1" max="50" step="0.5" placeholder="10"
                                         />
                                     </Field>
                                 </div>
 
-                                <Field id="maint-per-km" label="Ahorro para gastos corrientes" hint="Dinero destinado al lavado y mantenimiento del vehiculo" error={errors.maintPerKm} icon={Settings} suffix="$/KM">
+                                <Field id="maint-per-km" label="Gasto de mantenimiento" hint="Aceite, frenos, neumáticos, etc." error={errors.maintPerKm} icon={Settings} suffix="$/KM">
                                     <Input
                                         type="number" inputMode="decimal"
                                         value={maintPerKm}
                                         onChange={e => { setMaintPerKm(e.target.value); if (errors.maintPerKm) setErrors(prev => ({ ...prev, maintPerKm: undefined })); }}
-                                        placeholder="25"
+                                        placeholder="15"
                                     />
                                 </Field>
+
+                                {/* Amortización — campos opcionales pero recomendados */}
+                                <div className="rounded-2xl border border-white/5 bg-white/[.02] p-4 space-y-4">
+                                    <p className="text-xs font-black text-white/30 uppercase tracking-widest">Amortización vehicular <span className="text-white/15">(opcional)</span></p>
+                                    <p className="text-[11px] text-white/30">
+                                        Con estos datos calculamos el costo real de desgaste de tu vehículo por km, separado del mantenimiento.
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Field id="vehicle-value" label="Valor del vehículo ($)" error={errors.vehicleValue} hint="Precio de mercado actual">
+                                            <Input
+                                                type="number" inputMode="decimal"
+                                                value={vehicleValue}
+                                                onChange={e => { setVehicleValue(e.target.value); if (errors.vehicleValue) setErrors(prev => ({ ...prev, vehicleValue: undefined })); }}
+                                                placeholder="3.000.000"
+                                            />
+                                        </Field>
+                                        <Field id="vehicle-lifetime-km" label="Vida útil (km)" error={errors.vehicleLifetimeKm} hint="KM totales estimados">
+                                            <Input
+                                                type="number" inputMode="decimal"
+                                                value={vehicleLifetimeKm}
+                                                onChange={e => { setVehicleLifetimeKm(e.target.value); if (errors.vehicleLifetimeKm) setErrors(prev => ({ ...prev, vehicleLifetimeKm: undefined })); }}
+                                                placeholder="200000"
+                                            />
+                                        </Field>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -247,9 +296,11 @@ export const OnboardingFlow: React.FC = () => {
                                         onToggle={() => handleToggleExpense(expense.id)}
                                         label={expense.label}
                                         description={
-                                            expense.id === 'fuel' ? `Calculado a $${fuelPrice}/L` :
-                                                expense.id === 'maintenance' ? `Reserva de $${maintPerKm}/km para gastos corrientes` :
-                                                    `Plus por desgaste del vehículo`
+                                            expense.id === 'fuel' ? `Calculado a $${fuelPrice || '1400'}/L` :
+                                                expense.id === 'maintenance' ? `Reserva de $${maintPerKm || '15'}/km para gastos corrientes` :
+                                                    vehicleValue && vehicleLifetimeKm
+                                                        ? `~$${Math.round(parseFloat(vehicleValue) / parseFloat(vehicleLifetimeKm))}/km (÷ vida útil)`
+                                                        : 'Depreción del vehículo por km recorrido'
                                         }
                                         icon={
                                             <IconWrap size="md" theme={expense.enabled ? 'accent' : 'neutral'} aria-hidden="true">

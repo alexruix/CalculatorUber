@@ -9,24 +9,79 @@
    perderán las utilidades generadas.
    ============================================================================= */
 @theme {
-  /* --- Brand Identity --- */
+  /* ── Legacy Brand (backward-compat) ───────────────────────── */
   --color-nodo-petrol: #1a4d5c;
-  /* Primario: Acciones y calm */
   --color-nodo-wine: #6b1f3d;
-  /* Alerta: Pérdidas o peligro */
   --color-nodo-sand: #d4c5b0;
-  /* Secundario: Textos suaves y fondos */
 
-  /* --- Fondos oscuros (Modo Conducción) --- */
+  /* ── Manejate 2.0 Brand Palette ───────────────────────────── */
+  --color-brand-navy: #355872;
+  --color-brand-sea: #7AAACE;
+  --color-brand-blue: #9CD5FF;
+  --color-brand-cold: #F7F8F0;
+  --color-brand-black: #232323;
+  /* Alias para componentes que usan text-nodo-accent */
+  --color-nodo-accent: #7AAACE;
+
+  /* ── Superficies (Dark Mode / Conducción) ─────────────────── */
   --color-dark-bg: #0a0a0a;
   --color-dark-card: #151515;
   --color-dark-border: rgba(255, 255, 255, 0.08);
 
-  /* --- Tipografía --- */
+  /* ── Fluent 2 — Sistema tipográfico (Mobile First) ─────────── *
+   *  Escala legible desde 360px. Tamaños mínimos garantizan     *
+   *  accesibilidad sin zoom en Android gama media.              */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
-  /* --- Animaciones de Precisión --- */
-  --animate-score: score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Escala tipográfica — en rem para respetar zoom del usuario */
+  --text-hero: clamp(2.5rem, 8vw, 4rem);
+  /* Balance, pantalla de resultado */
+  --text-title: clamp(1.25rem, 5vw, 1.75rem);
+  /* Heading de pestaña         */
+  --text-subtitle: clamp(1rem, 4vw, 1.25rem);
+  /* Sub-sección                */
+  --text-body: 0.9375rem;
+  /* 15px — cuerpo de texto legible en mobile      */
+  --text-label: 0.8125rem;
+  /* 13px — labels de campo, mínimo Fluent 2       */
+  --text-caption: 0.75rem;
+  /* 12px — hints, meta-data, WCAG AA mínimo       */
+  --text-micro: 0.625rem;
+  /* 10px — badges, tracking-widest only           */
+
+  /* ── Fluent 2 — Espaciado en grid de 4px ─────────────────── */
+  --space-1: 0.25rem;
+  /* 4px  */
+  --space-2: 0.5rem;
+  /* 8px  */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+
+  /* ── Fluent 2 — Motion curves ────────────────────────────── */
+  --ease-fluent-accelerate: cubic-bezier(0.9, 0.1, 1, 0.2);
+  /* Salida rápida   */
+  --ease-fluent-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+  /* Entrada suave   */
+  --ease-fluent-standard: cubic-bezier(0.33, 0.0, 0.1, 1.0);
+  /* Transición base */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Spring pop      */
+
+  /* ── Animaciones ───────────────────────────────────────────── */
+  --animate-score: score-pop 0.5s var(--ease-spring);
+  --animate-fade: fade-in 0.2s var(--ease-fluent-decelerate);
 }
 
 @keyframes score-pop {
@@ -40,6 +95,22 @@
     opacity: 1;
   }
 }
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── xs breakpoint — Mobile First desde 360px ─────────────────────────── */
+@custom-media --xs (min-width: 360px);
+
 
 /* =============================================================================
    @LAYER BASE — Estilos globales del documento

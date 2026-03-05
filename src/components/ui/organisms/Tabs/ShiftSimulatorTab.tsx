@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useProfileStore } from '../../../../store/useProfileStore';
-import { TrafficCone, Zap, Car, Truck, Bike, Info, ArrowRight } from 'lucide-react';
+import { TrafficCone, Zap, Car, Truck, Bike, Info, ArrowRight, RefreshCw } from '../../../../lib/icons';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
 
 export const ShiftSimulatorTab: React.FC = () => {
-    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings, vertical, vehicleName } = useProfileStore();
+    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings, vertical, vehicleName, swapVehicle } = useProfileStore();
     const { setActiveTab } = useCalculatorStore();
 
     const [simulatedDistance, setSimulatedDistance] = useState<number>(5);
@@ -56,6 +56,19 @@ export const ShiftSimulatorTab: React.FC = () => {
 
     return (
         <div className="space-y-6 pb-24 animate-in fade-in duration-500">
+
+            {/* QUICK PROFILE SWAPPER */}
+            <div className="flex justify-between items-center px-2">
+                <h2 className="text-xl font-black text-white">Buen día ☀️</h2>
+                <button
+                    onClick={swapVehicle}
+                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all active:scale-95"
+                >
+                    {vertical === 'transport' ? <Car className="w-3.5 h-3.5 text-sky-400" /> : <Bike className="w-3.5 h-3.5 text-amber-400" />}
+                    {vehicleName || 'Vehículo'}
+                    <RefreshCw className="w-3 h-3 text-white/40 ml-1" />
+                </button>
+            </div>
 
             {/* HEADER HERO - EL NÚMERO MÁGICO */}
             <div className="glass-card rounded-4xl p-6 border border-white/10 text-center relative overflow-hidden shadow-2xl">

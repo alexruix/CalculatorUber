@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Rocket, Star, History, CheckCircle2, X } from 'lucide-react';
+import { Rocket, Star, History, CheckCircle2, X } from '../../../lib/icons';
 import { useProfileStore } from '../../../store/useProfileStore';
 import { supabase } from '../../../lib/supabase';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';

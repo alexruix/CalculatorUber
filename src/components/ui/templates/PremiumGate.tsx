@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock } from 'lucide-react';
+import { Lock } from '../../../lib/icons';
 import { useProfileStore } from '../../../store/useProfileStore';
 
 interface PremiumGateProps {

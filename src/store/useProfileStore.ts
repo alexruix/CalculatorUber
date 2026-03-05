@@ -8,9 +8,15 @@ interface ProfileState {
     isConfigured: boolean;
     isFetchingProfile: boolean;
     isPro: boolean;
+    driverName: string;
     vehicleName: string;
     kmPerLiter: number;
+    /** Costo de mantenimiento por KM (aceite, frenos, neumáticos, etc.) */
     maintPerKm: number;
+    /** Valor de mercado actual del vehículo en ARS */
+    vehicleValue: number;
+    /** Kilómetros de vida útil estimados del vehículo */
+    vehicleLifetimeKm: number;
     fuelPrice: number;
     expenseSettings: ExpenseToggle[];
     vertical: VerticalType | null;
@@ -19,11 +25,22 @@ interface ProfileState {
     dailyGoal: number;
     dailyHours: number;
 
+    // Quick Multi-Vertical Swapper
+    secondaryVehicle: {
+        vehicleName: string;
+        kmPerLiter: number;
+        maintPerKm: number;
+        vertical: VerticalType | null;
+    } | null;
+
     // Actions
-    setProfile: (data: Partial<Omit<ProfileState, 'setProfile' | 'resetProfile' | 'initProfile' | 'setUser' | 'logout'>>) => void;
+    setProfile: (data: Partial<Omit<ProfileState, 'setProfile' | 'resetProfile' | 'initProfile' | 'setUser' | 'logout' | 'swapVehicle' | 'amortizationPerKm'>>) => void;
+    /** Amortización calculada: vehicleValue / vehicleLifetimeKm (read-only derivada) */
+    readonly amortizationPerKm: number;
     resetProfile: () => void;
     initProfile: () => Promise<void>;
     setUser: (user: User | null) => void;
+    swapVehicle: () => void;
     logout: () => Promise<void>;
 }
 
@@ -31,10 +48,13 @@ const initialProfileState = {
     isConfigured: false,
     isFetchingProfile: false,
     isPro: false,
-    vehicleName: 'Name',
-    kmPerLiter: 9,
-    maintPerKm: 10,
-    fuelPrice: 1600,
+    driverName: '',
+    vehicleName: '',
+    kmPerLiter: 10,
+    maintPerKm: 15,
+    vehicleValue: 3000000,
+    vehicleLifetimeKm: 200000,
+    fuelPrice: 1400,
     expenseSettings: [
         { id: 'fuel', label: 'Combustible', enabled: true },
         { id: 'maintenance', label: 'Mantenimiento', enabled: true },
@@ -43,6 +63,7 @@ const initialProfileState = {
     vertical: null,
     dailyGoal: 0,
     dailyHours: 8,
+    secondaryVehicle: null,
 };
 
 export const useProfileStore = create<ProfileState>()(
@@ -50,6 +71,11 @@ export const useProfileStore = create<ProfileState>()(
         (set, get) => ({
             ...initialProfileState,
             user: null,
+            // Propiedad derivada: nunca persiste, siempre recalculada
+            get amortizationPerKm() {
+                const s = get();
+                return s.vehicleLifetimeKm > 0 ? s.vehicleValue / s.vehicleLifetimeKm : 0;
+            },
             setUser: (user) => set({ user }),
             initProfile: async () => {
                 if (!isSupabaseConfigured()) return;
@@ -115,6 +141,35 @@ export const useProfileStore = create<ProfileState>()(
                         .from('profiles')
                         .upsert(profileData)
                 }
+            },
+            swapVehicle: () => {
+                const current = get();
+                // Si no hay secundario, creamos uno por defecto invertido
+                const targetVertical = current.vertical === 'transport' ? 'delivery' : 'transport';
+                
+                const nextVehicle = current.secondaryVehicle || {
+                    vehicleName: targetVertical === 'delivery' ? 'Moto' : 'Auto',
+                    kmPerLiter: targetVertical === 'delivery' ? 30 : 10,
+                    maintPerKm: targetVertical === 'delivery' ? 5 : 20,
+                    vertical: targetVertical
+                };
+
+                // Guardamos el actual como secundario
+                const newSecondary = {
+                    vehicleName: current.vehicleName,
+                    kmPerLiter: current.kmPerLiter,
+                    maintPerKm: current.maintPerKm,
+                    vertical: current.vertical
+                };
+
+                // Asignamos el nuevo y guardamos auto en setProfile
+                current.setProfile({
+                    vehicleName: nextVehicle.vehicleName,
+                    kmPerLiter: nextVehicle.kmPerLiter,
+                    maintPerKm: nextVehicle.maintPerKm,
+                    vertical: nextVehicle.vertical,
+                    secondaryVehicle: newSecondary
+                });
             },
             resetProfile: () => set((state) => ({ ...initialProfileState, user: state.user })), // Keep user on reset
             logout: async () => {

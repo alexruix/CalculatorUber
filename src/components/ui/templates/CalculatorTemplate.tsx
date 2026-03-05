@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 
 // Stores
 import { useProfileStore } from "../../../store/useProfileStore";
@@ -7,15 +7,19 @@ import { useCalculatorStore } from "../../../store/useCalculatorStore";
 // UI Organisms & Templates (New Atomic Architecture)
 import { OnboardingFlow } from "../organisms/OnboardingFlow";
 import { AuthScreen } from "../organisms/AuthScreen";
-import { CalculatorTab } from "../organisms/Tabs/CalculatorTab";
-import { ShiftSimulatorTab } from "../organisms/Tabs/ShiftSimulatorTab";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
+import { PartyPopper } from '../../../lib/icons';
+import { TabSkeleton } from "../molecules/TabSkeleton";
+
+// Lazy Loaded Tabs (Code Splitting)
+const CalculatorTab = lazy(() => import("../organisms/Tabs/CalculatorTab").then(m => ({ default: m.CalculatorTab })));
+const ShiftSimulatorTab = lazy(() => import("../organisms/Tabs/ShiftSimulatorTab").then(m => ({ default: m.ShiftSimulatorTab })));
+const HistoryTab = lazy(() => import("../organisms/Tabs/HistoryTab").then(m => ({ default: m.HistoryTab })));
+const SessionAnalysis = lazy(() => import("../organisms/Tabs/SessionAnalysis").then(m => ({ default: m.SessionAnalysis })));
+const ProfileTab = lazy(() => import("../organisms/Tabs/ProfileTab").then(m => ({ default: m.ProfileTab })));
 
 // Refactored Tabs
 import { BottomTabNavigation } from "../organisms/BottomNavigation";
-import { HistoryTab } from "../organisms/Tabs/HistoryTab";
-import { SessionAnalysis } from "../organisms/Tabs/SessionAnalysis";
-import { ProfileTab } from "../organisms/Tabs/ProfileTab";
 
 const CalculatorApp: React.FC = () => {
   // Global State Access (Replacement of massive useState block)
@@ -31,6 +35,7 @@ const CalculatorApp: React.FC = () => {
   } = useCalculatorStore();
 
   const [isInitializing, setIsInitializing] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
   // Initialize Supabase data on mount e interceptar cambios de sesión
   useEffect(() => {
@@ -57,6 +62,15 @@ const CalculatorApp: React.FC = () => {
       };
     }
   }, [initProfile, initTrips]);
+
+  // Show motivational toast after login/init
+  useEffect(() => {
+    if (!isInitializing && !isFetchingProfile && isConfigured && user) {
+      setShowToast(true);
+      const t = setTimeout(() => setShowToast(false), 5000);
+      return () => clearTimeout(t);
+    }
+  }, [isInitializing, isFetchingProfile, isConfigured, user]);
 
   if (isInitializing || isFetchingProfile) {
     return (
@@ -99,42 +113,59 @@ const CalculatorApp: React.FC = () => {
 
       {/* Contenedor Principal de Pestañas */}
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
-        {activeTab === "simulator" && <ShiftSimulatorTab />}
+        <Suspense fallback={<TabSkeleton />}>
+          {activeTab === "simulator" && <ShiftSimulatorTab />}
 
-        {activeTab === "calculator" && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <CalculatorTab />
-          </div>
-        )}
+          {activeTab === "calculator" && (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+              <CalculatorTab />
+            </div>
+          )}
 
-        {activeTab === "history" && (
-          <HistoryTab
-            trips={sessionTrips}
-            onClearHistory={() => {
-              if (confirm("¿Borrar historial del día?")) clearSession();
-            }}
-            onDeleteTrip={deleteTrip}
-          />
-        )}
-
-        {activeTab === "analysis" && (
-          <div className="space-y-6 animate-in fade-in duration-500">
-            <SessionAnalysis
+          {activeTab === "history" && (
+            <HistoryTab
               trips={sessionTrips}
-              onClear={() => {
-                if (confirm("¿Borrar historial?")) clearSession();
+              onClearHistory={() => {
+                if (confirm("¿Borrar historial del día?")) clearSession();
               }}
+              onDeleteTrip={deleteTrip}
             />
-          </div>
-        )}
+          )}
 
-        {activeTab === "profile" && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* ProfileTab is now self-contained — reads from Zustand directly */}
-            <ProfileTab />
-          </div>
-        )}
+          {activeTab === "analysis" && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <SessionAnalysis
+                trips={sessionTrips}
+                onClear={() => {
+                  if (confirm("¿Borrar historial?")) clearSession();
+                }}
+              />
+            </div>
+          )}
+
+          {activeTab === "profile" && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ProfileTab is now self-contained — reads from Zustand directly */}
+              <ProfileTab />
+            </div>
+          )}
+        </Suspense>
       </main>
+
+      {/* Motivational Toast */}
+      {showToast && (
+        <div className="fixed bottom-24 left-4 right-4 z-50 animate-in slide-in-from-bottom-5 fade-in fade-out duration-500 max-w-md mx-auto pointer-events-none">
+          <div className="bg-[#111] supports-backdrop-filter:bg-green-500/10 border border-green-500/20 supports-backdrop-filter:backdrop-blur-md p-4 rounded-2xl flex items-center gap-3 shadow-lg">
+            <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+              <PartyPopper className="w-4 h-4 text-green-400" />
+            </div>
+            <div>
+              <h4 className="text-white text-sm font-black">¡A romperla hoy! 🚀</h4>
+              <p className="text-green-100/70 text-xs mt-0.5">Ayer te ahorraste mucha plata evitando viajes trampa.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Navegación Inferior */}
       <BottomTabNavigation

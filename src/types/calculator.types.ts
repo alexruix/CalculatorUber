@@ -13,8 +13,9 @@ export interface TripDataInput {
   distTrip: string;
   distPickup: string;
   tip?: string;
-  waitTime?: string;
   tolls?: string;
+  /** Horas en viaje (activo). Derivado de los datos del resumen de la app. */
+  activeTime?: string;
 }
 
 /**
@@ -29,6 +30,10 @@ export interface TripMetrics {
   netMargin: number;
   /** Ganancia por kilómetro recorrido */
   profitPerKm: number;
+  /** Ganancia Por Hora — EPH (Eficiencia de la jornada) */
+  profitPerHour: number;
+  /** Si el tráfico fue detectado como pesado automáticamente */
+  wasHeavyTraffic: boolean;
   roi: number;
   /** Estado de rentabilidad basado en umbrales */
   status: 'excellent' | 'fair' | 'poor' | 'danger' | 'neutral';
@@ -48,11 +53,34 @@ export interface SavedTrip {
   timestamp: number;
   distance: number;
   duration: number;
-  /** New segment fields */
   vertical?: VerticalType;
   tip?: number;
-  waitTime?: number;
   tolls?: number;
+  activeTime?: number;
+  
+  // Nuevos campos de Arquitectura V2
+  /** Velocidad promedio del viaje (km/h). 0 si no hay datos suficientes. */
+  avgSpeed?: number;
+  /** "HH:MM" — hora de inicio del viaje (opcional) */
+  startTime?: string;
+  /** minutos de espera desde el fin del viaje anterior */
+  waitMinutes?: number;
+}
+
+/**
+ * Cierre de Jornada (Shift Close)
+ */
+export interface ShiftClose {
+  /** "HH:MM" — hora de inicio de todo el turno */
+  shiftStartTime: string;
+  /** "HH:MM" — hora de fin del turno */
+  shiftEndTime: string;
+  /** Km del odómetro al iniciar (opcional) */
+  odometerStart?: number;
+  /** Km del odómetro al terminar (opcional) */
+  odometerEnd?: number;
+  /** Gastos extras de la jornada (comida, peajes, etc.) */
+  extraExpenses?: number;
 }
 
 /**

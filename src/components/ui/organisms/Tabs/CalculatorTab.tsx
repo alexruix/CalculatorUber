@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Zap, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RotateCcw, Activity } from '../../../../lib/icons';
 import { useProfileStore } from '../../../../store/useProfileStore';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
 import { useProfitability } from '../../../../hooks/useProfitability';
@@ -9,25 +9,31 @@ import type { SavedTrip } from '../../../../types/calculator.types';
 import { ProfitabilityScore } from '../ProfitabilityScore';
 import { TripInputForm } from '../TripInputForm';
 import { MiniSummary } from '../../molecules/MiniSummary';
+import { ProductivityIndex } from '../../molecules/ProductivityIndex';
 
 export const CalculatorTab: React.FC = () => {
     // Stores
-    const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings, vertical } = useProfileStore();
+    const { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings, vertical } = useProfileStore();
     const {
-        fare, distTrip, distPickup, duration, tip, waitTime, tolls,
-        isHeavyTraffic, setIsHeavyTraffic,
+        fare, distTrip, duration, activeTime, tip, tolls,
         sessionTrips, addTrip, resetInputs
     } = useCalculatorStore();
 
-    // Logic
+    // Logic — pass amortizationPerKm separately from maintPerKm
     const metrics = useProfitability(
-        { fare, distTrip, distPickup, tip, waitTime, tolls },
+        { fare, distTrip, distPickup: '0', tip, tolls, activeTime },
         vertical,
-        { kmPerLiter, maintPerKm, fuelPrice, expenseSettings },
-        isHeavyTraffic
+        { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings }
     );
 
     const totalMargin = useMemo(() => sessionTrips.reduce((acc, t) => acc + t.margin, 0), [sessionTrips]);
+    const totalEPH = useMemo(() => {
+        const withTime = sessionTrips.filter(t => (t.activeTime || 0) > 0);
+        if (!withTime.length) return 0;
+        const totalNet = withTime.reduce((acc, t) => acc + t.margin, 0);
+        const totalTime = withTime.reduce((acc, t) => acc + (t.activeTime || 0), 0);
+        return totalTime > 0 ? Math.round(totalNet / totalTime) : 0;
+    }, [sessionTrips]);
     const tripCount = sessionTrips.length;
 
     const saveTrip = () => {
@@ -36,12 +42,12 @@ export const CalculatorTab: React.FC = () => {
             id: Date.now(),
             fare: parseFloat(fare),
             margin: metrics.netMargin,
-            distance: parseFloat(distTrip) + (parseFloat(distPickup) || 0),
-            duration: parseFloat(duration),
+            distance: parseFloat(distTrip) || 0,
+            duration: parseFloat(duration) || 0,
+            activeTime: parseFloat(activeTime) || 0,
             timestamp: Date.now(),
             vertical: vertical || undefined,
             tip: parseFloat(tip) || 0,
-            waitTime: parseFloat(waitTime) || 0,
             tolls: parseFloat(tolls) || 0,
         };
         addTrip(newTrip);
@@ -51,30 +57,36 @@ export const CalculatorTab: React.FC = () => {
     return (
         <div className="pb-32 space-y-5 animate-in fade-in duration-500">
             {/* 1. Score de Rentabilidad */}
-            <div className="sticky top-0 z-20 backdrop-blur-md -mx-4 px-4 py-4 border-b border-white/5">
+            <div className="sticky top-0 z-20 bg-black/80 supports-[backdrop-filter]:backdrop-blur-md -mx-4 px-4 py-4 border-b border-white/5">
                 <ProfitabilityScore metrics={metrics} />
             </div>
 
             <div className="space-y-6">
-                {/* 2. Resumen Rápido */}
-                <MiniSummary totalMargin={totalMargin} tripCount={tripCount} />
+                {/* 2. Resumen acumulado de turnos */}
+                {tripCount > 0 && (
+                    <MiniSummary totalMargin={totalMargin} tripCount={tripCount} eph={totalEPH} />
+                )}
 
-                {/* 3. Botón de Tránsito */}
-                <button
-                    onClick={() => setIsHeavyTraffic(!isHeavyTraffic)}
-                    className={`w-full flex items-center justify-between p-5 rounded-3xl border-2 transition-all ${isHeavyTraffic
-                        ? 'border-nodo-wine bg-nodo-wine/10 text-nodo-wine'
-                        : 'border-white/5 bg-white/5 text-white/40'
-                        }`}
-                >
-                    <div className="flex flex-col items-start text-left">
-                        <span className="text-xs font-black uppercase tracking-[0.2em] opacity-50 mb-1">Tránsito</span>
-                        <span className="text-sm font-black">{isHeavyTraffic ? 'PESADO (+20% Gasto)' : 'NORMAL'}</span>
+                {/* 3. Auto-detección de tráfico — solo informativo */}
+                {metrics.wasHeavyTraffic && metrics.isValid && (
+                    <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl px-4 py-3">
+                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                        <p className="text-xs text-amber-100/70 font-bold">
+                            Tráfico pesado detectado <span className="text-amber-400">(velocidad prom &lt; 20 km/h)</span>. Consumo ajustado automáticamente.
+                        </p>
                     </div>
-                    <Zap className={`w-6 h-6 ${isHeavyTraffic ? 'fill-current' : ''}`} />
-                </button>
+                )}
 
-                {/* 4. Formulario de Ingreso */}
+                {/* 4. Índice de Productividad */}
+                {parseFloat(activeTime) > 0 && parseFloat(duration) > 0 && (
+                    <ProductivityIndex
+                        activeTime={parseFloat(activeTime)}
+                        totalTime={parseFloat(duration)}
+                        eph={metrics.profitPerHour}
+                    />
+                )}
+
+                {/* 5. Formulario de Ingreso */}
                 <TripInputForm onSave={saveTrip} isValid={metrics.isValid} />
 
                 {/* Acción de Limpieza */}

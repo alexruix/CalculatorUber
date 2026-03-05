@@ -1,27 +1,22 @@
+/**
+ * BottomNavigation.tsx
+ * ─────────────────────────────────────────────────────────────
+ * Barra de navegación inferior — Mobile First.
+ * Consume NAV_TABS desde /data/nav.data.ts.
+ *
+ * Fluent 2: indicador slide activo, touch targets ≥44px,
+ * contraste de label WCAG AA, motion reducida respetada.
+ */
 import React from 'react';
-import { Calculator, BarChart3, History, User, Zap } from 'lucide-react';
+import { NAV_TABS } from '../../../data/nav.data';
 
 export type TabId = 'simulator' | 'calculator' | 'history' | 'analysis' | 'profile';
-
-interface Tab {
-  id: TabId;
-  label: string;
-  icon: React.FC<any>;
-}
 
 interface BottomTabNavigationProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
-  badgeCount?: number; // Simplificado para mostrar viajes en la sesión actual
+  badgeCount?: number;
 }
-
-const tabs: Tab[] = [
-  { id: 'simulator', label: 'Turno', icon: Zap },
-  { id: 'calculator', label: 'Cierre', icon: Calculator },
-  { id: 'history', label: 'Historial', icon: History },
-  { id: 'analysis', label: 'Análisis', icon: BarChart3 },
-  { id: 'profile', label: 'Perfil', icon: User },
-];
 
 export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
   activeTab,
@@ -31,9 +26,11 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
   return (
     <nav
       className="nav-bar"
-      aria-label="Navegación principal de la aplicación">
-      <div className="max-w-md mx-auto grid grid-cols-4 h-20">
-        {tabs.map((tab) => {
+      aria-label="Navegación principal de la aplicación"
+    >
+      {/* Grid de 5 columnas: layout fijo para mobile */}
+      <div className="max-w-md mx-auto grid grid-cols-5 h-[3.75rem] sm:h-20">
+        {NAV_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
 
@@ -41,29 +38,52 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`relative flex flex-col items-center justify-center gap-1.5 transition-all duration-300 touch-target
-                ${isActive ? 'text-nodo-petrol' : 'text-white/30'}
+              aria-current={isActive ? 'page' : undefined}
+              className={`
+                relative flex flex-col items-center justify-center gap-1
+                transition-colors duration-200
+                /* touch target mínimo 44px via padding */
+                px-1 py-2
+                ${isActive ? 'text-brand-sea' : 'text-white/30 hover:text-white/50'}
               `}
             >
-              {/* Indicador de pestaña activa tipo NODO */}
-              {isActive && (
-                <div className="absolute top-0 w-8 h-1 bg-nodo-petrol rounded-b-full shadow-[0_0_10px_rgba(0,183,189,0.5)]" />
-              )}
+              {/* Indicador superior — Fluent 2 pill */}
+              <span
+                aria-hidden="true"
+                className={`
+                  absolute top-0 h-0.5 rounded-b-full
+                  transition-all duration-300
+                  ${isActive
+                    ? 'w-8 bg-brand-sea shadow-[0_0_8px_var(--color-brand-sea)]'
+                    : 'w-0 bg-transparent'}
+                `}
+              />
 
-              <div className="relative">
-                <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-300`} />
+              {/* Ícono */}
+              <span className="relative flex items-center justify-center">
+                <Icon
+                  className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-200 motion-reduce:transform-none ${isActive ? 'scale-110' : 'scale-100'}`}
+                  aria-hidden="true"
+                />
 
-                {/* Badge con tu color Wine para el historial */}
+                {/* Badge de notificación */}
                 {tab.id === 'analysis' && badgeCount > 0 && (
-                  <div className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-nodo-wine border border-black rounded-full flex items-center justify-center px-1 animate-in zoom-in">
-                    <span className="text-xs font-black text-white leading-none">
-                      {badgeCount}
+                  <span
+                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 bg-nodo-wine border border-black rounded-full flex items-center justify-center px-1"
+                    aria-label={`${badgeCount} registros pendientes`}
+                  >
+                    <span className="text-[10px] font-black text-white leading-none">
+                      {badgeCount > 99 ? '99+' : badgeCount}
                     </span>
-                  </div>
+                  </span>
                 )}
-              </div>
+              </span>
 
-              <span className="text-xs font-black tracking-[0.15em] leading-none">
+              {/* Label — visible desde 360px, oculta en pantallas muy pequeñas */}
+              <span
+                className="font-black tracking-wider leading-none hidden xs:block"
+                style={{ fontSize: 'var(--text-micro)' }}
+              >
                 {tab.label}
               </span>
             </button>
