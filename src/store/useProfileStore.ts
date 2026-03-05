@@ -15,6 +15,9 @@ interface ProfileState {
     expenseSettings: ExpenseToggle[];
     vertical: VerticalType | null;
     user: User | null;
+    // Module C — Objetivos
+    dailyGoal: number;
+    dailyHours: number;
 
     // Actions
     setProfile: (data: Partial<Omit<ProfileState, 'setProfile' | 'resetProfile' | 'initProfile' | 'setUser' | 'logout'>>) => void;
@@ -38,6 +41,8 @@ const initialProfileState = {
         { id: 'amortization', label: 'Amortización Vehicular', enabled: false },
     ],
     vertical: null,
+    dailyGoal: 0,
+    dailyHours: 8,
 };
 
 export const useProfileStore = create<ProfileState>()(
