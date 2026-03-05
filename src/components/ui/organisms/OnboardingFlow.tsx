@@ -289,7 +289,7 @@ export const OnboardingFlow: React.FC = () => {
 
                             <fieldset className="space-y-3 border-0 p-0 m-0">
                                 <legend className="sr-only">Gastos a incluir en el cálculo</legend>
-                                {expenseSettings.map((expense) => (
+                                {Array.isArray(expenseSettings) && expenseSettings.map((expense) => (
                                     <Toggle
                                         key={expense.id}
                                         enabled={expense.enabled}

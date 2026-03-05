@@ -185,6 +185,41 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
         <PremiumGate featureName="Análisis Fino y Tendencias">
           <div className="border-t border-white/5 px-6 py-8 space-y-8 bg-black/20 animate-in slide-in-from-top-4 duration-500">
 
+            {/* Rendimiento por Vertical (NUEVO) */}
+            {insights.verticalPerformance.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between ml-1">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-info" />
+                    <p className="text-xs font-black text-white/20 uppercase tracking-[0.2em]">Eficiencia por Vertical</p>
+                  </div>
+                </div>
+                <div className="grid gap-3">
+                  {insights.verticalPerformance.map((vp, idx) => (
+                    <div key={idx} className="bg-white/2 rounded-3xl p-4 border border-white/5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center">
+                          <span className="text-lg uppercase text-white font-black tracking-tighter">
+                            {vp.vertical === 'transport' ? 'T' : vp.vertical === 'delivery' ? 'R' : vp.vertical === 'logistics' ? 'L' : '?'}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-white uppercase tracking-tight">
+                            {vp.vertical === 'transport' ? 'Transporte' : vp.vertical === 'delivery' ? 'Reparto' : vp.vertical === 'logistics' ? 'Logística' : 'Desconocido'}
+                          </p>
+                          <p className="text-xs font-bold text-white/40 uppercase tracking-widest">{vp.count} viajes</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-black text-success italic tracking-tighter">${vp.efficiency} <span className="text-[10px] text-white/30 uppercase not-italic tracking-widest">/km</span></p>
+                        <p className="text-[10px] text-white/50 font-bold uppercase tracking-widest">${vp.margin.toLocaleString('es-AR')} netos</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Tips Mejorados (Usa la nueva lógica del hook) */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 ml-1">

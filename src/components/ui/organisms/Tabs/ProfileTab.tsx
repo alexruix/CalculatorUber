@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Copy,
   HelpCircle,
+  RefreshCw,
 } from "lucide-react";
 import type { VerticalType } from "../../../../types/calculator.types";
 
@@ -50,34 +51,34 @@ const VERTICALS: Array<{
   accentBorder: string;
   accentText: string;
 }> = [
-  {
-    id: "transport",
-    label: "Transporte",
-    sub: "Uber / Cabify",
-    Icon: Car,
-    accentBg: "bg-green-500/15",
-    accentBorder: "border-green-500/40",
-    accentText: "text-green-400",
-  },
-  {
-    id: "delivery",
-    label: "Delivery",
-    sub: "Rappi / Pedidos",
-    Icon: Bike,
-    accentBg: "bg-orange-500/15",
-    accentBorder: "border-orange-500/40",
-    accentText: "text-orange-400",
-  },
-  {
-    id: "logistics",
-    label: "Logística",
-    sub: "Flete / Envíos",
-    Icon: Truck,
-    accentBg: "bg-sky-500/15",
-    accentBorder: "border-sky-500/40",
-    accentText: "text-sky-400",
-  },
-];
+    {
+      id: "transport",
+      label: "Transporte",
+      sub: "Uber / Cabify",
+      Icon: Car,
+      accentBg: "bg-green-500/15",
+      accentBorder: "border-green-500/40",
+      accentText: "text-green-400",
+    },
+    {
+      id: "delivery",
+      label: "Delivery",
+      sub: "Rappi / Pedidos",
+      Icon: Bike,
+      accentBg: "bg-orange-500/15",
+      accentBorder: "border-orange-500/40",
+      accentText: "text-orange-400",
+    },
+    {
+      id: "logistics",
+      label: "Logística",
+      sub: "Flete / Envíos",
+      Icon: Truck,
+      accentBg: "bg-sky-500/15",
+      accentBorder: "border-sky-500/40",
+      accentText: "text-sky-400",
+    },
+  ];
 
 // ─── Section Header component ────────────────────────────────────────────────
 
@@ -122,9 +123,14 @@ export const ProfileTab: React.FC = () => {
     vertical,
     dailyGoal,
     dailyHours,
+    secondaryVehicle,
+    vehicleValue,
+    vehicleLifetimeKm,
+    amortizationPerKm,
     setProfile,
     resetProfile,
     logout,
+    swapVehicle,
   } = useProfileStore();
 
   const { sessionTrips } = useCalculatorStore();
@@ -152,18 +158,19 @@ export const ProfileTab: React.FC = () => {
   // — Quick stats —
   const costPerKm = useMemo(() => {
     let cost = 0;
-    const isFuel = expenseSettings.find((e) => e.id === "fuel")?.enabled;
-    const isMaint = expenseSettings.find(
+    const expenses = Array.isArray(expenseSettings) ? expenseSettings : [];
+    const isFuel = expenses.find((e) => e.id === "fuel")?.enabled;
+    const isMaint = expenses.find(
       (e) => e.id === "maintenance",
     )?.enabled;
-    const isAmort = expenseSettings.find(
+    const isAmort = expenses.find(
       (e) => e.id === "amortization",
     )?.enabled;
     if (isFuel && kmPerLiter > 0) cost += fuelPrice / kmPerLiter;
     if (isMaint) cost += maintPerKm;
-    if (isAmort) cost += 15;
+    if (isAmort) cost += amortizationPerKm;
     return Math.round(cost);
-  }, [expenseSettings, kmPerLiter, fuelPrice, maintPerKm]);
+  }, [expenseSettings, kmPerLiter, fuelPrice, maintPerKm, amortizationPerKm]);
 
   const dailyProgressPct =
     dailyGoal > 0 ? Math.min(100, Math.round((todayNet / dailyGoal) * 100)) : 0;
@@ -193,7 +200,8 @@ export const ProfileTab: React.FC = () => {
 
   const handleToggleExpense = useCallback(
     (id: string) => {
-      const updated = expenseSettings.map((e) =>
+      const expenses = Array.isArray(expenseSettings) ? expenseSettings : [];
+      const updated = expenses.map((e) =>
         e.id === id ? { ...e, enabled: !e.enabled } : e,
       );
       setProfile({ expenseSettings: updated });
@@ -314,20 +322,18 @@ export const ProfileTab: React.FC = () => {
               <img
                 src={avatarUrl}
                 alt={`Foto de ${displayName}`}
-                className={`w-20 h-20 rounded-3xl object-cover border-2 mx-auto ${
-                  isPro ? "border-sky-400" : "border-white/20"
-                }`}
+                className={`w-20 h-20 rounded-3xl object-cover border-2 mx-auto ${isPro ? "border-sky-400" : "border-white/20"
+                  }`}
                 style={
                   isPro ? { boxShadow: "0 0 20px rgba(14,165,233,0.4)" } : {}
                 }
               />
             ) : (
               <div
-                className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto border-2 text-2xl font-black text-white ${
-                  isPro
-                    ? "bg-sky-500/20 border-sky-400"
-                    : "bg-white/10 border-white/20"
-                }`}
+                className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto border-2 text-2xl font-black text-white ${isPro
+                  ? "bg-sky-500/20 border-sky-400"
+                  : "bg-white/10 border-white/20"
+                  }`}
                 style={
                   isPro ? { boxShadow: "0 0 20px rgba(14,165,233,0.4)" } : {}
                 }
@@ -351,6 +357,20 @@ export const ProfileTab: React.FC = () => {
 
           {/* Vehicle identity */}
           <VehicleIdentityCard vehicleName={vehicleName} vertical={vertical} />
+
+          {/* Quick Swapper (PRO) */}
+          {isPro && (
+            <div className="mt-4 pt-4 border-t border-white/5 animate-in fade-in duration-500">
+              <button
+                onClick={swapVehicle}
+                className="w-full flex items-center justify-center gap-2 bg-info/10 hover:bg-info/20 border border-info/30 text-info py-3 px-4 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.15)]"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Cambiar a modo {vertical === "transport" ? "Reparto" : "Transporte"}
+              </button>
+              <p className="text-[10px] text-white/30 mt-2 font-medium">Alterná entre perfiles con sus propios costos al instante.</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -368,7 +388,7 @@ export const ProfileTab: React.FC = () => {
             <p className="caption mb-1">Costo / KM</p>
             <p className="text-2xl font-black text-white">${costPerKm}</p>
             <p className="label-hint mt-1">
-              {expenseSettings.filter((e) => e.enabled).length} gastos activos
+              {Array.isArray(expenseSettings) ? expenseSettings.filter((e) => e.enabled).length : 0} gastos activos
             </p>
           </div>
 
@@ -405,7 +425,7 @@ export const ProfileTab: React.FC = () => {
                 />
               )}
               <p className="text-sm font-black text-white capitalize">
-                {vertical || "Sin config"}
+                {vertical === "transport" ? "Transporte" : vertical === "delivery" ? "Reparto" : vertical === "logistics" ? "Logística" : "Sin config"}
               </p>
             </div>
           </div>
@@ -440,13 +460,12 @@ export const ProfileTab: React.FC = () => {
           <div className="card-metric" role="listitem">
             <p className="caption mb-1">Eficiencia</p>
             <p
-              className={`text-2xl font-black ${
-                efficiencyPct > 0
-                  ? "text-green-400"
-                  : efficiencyPct < -5
-                    ? "text-amber-400"
-                    : "text-white"
-              }`}
+              className={`text-2xl font-black ${efficiencyPct > 0
+                ? "text-green-400"
+                : efficiencyPct < -5
+                  ? "text-amber-400"
+                  : "text-white"
+                }`}
             >
               {efficiencyPct > 0 ? "+" : ""}
               {efficiencyPct}%
@@ -567,6 +586,53 @@ export const ProfileTab: React.FC = () => {
               </div>
             </div>
 
+            {/* Row 3: Amortization (Vehicle Value & Lifetime) */}
+            <div className="rounded-2xl border border-white/5 bg-white/2 p-4 space-y-4">
+              <p className="text-xs font-black text-white/30 uppercase tracking-widest">Amortización <span className="text-white/15">(opcional)</span></p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="field-wrapper">
+                  <label htmlFor="profile-vehicle-value" className="label-base">
+                    Valor del Vehículo
+                  </label>
+                  <div className="field-input-wrapper">
+                    <DollarSign className="field-icon-left" aria-hidden="true" />
+                    <input
+                      id="profile-vehicle-value"
+                      type="number"
+                      inputMode="decimal"
+                      defaultValue={vehicleValue}
+                      onBlur={(e) =>
+                        handleFieldSave({ vehicleValue: Number(e.target.value) })
+                      }
+                      min="0"
+                      className="input-base input-focus text-sm pl-11"
+                      placeholder="3000000"
+                    />
+                  </div>
+                </div>
+
+                <div className="field-wrapper">
+                  <label htmlFor="profile-vehicle-lifetime" className="label-base">
+                    Vida útil (km)
+                  </label>
+                  <div className="field-input-wrapper">
+                    <input
+                      id="profile-vehicle-lifetime"
+                      type="number"
+                      inputMode="decimal"
+                      defaultValue={vehicleLifetimeKm}
+                      onBlur={(e) =>
+                        handleFieldSave({ vehicleLifetimeKm: Number(e.target.value) })
+                      }
+                      min="1"
+                      className="input-base input-focus text-sm pr-11"
+                      placeholder="200000"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <p className="label-hint text-center">
               Los campos se guardan automáticamente al salir de cada campo.
             </p>
@@ -610,10 +676,9 @@ export const ProfileTab: React.FC = () => {
                       aria-checked={isActive}
                       onClick={() => handleVerticalSelect(v.id)}
                       className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40
-                        ${
-                          isActive
-                            ? `${v.accentBg} ${v.accentBorder}`
-                            : "bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.07]"
+                        ${isActive
+                          ? `${v.accentBg} ${v.accentBorder}`
+                          : "bg-white/3 border-white/8 hover:bg-white/10"
                         }`}
                     >
                       <Icon
@@ -644,6 +709,7 @@ export const ProfileTab: React.FC = () => {
                 kmPerLiter={kmPerLiter}
                 fuelPrice={fuelPrice}
                 maintPerKm={maintPerKm}
+                amortizationPerKm={amortizationPerKm}
                 onToggle={handleToggleExpense}
               />
             </div>
@@ -714,7 +780,7 @@ export const ProfileTab: React.FC = () => {
             </div>
 
             {/* Danger Zone */}
-            <div className="p-6 border-2 border-red-500/20 rounded-[2rem] bg-red-500/[0.03] text-center">
+            <div className="p-6 border-2 border-red-500/20 rounded-4xl bg-red-500/3 text-center">
               <AlertTriangle
                 className="w-7 h-7 text-red-400 mx-auto mb-3"
                 aria-hidden="true"

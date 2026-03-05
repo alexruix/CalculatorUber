@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
-import { useShiftMetrics } from '../../../../hooks/useShiftMetrics';
+import { useShiftData } from '../../../../hooks/useShiftData';
 
 // Components
 import { ShiftCloseForm } from '../ShiftCloseForm';
@@ -12,11 +12,10 @@ interface ShiftCloseTabProps {
 }
 
 export const ShiftCloseTab: React.FC<ShiftCloseTabProps> = ({ onNavigateTrips }) => {
-    const { sessionTrips, shiftClose, clearSession } = useCalculatorStore();
+    const { sessionTrips, clearSession } = useCalculatorStore();
 
-    // Filtramos para mostrar análisis solo de turnos de hoy (opcional, por ahora usamos todos)
-    // Obtenemos métricas globales del turno
-    const metrics = useShiftMetrics(sessionTrips, shiftClose);
+    // Obtenemos métricas globales del turno usando el nuevo hook unificado
+    const metrics = useShiftData();
 
     return (
         <div className="pb-32 space-y-6 animate-in slide-in-from-right-4 duration-500">

@@ -37,6 +37,10 @@ export interface TripMetrics {
   roi: number;
   /** Estado de rentabilidad basado en umbrales */
   status: 'excellent' | 'fair' | 'poor' | 'danger' | 'neutral';
+  
+  // Arch V2 fields
+  deadKm?: number;
+  realProfitPerKm?: number;
 }
 
 /**
@@ -114,16 +118,24 @@ export interface Trip {
   distance: number;
   duration: number;
   pickupDistance: number;
-  deadheadDistance: number; // 👈 Nuevo: KM desde el viaje anterior hasta este
-  platform: 'Uber' | 'Didi' | 'Cabify' | 'Particular'; // 👈 Nuevo
+  deadheadDistance: number; 
+  platform: 'Uber' | 'Didi' | 'Cabify' | 'Particular';
   metrics: {
     netMargin: number;
     profitPerKm: number;
-    profitPerHour: number; // 👈 Nuevo: Ganancia real por hora de trabajo
-    efficiencyRatio: number; // 👈 Nuevo: % de KM facturados
+    profitPerHour: number;
+    efficiencyRatio: number;
   }
 }
 
+
+export interface VerticalPerformance {
+  vertical: VerticalType | 'unknown';
+  efficiency: number;
+  margin: number;
+  distance: number;
+  count: number;
+}
 
 /**
  * Análisis de sesión con insights y gamificación
@@ -151,6 +163,7 @@ export interface SessionInsights {
   driverLevel: number;
   pointsToNextLevel: number;
   totalPoints: number;
+  verticalPerformance: VerticalPerformance[];
 }
 
 

@@ -22,6 +22,7 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
         pointsToNextLevel: 10,
         totalPoints: 0,
         bestTimeOfDay: null,
+        verticalPerformance: [],
       };
     }
 
@@ -57,6 +58,26 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
     // === 8. EL RANGO DE CALLE (NIVEL) ===
     const { level, points, pointsToNext } = calculateLevel(trips.length, totalMargin);
 
+    // === 9. RENDIMIENTO POR VERTICAL (NUEVO) ===
+    const verticalStats: Record<string, { margin: number, distance: number, count: number }> = {};
+    trips.forEach(t => {
+      const v = t.vertical || 'unknown';
+      if (!verticalStats[v]) {
+        verticalStats[v] = { margin: 0, distance: 0, count: 0 };
+      }
+      verticalStats[v].margin += t.margin;
+      verticalStats[v].distance += (t.distance || 0);
+      verticalStats[v].count += 1;
+    });
+
+    const verticalPerformance = Object.entries(verticalStats).map(([v, stats]) => ({
+      vertical: v as any,
+      margin: stats.margin,
+      distance: stats.distance,
+      count: stats.count,
+      efficiency: stats.distance > 0 ? Math.round(stats.margin / stats.distance) : 0,
+    })).sort((a, b) => b.efficiency - a.efficiency);
+
     return {
       bestTrip,
       worstTrip,
@@ -70,6 +91,7 @@ export const useSessionInsights = (trips: SavedTrip[]): SessionInsights => {
       pointsToNextLevel: pointsToNext,
       totalPoints: points,
       bestTimeOfDay: null,
+      verticalPerformance,
     };
   }, [trips]);
 };

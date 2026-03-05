@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 interface ProfileState {
     isConfigured: boolean;
     isFetchingProfile: boolean;
+    isInitialLoading: boolean; // 👈 Evita parpadeos de UI
     isPro: boolean;
     driverName: string;
     vehicleName: string;
@@ -47,6 +48,7 @@ interface ProfileState {
 const initialProfileState = {
     isConfigured: false,
     isFetchingProfile: false,
+    isInitialLoading: true, // Inicia en true hasta que termina initProfile
     isPro: false,
     driverName: '',
     vehicleName: '',
@@ -78,9 +80,12 @@ export const useProfileStore = create<ProfileState>()(
             },
             setUser: (user) => set({ user }),
             initProfile: async () => {
-                if (!isSupabaseConfigured()) return;
-
-                set({ isFetchingProfile: true });
+                set({ isFetchingProfile: true, isInitialLoading: true });
+                
+                if (!isSupabaseConfigured()) {
+                    set({ isFetchingProfile: false, isInitialLoading: false });
+                    return;
+                }
 
                 try {
                     const { data: { session } } = await supabase.auth.getSession();
@@ -100,27 +105,34 @@ export const useProfileStore = create<ProfileState>()(
                                 isConfigured: true,
                                 isPro: data.subscription_tier === 'pro',
                                 vehicleName: data.vehicle_name,
-                                kmPerLiter: Number(data.km_per_liter),
-                                maintPerKm: Number(data.maint_per_km),
-                                fuelPrice: Number(data.fuel_price),
+                                kmPerLiter: Math.max(0.1, Number(data.km_per_liter) || 10), // Safe Default
+                                maintPerKm: Number(data.maint_per_km) || 15,
+                                fuelPrice: Number(data.fuel_price) || 1400,
                                 expenseSettings: data.expense_settings || initialProfileState.expenseSettings,
                                 vertical: data.vertical || null,
-                                isFetchingProfile: false
+                                dailyGoal: data.daily_goal !== undefined && data.daily_goal !== null ? Number(data.daily_goal) : initialProfileState.dailyGoal,
+                                secondaryVehicle: data.secondary_vehicle || null,
+                                isFetchingProfile: false,
+                                isInitialLoading: false
                             });
                         } else {
                             // Current user exists but no profile yet (new user) or error
-                            set({ user: currentUser, isConfigured: false, isFetchingProfile: false });
+                            set({ user: currentUser, isConfigured: false, isFetchingProfile: false, isInitialLoading: false });
                         }
                     } else {
                         // No user
-                        set({ user: null, isFetchingProfile: false });
+                        set({ user: null, isFetchingProfile: false, isInitialLoading: false });
                     }
                 } catch (e) {
-                    set({ isFetchingProfile: false });
+                    set({ isFetchingProfile: false, isInitialLoading: false });
                 }
             },
             setProfile: async (data) => {
-                set((state) => ({ ...state, ...data, isConfigured: true }));
+                // Aplicar Safe Defaults en la entrada
+                const sanitizedData = { ...data };
+                if (sanitizedData.kmPerLiter !== undefined) sanitizedData.kmPerLiter = Math.max(0.1, sanitizedData.kmPerLiter);
+
+                set((state) => ({ ...state, ...sanitizedData, isConfigured: true }));
 
                 // Sync with supabase if authenticated
                 const currentUser = get().user;
@@ -134,6 +146,8 @@ export const useProfileStore = create<ProfileState>()(
                         fuel_price: state.fuelPrice,
                         expense_settings: state.expenseSettings,
                         vertical: state.vertical,
+                        daily_goal: state.dailyGoal,
+                        secondary_vehicle: state.secondaryVehicle,
                         subscription_tier: state.isPro ? 'pro' : 'free'
                     };
 
@@ -186,8 +200,19 @@ export const useProfileStore = create<ProfileState>()(
         {
             name: 'nodo_config_v1', // Replaces custom localStorage handling
             partialize: (state) => Object.fromEntries(
-                Object.entries(state).filter(([key]) => !['user', 'isFetchingProfile'].includes(key))
+                Object.entries(state).filter(([key]) => !['user', 'isFetchingProfile', 'isInitialLoading'].includes(key))
             ) as ProfileState,
+            merge: (persistedState: any, currentState) => {
+                return {
+                    ...currentState,
+                    ...persistedState,
+                    // Seguro absoluto: obliga a que expenseSettings sea un array. 
+                    // Si local storage envía basura (un objeto vacío) por un bug viejo, resetea a default.
+                    expenseSettings: Array.isArray(persistedState?.expenseSettings)
+                        ? persistedState.expenseSettings
+                        : currentState.expenseSettings,
+                };
+            }
         }
     )
 );

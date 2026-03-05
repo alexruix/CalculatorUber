@@ -9,6 +9,16 @@ interface PremiumGateProps {
 
 export const PremiumGate: React.FC<PremiumGateProps> = ({ children, featureName = 'esta funcionalidad' }) => {
     const isPro = useProfileStore((state) => state.isPro);
+    const isInitialLoading = useProfileStore((state) => state.isInitialLoading);
+
+    // Evitar parpadeo del Paywall durante la hidratación inicial
+    if (isInitialLoading) {
+        return (
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-white/5 animate-pulse min-h-[100px] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/30 animate-spin" />
+            </div>
+        );
+    }
 
     if (isPro) {
         return <>{children}</>;

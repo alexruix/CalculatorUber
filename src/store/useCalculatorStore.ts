@@ -6,6 +6,7 @@ import { useProfileStore } from './useProfileStore';
 
 export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
 
+
 interface CalculatorState {
     // Inputs del form del VIAJE
     fare: string;
@@ -15,6 +16,11 @@ interface CalculatorState {
     tip: string;
     tolls: string;
     startTime: string; // "HH:MM"
+
+    // Odometer data (Persistidos localmente y sincronizados con Shifts)
+    startingOdometer: string;
+    currentOdometer: string;
+    activeShiftId: string | null;
 
     // Datos del CIERRE de turno
     shiftClose: ShiftClose | null;
@@ -31,21 +37,23 @@ interface CalculatorState {
     setTip: (val: string) => void;
     setTolls: (val: string) => void;
     setStartTime: (val: string) => void;
+    setStartingOdometer: (val: string) => void;
+    setCurrentOdometer: (val: string) => void;
     setShiftClose: (data: ShiftClose | null) => void;
     setActiveTab: (tab: TabId) => void;
 
     // Trip management
-    // Trip management
-    addTrip: (trip: SavedTrip) => void;
-    deleteTrip: (id: number | string) => void;
-    clearSession: () => void;
+    addTrip: (trip: SavedTrip) => Promise<void>;
+    deleteTrip: (id: number | string) => Promise<void>;
+    clearSession: () => Promise<void>;
     initTrips: () => Promise<void>;
     resetInputs: () => void;
+    updateTrip: (id: number | string, newData: Partial<SavedTrip>) => Promise<void>;
 }
 
 export const useCalculatorStore = create<CalculatorState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             fare: '',
             distTrip: '',
             distPickup: '',
@@ -53,6 +61,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             tip: '',
             tolls: '',
             startTime: '',
+            startingOdometer: '',
+            currentOdometer: '',
+            activeShiftId: null,
             shiftClose: null,
             activeTab: 'home',
             sessionTrips: [],
@@ -64,45 +75,67 @@ export const useCalculatorStore = create<CalculatorState>()(
             setTip: (val) => set({ tip: val }),
             setTolls: (val) => set({ tolls: val }),
             setStartTime: (val) => set({ startTime: val }),
+            
+            
+            setStartingOdometer: async (val) => {
+                set({ startingOdometer: val });
+                
+                // Si hay internet y no hay turno activo, creamos uno en Supabase
+                const user = useProfileStore.getState().user;
+                if (user && isSupabaseConfigured() && navigator.onLine && !get().activeShiftId && val !== '') {
+                    const { data } = await supabase.from('shifts').insert({
+                        user_id: user.id,
+                        odometer_start: Number(val),
+                        status: 'active'
+                    }).select().single();
+                    if (data) set({ activeShiftId: data.id });
+                }
+            },
+
+            setCurrentOdometer: (val) => set({ currentOdometer: val }),
             setShiftClose: (data) => set({ shiftClose: data }),
             setActiveTab: (val) => set({ activeTab: val }),
 
             addTrip: async (trip) => {
-                set((state) => {
-                    // Auto-calcular avgSpeed
-                    const km = trip.distance || 0;
-                    const mins = trip.duration || 0;
-                    const avgSpeed = (km > 0 && mins > 0) ? km / (mins / 60) : 0;
+                const state = get();
+                
+                // 1. Lógica de cálculo (UI enrichment)
+                const km = trip.distance || 0;
+                const mins = trip.duration || 0;
+                const avgSpeed = (km > 0 && mins > 0) ? km / (mins / 60) : 0;
 
-                    // Auto-calcular waitMinutes desde el viaje anterior si hay startTime
-                    let waitMinutes = 0;
-                    if (trip.startTime && state.sessionTrips.length > 0) {
-                        const prevTrip = state.sessionTrips[0]; // están ordenados por id desc
-                        if (prevTrip.startTime) {
-                            const [prevH, prevM] = prevTrip.startTime.split(':').map(Number);
-                            const prevEndTotalMins = prevH * 60 + prevM + prevTrip.duration;
-                            
-                            const [currH, currM] = trip.startTime.split(':').map(Number);
-                            let currStartTotalMins = currH * 60 + currM;
-                            
-                            // Si cruzó la medianoche
-                            if (currStartTotalMins < prevEndTotalMins && (prevEndTotalMins - currStartTotalMins) > 12 * 60) {
-                                currStartTotalMins += 24 * 60;
-                            }
-                            
-                            waitMinutes = Math.max(0, currStartTotalMins - prevEndTotalMins);
+                let waitMinutes = 0;
+                if (trip.startTime && state.sessionTrips.length > 0) {
+                    const prevTrip = state.sessionTrips[0];
+                    if (prevTrip.startTime) {
+                        const [prevH, prevM] = prevTrip.startTime.split(':').map(Number);
+                        const prevEndTotalMins = prevH * 60 + prevM + prevTrip.duration;
+                        const [currH, currM] = trip.startTime.split(':').map(Number);
+                        let currStartTotalMins = currH * 60 + currM;
+                        if (currStartTotalMins < prevEndTotalMins && (prevEndTotalMins - currStartTotalMins) > 12 * 60) {
+                            currStartTotalMins += 24 * 60;
                         }
+                        waitMinutes = Math.max(0, currStartTotalMins - prevEndTotalMins);
                     }
+                }
 
-                    const enrichedTrip = { ...trip, avgSpeed, waitMinutes };
-                    return { sessionTrips: [enrichedTrip, ...state.sessionTrips] }
-                });
+                const enrichedTrip = { 
+                    ...trip, 
+                    avgSpeed, 
+                    waitMinutes, 
+                    shift_id: state.activeShiftId || undefined 
+                };
 
+                // 2. Persistencia Local Inmediata (Zustand + LocalStorage)
+                set((s) => ({ sessionTrips: [enrichedTrip, ...s.sessionTrips] }));
+
+                // 3. Sincronización con Supabase si hay internet
                 const user = useProfileStore.getState().user;
-                if (user && isSupabaseConfigured()) {
+                if (user && isSupabaseConfigured() && navigator.onLine) {
                     await supabase.from('trips').insert({
                         id: trip.id,
                         user_id: user.id,
+                        shift_id: state.activeShiftId,
                         fare: trip.fare,
                         margin: trip.margin,
                         distance: trip.distance,
@@ -110,62 +143,109 @@ export const useCalculatorStore = create<CalculatorState>()(
                         vertical: trip.vertical,
                         tip: trip.tip,
                         tolls: trip.tolls,
-                        timestamp: trip.timestamp.toString() // Save numeric Unix timestamp as string
-                        // Falta persistir startTime, avgSpeed y waitMinutes en base de datos si se requiere
+                        start_time: trip.startTime,
+                        avg_speed: avgSpeed,
+                        wait_minutes: waitMinutes,
+                        timestamp: trip.timestamp // bigint en SQL
                     });
                 }
             },
+
             deleteTrip: async (id) => {
                 set((state) => ({
                     sessionTrips: state.sessionTrips.filter(t => t.id !== id)
                 }));
 
                 const user = useProfileStore.getState().user;
-                if (user && isSupabaseConfigured()) {
+                if (user && isSupabaseConfigured() && navigator.onLine) {
                     await supabase.from('trips').delete().eq('id', id).eq('user_id', user.id);
                 }
             },
+
             clearSession: async () => {
-                set({ sessionTrips: [] });
+                const state = get();
+                const user = useProfileStore.getState().user;
+
+                // 1. Cierre de turno en Supabase (si hay internet)
+                if (user && isSupabaseConfigured() && navigator.onLine && state.activeShiftId) {
+                    await supabase.from('shifts')
+                        .update({ 
+                            status: 'closed', 
+                            odometer_end: Number(state.currentOdometer),
+                            end_at: new Date().toISOString()
+                        })
+                        .eq('id', state.activeShiftId);
+                }
+
+                // 2. Reseteo local (Preservamos el historial en la DB, solo limpiamos la sesión actual)
+                set({ 
+                    sessionTrips: [], 
+                    startingOdometer: '', 
+                    currentOdometer: '',
+                    activeShiftId: null,
+                    shiftClose: null 
+                });
+            },
+
+            updateTrip: async (id, newData) => {
+                set((state) => ({
+                    sessionTrips: state.sessionTrips.map(t => 
+                        t.id === id ? { ...t, ...newData } : t
+                    )
+                }));
 
                 const user = useProfileStore.getState().user;
-                // Si limpia la sesión actual, en un modelo real quizás solo borramos de la vista local 
-                // o borramos de la BD los de las últimas 24hs. Por simplicidad de este sprint, borramos todo de este usuario.
-                if (user && isSupabaseConfigured()) {
-                    await supabase.from('trips').delete().eq('user_id', user.id);
+                if (user && isSupabaseConfigured() && navigator.onLine) {
+                    await supabase.from('trips').update(newData).eq('id', id).eq('user_id', user.id);
                 }
             },
+
             initTrips: async () => {
                 const user = useProfileStore.getState().user;
                 if (user && isSupabaseConfigured()) {
-                    const { data, error } = await supabase
-                        .from('trips')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .order('timestamp', { ascending: false });
+                    // Si estamos online, reconciliamos con la base de datos
+                    if (navigator.onLine) {
+                        const { data, error } = await supabase
+                            .from('trips')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .order('timestamp', { ascending: false });
 
-                    if (data && !error) {
-                        const loadedTrips: SavedTrip[] = data.map(dbTrip => ({
-                            id: dbTrip.id,
-                            fare: Number(dbTrip.fare),
-                            margin: Number(dbTrip.margin),
-                            distance: Number(dbTrip.distance),
-                            duration: Number(dbTrip.duration),
-                            vertical: dbTrip.vertical,
-                            tip: Number(dbTrip.tip || 0),
-                            tolls: Number(dbTrip.tolls || 0),
-                            timestamp: Number(dbTrip.timestamp), // Convert string back to numeric timestamp
-                        }));
-                        set({ sessionTrips: loadedTrips });
+                        if (data && !error) {
+                            const loadedTrips: SavedTrip[] = data.map(dbTrip => ({
+                                id: Number(dbTrip.id),
+                                fare: Number(dbTrip.fare),
+                                margin: Number(dbTrip.margin),
+                                distance: Number(dbTrip.distance),
+                                duration: Number(dbTrip.duration),
+                                vertical: dbTrip.vertical,
+                                tip: Number(dbTrip.tip || 0),
+                                tolls: Number(dbTrip.tolls || 0),
+                                timestamp: Number(dbTrip.timestamp),
+                                startTime: dbTrip.start_time,
+                                avgSpeed: Number(dbTrip.avg_speed || 0),
+                                waitMinutes: Number(dbTrip.wait_minutes || 0),
+                                shift_id: dbTrip.shift_id
+                            }));
+                            set({ sessionTrips: loadedTrips });
+                        }
                     }
                 }
             },
 
-            resetInputs: () => set({ fare: '', distTrip: '', distPickup: '', duration: '', tip: '', tolls: '', startTime: '' }),
+            resetInputs: () => set({ 
+                fare: '', distTrip: '', distPickup: '', duration: '', tip: '', tolls: '', startTime: '' 
+            }),
         }),
         {
-            name: 'nodo_session_v1', // Replaces useSessionStorage custom hook
-            partialize: (state) => ({ sessionTrips: state.sessionTrips, shiftClose: state.shiftClose }), // Persist trips and shiftClose
+            name: 'nodo_session_v2', 
+            partialize: (state) => ({ 
+                sessionTrips: state.sessionTrips, 
+                shiftClose: state.shiftClose,
+                startingOdometer: state.startingOdometer,
+                currentOdometer: state.currentOdometer,
+                activeShiftId: state.activeShiftId
+            }), 
         }
     )
 );

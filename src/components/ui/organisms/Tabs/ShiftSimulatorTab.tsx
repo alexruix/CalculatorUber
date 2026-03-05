@@ -13,18 +13,21 @@ export const ShiftSimulatorTab: React.FC = () => {
     const costPerKm = useMemo(() => {
         let cost = 0;
 
+        // Seguro contra corrupciones de Local Storage o Supabase JSONB
+        const expenses = Array.isArray(expenseSettings) ? expenseSettings : [];
+
         // Combustible
-        if (expenseSettings.find(e => e.id === 'fuel')?.enabled && kmPerLiter > 0) {
+        if (expenses.find(e => e.id === 'fuel')?.enabled && kmPerLiter > 0) {
             cost += (1 / kmPerLiter) * fuelPrice;
         }
 
         // Mantenimiento
-        if (expenseSettings.find(e => e.id === 'maintenance')?.enabled) {
+        if (expenses.find(e => e.id === 'maintenance')?.enabled) {
             cost += maintPerKm;
         }
 
         // Amortización (estimado 50% del mantenimiento)
-        if (expenseSettings.find(e => e.id === 'amortization')?.enabled) {
+        if (expenses.find(e => e.id === 'amortization')?.enabled) {
             cost += maintPerKm * 0.5;
         }
 

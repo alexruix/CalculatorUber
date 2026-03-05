@@ -1,17 +1,16 @@
 import React from 'react';
 import { SHIFT_CLOSE } from '../../../data/ui-strings';
 import { ProductivityIndex } from './ProductivityIndex';
-import { TrendingUp, AlertTriangle, Car, Plus } from '../../../lib/icons';
-import type { ShiftMetrics } from '../../../hooks/useShiftMetrics';
+import { TrendingUp, AlertTriangle, Car, Plus, Navigation } from '../../../lib/icons';
 
 interface ShiftSummaryCardProps {
-    metrics: ShiftMetrics;
+    metrics: any; // O una interfaz compartida si se prefiere
     onAddTrip: () => void;
 }
 
 export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onAddTrip }) => {
     // Si no hay viajes ni horas de turno, mostrar null
-    if (metrics.totalShiftMinutes === 0 && metrics.productiveMinutes === 0) {
+    if (metrics.totalShiftMinutes === 0 && (metrics.totalDuration || 0) === 0) {
         return null;
     }
 
@@ -53,7 +52,7 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
                     <div>
                         <p className="text-[10px] text-success/50 uppercase font-black tracking-widest mb-1">Ganancia Neta</p>
                         <p className="text-2xl font-black text-success relative z-10">
-                            ${Math.round(metrics.totalMargin).toLocaleString('es-AR')}
+                            ${Math.round(metrics.netMargin).toLocaleString('es-AR')}
                         </p>
                     </div>
                     <div className="col-span-2 flex items-center justify-between p-3 bg-white/5 rounded-2xl">
@@ -62,18 +61,28 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
                             <span className="text-xs font-black text-white uppercase tracking-widest">EPH</span>
                         </div>
                         <span className="text-xl font-black text-info">
-                            ${Math.round(metrics.eph).toLocaleString('es-AR')} <span className="text-xs opacity-50">/hr</span>
+                            ${Math.round(metrics.profitPerHour).toLocaleString('es-AR')} <span className="text-xs opacity-50">/hr</span>
                         </span>
                     </div>
                 </div>
 
-                {metrics.kmDriven > 0 && (
+                {(metrics.totalKmDriven || 0) > 0 && (
                     <div className="mb-6 flex items-center justify-between border-t border-white/5 pt-4">
                         <div className="flex items-center gap-2">
-                            <Car className="w-4 h-4 text-white/20" />
-                            <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Desgaste del vehículo</span>
+                            <Navigation className="w-4 h-4 text-white/20" />
+                            <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Recorrido Real</span>
                         </div>
-                        <span className="text-sm font-black text-white">{metrics.kmDriven} KM</span>
+                        <span className="text-sm font-black text-white">{Math.round(metrics.totalKmDriven)} KM</span>
+                    </div>
+                )}
+
+                {(metrics.deadKm || 0) > 0 && (
+                    <div className="mb-6 flex items-center justify-between border-t border-white/5 pt-4">
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-error/40" />
+                            <span className="text-xs font-bold text-error/60 uppercase tracking-widest">KM Muertos (Sin viaje)</span>
+                        </div>
+                        <span className="text-sm font-black text-error/80">{metrics.deadKm} KM</span>
                     </div>
                 )}
 
@@ -81,9 +90,8 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
                 {metrics.totalShiftMinutes > 0 ? (
                     <div className="pt-2">
                         <ProductivityIndex
-                            activeTime={metrics.productiveMinutes / 60}
+                            activeTime={(metrics.totalDuration || 0) / 60}
                             totalTime={metrics.totalShiftMinutes / 60}
-                        // EPH omitido ya que se muestra en la card misma
                         />
                     </div>
                 ) : null}

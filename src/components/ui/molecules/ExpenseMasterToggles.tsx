@@ -14,6 +14,7 @@ interface ExpenseMasterTogglesProps {
   kmPerLiter: number;
   fuelPrice: number;
   maintPerKm: number;
+  amortizationPerKm: number;
   onToggle: (id: string) => void;
 }
 
@@ -44,15 +45,17 @@ function calcCostPerKm(
   kmPerLiter: number,
   fuelPrice: number,
   maintPerKm: number,
+  amortizationPerKm: number,
 ): number {
   let cost = 0;
-  const isFuel = expenseSettings.find((e) => e.id === "fuel")?.enabled;
-  const isMaint = expenseSettings.find((e) => e.id === "maintenance")?.enabled;
-  const isAmort = expenseSettings.find((e) => e.id === "amortization")?.enabled;
+  const expenses = Array.isArray(expenseSettings) ? expenseSettings : [];
+  const isFuel = expenses.find((e) => e.id === "fuel")?.enabled;
+  const isMaint = expenses.find((e) => e.id === "maintenance")?.enabled;
+  const isAmort = expenses.find((e) => e.id === "amortization")?.enabled;
 
   if (isFuel && kmPerLiter > 0) cost += fuelPrice / kmPerLiter;
   if (isMaint) cost += maintPerKm;
-  if (isAmort) cost += 15; // fixed amortization default
+  if (isAmort) cost += amortizationPerKm;
   return Math.round(cost);
 }
 
@@ -61,14 +64,15 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
   kmPerLiter,
   fuelPrice,
   maintPerKm,
+  amortizationPerKm,
   onToggle,
 }) => {
   const costPerKm = useMemo(
-    () => calcCostPerKm(expenseSettings, kmPerLiter, fuelPrice, maintPerKm),
-    [expenseSettings, kmPerLiter, fuelPrice, maintPerKm],
+    () => calcCostPerKm(expenseSettings, kmPerLiter, fuelPrice, maintPerKm, amortizationPerKm),
+    [expenseSettings, kmPerLiter, fuelPrice, maintPerKm, amortizationPerKm],
   );
 
-  const enabledCount = expenseSettings.filter((e) => e.enabled).length;
+  const enabledCount = Array.isArray(expenseSettings) ? expenseSettings.filter((e) => e.enabled).length : 0;
 
   return (
     <div className="space-y-3">
@@ -88,7 +92,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
           Selección de gastos a incluir en el cálculo
         </legend>
 
-        {expenseSettings.map((expense) => {
+        {Array.isArray(expenseSettings) && expenseSettings.map((expense) => {
           const meta = EXPENSE_META[expense.id];
           if (!meta) return null;
           const { Icon, label, desc } = meta;
@@ -103,6 +107,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
             kmPerLiter,
             fuelPrice,
             maintPerKm,
+            amortizationPerKm,
           );
           const diff = previewCost - costPerKm;
 

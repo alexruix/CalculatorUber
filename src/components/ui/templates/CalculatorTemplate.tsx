@@ -20,29 +20,44 @@ const ProfileTab = lazy(() => import("../organisms/Tabs/ProfileTab").then(m => (
 
 // Refactored Tabs
 import { BottomTabNavigation } from "../organisms/BottomNavigation";
+import { useUnifiedSession } from "../../../hooks/useUnifiedSession";
 
 const CalculatorApp: React.FC = () => {
-  // Global State Access (Replacement of massive useState block)
-  const { isConfigured, user, initProfile, isFetchingProfile } =
-    useProfileStore();
+
+  // --- 1. SESSION & PROFILE (Unified Hook Interface) ---
   const {
+    isReady,
+    isInitialLoading,
+    isConfigured,
+    user,
     sessionTrips,
     activeTab,
     setActiveTab,
     clearSession,
-    deleteTrip,
-    initTrips,
-  } = useCalculatorStore();
+    deleteTrip
+  } = useUnifiedSession();
 
-  const [isInitializing, setIsInitializing] = useState(true);
+  const { initProfile } = useProfileStore();
+  const { initTrips } = useCalculatorStore();
+
   const [showToast, setShowToast] = useState(false);
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([activeTab]));
+
+  // Keep track of visited tabs to prevent unmounting and losing state
+  useEffect(() => {
+    setVisitedTabs((prev) => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
 
   // Initialize Supabase data on mount e interceptar cambios de sesión
   useEffect(() => {
     const initializeApp = async () => {
       await initProfile();
       await initTrips();
-      setIsInitializing(false);
     };
     initializeApp();
 
@@ -65,14 +80,14 @@ const CalculatorApp: React.FC = () => {
 
   // Show motivational toast after login/init
   useEffect(() => {
-    if (!isInitializing && !isFetchingProfile && isConfigured && user) {
+    if (isReady && isConfigured && user) {
       setShowToast(true);
       const t = setTimeout(() => setShowToast(false), 5000);
       return () => clearTimeout(t);
     }
-  }, [isInitializing, isFetchingProfile, isConfigured, user]);
+  }, [isReady, isConfigured, user]);
 
-  if (isInitializing || isFetchingProfile) {
+  if (!isReady) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black gap-4">
         <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -114,31 +129,43 @@ const CalculatorApp: React.FC = () => {
       {/* Contenedor Principal de Pestañas */}
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
         <Suspense fallback={<TabSkeleton />}>
-          {activeTab === "home" && <ShiftSimulatorTab />}
+          {visitedTabs.has("home") && (
+            <div style={{ display: activeTab === "home" ? "block" : "none" }}>
+              <ShiftSimulatorTab />
+            </div>
+          )}
 
-          {activeTab === "trips" && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+          {visitedTabs.has("trips") && (
+            <div
+              className="animate-in fade-in slide-in-from-right-4 duration-500"
+              style={{ display: activeTab === "trips" ? "block" : "none" }}
+            >
               <TripsTab />
             </div>
           )}
 
-          {activeTab === "close" && (
-            <ShiftCloseTab onNavigateTrips={() => setActiveTab('trips')} />
+          {visitedTabs.has("close") && (
+            <div style={{ display: activeTab === "close" ? "block" : "none" }}>
+              <ShiftCloseTab onNavigateTrips={() => setActiveTab('trips')} />
+            </div>
           )}
 
-          {activeTab === "history" && (
-            <HistoryTab
-              trips={sessionTrips}
-              onClearHistory={() => {
-                if (confirm("¿Borrar historial del día?")) clearSession();
-              }}
-              onDeleteTrip={deleteTrip}
-            />
+          {visitedTabs.has("history") && (
+            <div style={{ display: activeTab === "history" ? "block" : "none" }}>
+              <HistoryTab
+                onClearHistory={() => {
+                  if (confirm("¿Borrar historial del día?")) clearSession();
+                }}
+                onDeleteTrip={deleteTrip}
+              />
+            </div>
           )}
 
-          {activeTab === "profile" && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* ProfileTab is now self-contained — reads from Zustand directly */}
+          {visitedTabs.has("profile") && (
+            <div
+              className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+              style={{ display: activeTab === "profile" ? "block" : "none" }}
+            >
               <ProfileTab />
             </div>
           )}

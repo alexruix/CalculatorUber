@@ -43,6 +43,8 @@ export {
   Package,
   PartyPopper,
   Plus,
+  Gauge,
+  Pencil,
   RefreshCw,
   Rocket,
   RotateCcw,
@@ -59,5 +61,7 @@ export {
   User,
   X,
   Zap,
-  Home
+  Home,
+  Timer,
+  Save,
 } from 'lucide-react';
