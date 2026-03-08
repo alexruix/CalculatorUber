@@ -1,142 +1,494 @@
+/**
+ * global.css - MANEJATE Design System v2.0
+ * Complete implementation with all necessary features
+ * Source of Truth for design tokens
+ */
+
+/* ============================================
+   FONT IMPORT (CRITICAL - Must be first)
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ============================================
+   TAILWIND IMPORT
+   ============================================ */
+
 @import "tailwindcss";
-@import "./manejate-ui.css";
-/* 👈 Design System — fuente única de verdad */
 
-/* =============================================================================
-   @THEME — Tokens de Tailwind
-   Estos valores generan utilidades Tailwind (bg-dark-bg, text-nodo-petrol, etc.)
-   que se usan en los componentes. No mover a :root de manejate-ui.css o se
-   perderán las utilidades generadas.
-   ============================================================================= */
-@theme {
-  /* ── Legacy Brand (backward-compat) ───────────────────────── */
-  --color-nodo-petrol: #1a4d5c;
-  --color-nodo-wine: #6b1f3d;
-  --color-nodo-sand: #d4c5b0;
+/* ============================================
+   DESIGN TOKENS - Base Layer
+   ============================================ */
 
-  /* ── Manejate 2.0 Brand Palette ───────────────────────────── */
-  --color-brand-navy: #355872;
-  --color-brand-sea: #7AAACE;
-  --color-brand-blue: #9CD5FF;
-  --color-brand-cold: #F7F8F0;
-  --color-brand-black: #232323;
-  /* Alias para componentes que usan text-nodo-accent */
-  --color-nodo-accent: #7AAACE;
-
-  /* ── Semantic State Colors (Fluent 2) ───────────────────────── */
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #0ea5e9;
-
-  /* ── Superficies (Dark Mode / Conducción) ─────────────────── */
-  --color-dark-bg: #0a0a0a;
-  --color-dark-card: #151515;
-  --color-dark-border: rgba(255, 255, 255, 0.08);
-
-  /* ── Fluent 2 — Sistema tipográfico (Mobile First) ─────────── *
-   *  Escala legible desde 360px. Tamaños mínimos garantizan     *
-   *  accesibilidad sin zoom en Android gama media.              */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-
-  /* Escala tipográfica — en rem para respetar zoom del usuario */
-  --text-hero: clamp(2.5rem, 8vw, 4rem);
-  /* Balance, pantalla de resultado */
-  --text-title: clamp(1.25rem, 5vw, 1.75rem);
-  /* Heading de pestaña         */
-  --text-subtitle: clamp(1rem, 4vw, 1.25rem);
-  /* Sub-sección                */
-  --text-body: 0.9375rem;
-  /* 15px — cuerpo de texto legible en mobile      */
-  --text-label: 0.8125rem;
-  /* 13px — labels de campo, mínimo Fluent 2       */
-  --text-caption: 0.75rem;
-  /* 12px — hints, meta-data, WCAG AA mínimo       */
-  --text-micro: 0.625rem;
-  /* 10px — badges, tracking-widest only           */
-
-  /* ── Fluent 2 — Espaciado en grid de 4px ─────────────────── */
-  --space-1: 0.25rem;
-  /* 4px  */
-  --space-2: 0.5rem;
-  /* 8px  */
-  --space-3: 0.75rem;
-  /* 12px */
-  --space-4: 1rem;
-  /* 16px */
-  --space-5: 1.25rem;
-  /* 20px */
-  --space-6: 1.5rem;
-  /* 24px */
-  --space-8: 2rem;
-  /* 32px */
-  --space-10: 2.5rem;
-  /* 40px */
-  --space-12: 3rem;
-  /* 48px */
-
-  /* ── Fluent 2 — Motion curves ────────────────────────────── */
-  --ease-fluent-accelerate: cubic-bezier(0.9, 0.1, 1, 0.2);
-  /* Salida rápida   */
-  --ease-fluent-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
-  /* Entrada suave   */
-  --ease-fluent-standard: cubic-bezier(0.33, 0.0, 0.1, 1.0);
-  /* Transición base */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Spring pop      */
-
-  /* ── Animaciones ───────────────────────────────────────────── */
-  --animate-score: score-pop 0.5s var(--ease-spring);
-  --animate-fade: fade-in 0.2s var(--ease-fluent-decelerate);
-}
-
-@keyframes score-pop {
-  0% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── xs breakpoint — Mobile First desde 360px ─────────────────────────── */
-@custom-media --xs (min-width: 360px);
-
-
-/* =============================================================================
-   @LAYER BASE — Estilos globales del documento
-   ============================================================================= */
 @layer base {
+  :root {
+    /* ==================== NEON GAMING PALETTE ==================== */
+    
+    /* PRIMARY: GREENT (Success / Profit / Action) */
+    --color-primary: #00F068;
+    --color-primary-glow: rgba(0, 240, 104, 0.5);
+    --color-primary-dim: rgba(0, 240, 104, 0.1);
+
+    /* SECONDARY: NEBULA (Gamification / XP / Progress) */
+    --color-secondary: #925DEE;
+    --color-secondary-glow: rgba(146, 93, 238, 0.5);
+    --color-secondary-dim: rgba(146, 93, 238, 0.1);
+
+    /* ACCENT: SOLAR (Alerts / Critical / Warnings) */
+    --color-accent: #FF8800;
+    --color-accent-glow: rgba(255, 136, 0, 0.5);
+    --color-accent-dim: rgba(255, 136, 0, 0.1);
+
+    /* NEUTRAL: Base Colors */
+    --color-black: #000000;           /* True black background */
+    --color-starlight: #E7E7E7;       /* Primary text */
+    --color-moon: #5B5B5B;            /* Secondary text */
+    --color-slate: #1E293B;           /* Card backgrounds */
+    --color-evergreen: #00A849;       /* Alternative green */
+
+    /* ==================== SEMANTIC COLORS ==================== */
+    
+    /* Success (Profit > threshold) */
+    --color-success: var(--color-primary);
+    --color-success-bg: var(--color-primary-dim);
+    --color-success-border: var(--color-primary);
+
+    /* Warning (Profit at limit) */
+    --color-warning: var(--color-accent);
+    --color-warning-bg: var(--color-accent-dim);
+    --color-warning-border: var(--color-accent);
+
+    /* Error (Unprofitable) */
+    --color-error: #FF4444;
+    --color-error-bg: rgba(255, 68, 68, 0.1);
+    --color-error-border: #FF4444;
+
+    /* Info */
+    --color-info: var(--color-secondary);
+    --color-info-bg: var(--color-secondary-dim);
+    --color-info-border: var(--color-secondary);
+
+    /* ==================== TYPOGRAPHY ==================== */
+    
+    /* Font Family */
+    --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Font Sizes (Mobile-First) */
+    --text-xs: 0.75rem;      /* 12px */
+    --text-sm: 0.875rem;     /* 14px */
+    --text-base: 1rem;       /* 16px */
+    --text-lg: 1.125rem;     /* 18px */
+    --text-xl: 1.25rem;      /* 20px */
+    --text-2xl: 1.5rem;      /* 24px */
+    --text-3xl: 1.875rem;    /* 30px */
+    --text-4xl: 2.25rem;     /* 36px */
+    --text-5xl: 3rem;        /* 48px */
+    --text-6xl: 3.75rem;     /* 60px */
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.2;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+
+    /* Letter Spacing (for uppercase labels) */
+    --tracking-tight: -0.02em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.05em;
+    --tracking-wider: 0.1em;
+    --tracking-widest: 0.2em;
+
+    /* ==================== SPACING (8pt Grid) ==================== */
+    
+    /* Base unit: 4px (0.25rem) */
+    --space-0: 0;
+    --space-1: 0.25rem;      /* 4px */
+    --space-2: 0.5rem;       /* 8px */
+    --space-3: 0.75rem;      /* 12px */
+    --space-4: 1rem;         /* 16px */
+    --space-5: 1.25rem;      /* 20px */
+    --space-6: 1.5rem;       /* 24px */
+    --space-8: 2rem;         /* 32px */
+    --space-10: 2.5rem;      /* 40px */
+    --space-12: 3rem;        /* 48px */
+    --space-16: 4rem;        /* 64px */
+    --space-20: 5rem;        /* 80px */
+
+    /* ==================== BORDER RADIUS ==================== */
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-3xl: 32px;
+    --radius-4xl: 40px;
+    --radius-full: 9999px;
+
+    /* ==================== CONTAINER WIDTHS ==================== */
+    
+    --container-sm: 640px;   /* Mobile-first */
+    --container-md: 768px;   /* Tablets */
+    --container-lg: 1024px;  /* Desktops */
+    
+    /* ==================== ANIMATION TIMING ==================== */
+    
+    /* Easing Functions */
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Durations */
+    --duration-instant: 100ms;
+    --duration-fast: 200ms;
+    --duration-base: 300ms;
+    --duration-slow: 500ms;
+  }
+  
+  /* ==================== GLOBAL RESETS ==================== */
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+  
   body {
-    @apply bg-dark-bg text-white selection:bg-nodo-petrol/30;
-    -webkit-tap-highlight-color: transparent;
-    /* Optimización táctil */
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    background: var(--color-black);
+    color: var(--color-starlight);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-
-  /* Evitar zoom automático en iOS al hacer focus en inputs numéricos */
-  input[type="number"] {
-    -moz-appearance: textfield;
-    @apply font-mono tracking-tight;
+  
+  /* ==================== TYPOGRAPHY DEFAULTS ==================== */
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-4);
   }
-
+  
+  h1 { font-size: var(--text-6xl); }
+  h2 { font-size: var(--text-5xl); }
+  h3 { font-size: var(--text-4xl); }
+  h4 { font-size: var(--text-3xl); }
+  h5 { font-size: var(--text-2xl); }
+  h6 { font-size: var(--text-xl); }
+  
+  p {
+    margin-bottom: var(--space-4);
+  }
+  
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  
+  a:hover {
+    color: var(--color-evergreen);
+  }
+  
+  /* ==================== FORM ELEMENTS ==================== */
+  
+  /* Hide number input spinners */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  /* Placeholder styling */
+  ::placeholder {
+    color: var(--color-moon);
+    opacity: 1;
+  }
+  
+  /* ==================== SCROLLBAR STYLING ==================== */
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-evergreen);
+  }
+  
+  /* ==================== FOCUS STATES (Accessibility) ==================== */
+  
+  *:focus-visible {
+    outline: none;
+    box-shadow: 
+      0 0 0 3px var(--color-black),
+      0 0 0 6px var(--color-primary);
+  }
+  
+  /* For inputs */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px var(--color-primary-glow);
+  }
+}
+
+/* ============================================
+   UTILITIES LAYER - Custom Classes
+   ============================================ */
+
+@layer utilities {
+  /* ==================== GLOW EFFECTS ==================== */
+  
+  /* Text Glow */
+  .text-glow-primary {
+    color: var(--color-primary);
+    text-shadow: 
+      0 0 10px var(--color-primary-glow),
+      0 0 20px var(--color-primary-glow);
+  }
+  
+  .text-glow-secondary {
+    color: var(--color-secondary);
+    text-shadow: 
+      0 0 10px var(--color-secondary-glow),
+      0 0 20px var(--color-secondary-glow);
+  }
+  
+  .text-glow-accent {
+    color: var(--color-accent);
+    text-shadow: 
+      0 0 10px var(--color-accent-glow),
+      0 0 20px var(--color-accent-glow);
+  }
+  
+  /* Box Glow */
+  .box-glow-primary {
+    box-shadow: 
+      0 0 20px var(--color-primary-glow),
+      0 0 40px rgba(0, 240, 104, 0.3);
+  }
+  
+  .box-glow-secondary {
+    box-shadow: 
+      0 0 20px var(--color-secondary-glow),
+      0 0 40px rgba(146, 93, 238, 0.3);
+  }
+  
+  /* ==================== ANIMATIONS ==================== */
+  
+  /* Pulse (for live indicators) */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  /* Glow Pulse (for critical alerts) */
+  @keyframes glow-pulse {
+    0%, 100% { 
+      box-shadow: 0 0 20px var(--color-primary-glow); 
+    }
+    50% { 
+      box-shadow: 0 0 40px var(--color-primary-glow); 
+    }
+  }
+  
+  .animate-glow-pulse {
+    animation: glow-pulse 2s infinite;
+  }
+  
+  /* Level Up (achievement animation) */
+  @keyframes level-up {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .animate-level-up {
+    animation: level-up 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  /* Zoom In (modal entrance) */
+  @keyframes zoom-in {
+    from { 
+      opacity: 0; 
+      transform: scale(0.95); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+  
+  .animate-zoom-in {
+    animation: zoom-in 0.3s cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* Fade In */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.3s cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* Slide In (from right - for toasts) */
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* Slide In (from top - for dropdowns) */
+  @keyframes slide-in-top {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-in-top {
+    animation: slide-in-top 0.3s cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* Shake (for errors) */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* ==================== GRADIENT BACKGROUNDS ==================== */
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, 
+      var(--color-primary) 0%, 
+      var(--color-evergreen) 100%);
+  }
+  
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, 
+      var(--color-secondary) 0%, 
+      var(--color-primary) 100%);
+  }
+  
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, 
+      var(--color-accent) 0%, 
+      #FFB800 100%);
+  }
+  
+  /* ==================== GLASS MORPHISM ==================== */
+  
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-primary {
+    background: var(--color-primary-dim);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-primary);
+  }
+  
+  /* ==================== UTILITY CLASSES ==================== */
+  
+  /* Truncate text */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE & ACCESSIBILITY
+   ============================================ */
+
+/* Reduced Motion (Accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #00FF6E;
+    --color-secondary: #A070FF;
+    --color-accent: #FFA500;
   }
 }

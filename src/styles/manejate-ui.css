@@ -1,41 +1,5 @@
-/* =============================================================================
-   RADAR Manejate — DESIGN SYSTEM
-   Atomic Design + Tailwind CSS @layer components
-
-   REGLA DE ORO DE ESTE ARCHIVO:
-   · Las clases "base" (btn-base, badge-base, etc.) viven en CSS PURO fuera
-     de @layer, escritas como propiedades nativas. Esto las hace utilizables
-     desde @apply sin errores de Tailwind.
-   · Todas las variantes dentro de @layer components usan ÚNICAMENTE utilidades
-     nativas de Tailwind — jamás @apply de clases custom.
-   · Las variantes son AUTOCONTENIDAS: incluyen todos los estilos necesarios
-     para funcionar solas en HTML con una sola clase.
-
-   Principios de diseño:
-   ─ Contraste mínimo WCAG AA: 4.5:1 texto normal · 3:1 texto grande / UI
-   ─ Touch targets mínimos: 48×48px (WCAG 2.5.5)
-   ─ Ningún texto funcional por debajo de 12px (0.75rem)
-   ─ Estados explícitos: default · hover · focus-visible · active · disabled · error · success
-   ─ prefers-reduced-motion respetado en todas las animaciones
-   ─ Jerarquía tipográfica: 5 niveles, diferencia mínima de 2 pasos entre niveles
-   ─ Espaciado en escala 4px: 4 · 8 · 12 · 16 · 20 · 24 · 28 · 32 · 40 · 48 · 64
-   ============================================================================= */
-
-
-/* =============================================================================
-   TOKENS DE DISEÑO — Custom Properties
-   Fuente única de verdad para colores, sombras y radios.
-   ============================================================================= */
 :root {
-  /* ── Escala de opacidad de texto (blanco sobre fondo #090909) ────────────
-     Ratios calculados: #FFFFFF sobre #090909
-     /100  → 21:1   Énfasis absoluto
-     /90   → ~18:1  Primario — headings
-     /70   → ~12:1  Secundario — labels (MÍNIMO para labels de campo)
-     /50   → ~7.5:1 Terciario — hints ≥ 12px
-     /35   → ~4.5:1 Mínimo AA — placeholders y decorativa
-     /25   → ~3:1   Sólo bordes y dividers — nunca en texto
-  */
+  
   --text-primary: rgba(255, 255, 255, 1);
   --text-secondary: rgba(255, 255, 255, 0.90);
   --text-tertiary: rgba(255, 255, 255, 0.70);
@@ -43,36 +7,25 @@
   --text-placeholder: rgba(255, 255, 255, 0.35);
   --text-disabled: rgba(255, 255, 255, 0.30);
 
-  /* ── Brand Manejate 2.0 ────────────────────────────────────────────── */
   --brand-navy: #355872;
-  /* Nav, header, backgrounds de cards */
   --brand-sea: #7AAACE;
-  /* CTA primarios, links activos      */
   --brand-blue: #9CD5FF;
-  /* Badges Premium, tooltips, info    */
   --brand-cold: #F7F8F0;
-  /* Texto sobre fondos oscuros        */
   --brand-black: #232323;
-  /* Fondo base de pantalla            */
 
-  /* Aliases semánticos → nueva paleta */
   --color-accent: var(--brand-sea);
   --color-accent-dark: #5B8DAD;
   --color-accent-glow: rgba(122, 170, 206, 0.35);
 
-  /* ── Focus ring ──────────────────────────────────────────────────────── */
   --ring-color: rgba(255, 255, 255, 0.9);
   --ring-offset: #09090b;
-  /* zinc-950 — igual al fondo base */
 
-  /* ── Radios ──────────────────────────────────────────────────────────── */
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
   --radius-xl: 2rem;
   --radius-2xl: 2.5rem;
 
-  /* ── Sombras ─────────────────────────────────────────────────────────── */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
@@ -81,22 +34,6 @@
 }
 
 
-/* =============================================================================
-   CLASES BASE — CSS PURO (fuera de @layer)
-
-   Por qué están aquí y no dentro de @layer components:
-   Tailwind procesa @apply en tiempo de compilación y sólo reconoce sus propias
-   utilidades generadas. Si una clase custom (definida por el usuario) se usa
-   dentro de @apply, el compilador no la encuentra y lanza:
-   "Cannot apply unknown utility class: btn-base".
-
-   Solución (Option A): las clases base se escriben en CSS nativo fuera de
-   @layer. Las variantes dentro de @layer son autocontenidas y no las referencian
-   con @apply — las incluyen directamente como utilidades Tailwind.
-   Las clases base siguen disponibles para uso directo en HTML.
-   ============================================================================= */
-
-/* ── Botones ─────────────────────────────────────────────────────────────── */
 .btn-base {
   display: inline-flex;
   align-items: center;
@@ -227,16 +164,10 @@
   transition: width 700ms ease;
 }
 
-
-/* =============================================================================
-   @LAYER COMPONENTS — Variantes y composiciones
-   REGLA ÚNICA: @apply sólo con utilidades nativas de Tailwind.
-   ============================================================================= */
 @layer components {
 
   /* =========================================================================
      NIVEL 1 — ÁTOMOS: TIPOGRAFÍA
-     Escala: H1(36px) → H2(24px) → H3(16px) → Label(12px) → Hint(12px) → Caption(11px)
      ========================================================================= */
 
   .heading-1 {
@@ -268,40 +199,24 @@
   }
 
 
-  /* =========================================================================
-     NIVEL 1 — ÁTOMOS: BOTONES
-     AUTOCONTENIDOS — cada variante incluye todos sus estilos.
-     La clase .btn-base (CSS puro) existe para uso directo en HTML cuando
-     se necesite el esqueleto sin color específico.
-     ========================================================================= */
-
-  /* Primario — 1 por pantalla
-     text-slate-950 (#020617) sobre info (#0ea5e9) = 5.1:1 ✅ */
+ 
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-info text-slate-950 hover:bg-info/90 active:bg-info active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
     box-shadow: var(--shadow-accent);
   }
 
-  /* Secundario — jerarquía media
-     text-white (~21:1) sobre bg ~#141414 ✅ */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-white/[0.08] text-white border border-white/20 hover:bg-white/[0.14] hover:border-white/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
-  /* Destructivo — borrado / acciones irreversibles
-     text-error/80 (~6:1) sobre bg-error/8 ✅ */
   .btn-danger {
     @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-error/[0.08] text-error border border-error/25 hover:bg-error/[0.15] hover:text-white/80 hover:border-error/40 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
-  /* Fantasma — "Volver", acciones de baja prioridad
-     text-white/60 (~8:1) ✅ */
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-transparent text-white/60 border border-white/10 hover:bg-white/[0.06] hover:text-white/80 hover:border-white/20 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
-  /* Ícono — sólo ícono, siempre con aria-label en HTML
-     48×48px garantizados (WCAG 2.5.5) · text-white/60 (~8:1) ✅ */
   .btn-icon {
     @apply inline-flex items-center justify-center min-h-[48px] min-w-[48px] rounded-xl cursor-pointer text-white/60 hover:text-white hover:bg-white/[0.08] transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
@@ -309,9 +224,6 @@
 
   /* =========================================================================
      NIVEL 1 — ÁTOMOS: INPUTS
-     Estados: default · focus · error · success · disabled
-     py-4 + text-base ≈ 56px → touch target ✅
-     16px (text-base) evita zoom automático en iOS ✅
      ========================================================================= */
 
   .input-base {
@@ -333,19 +245,16 @@
 
   /* =========================================================================
      NIVEL 1 — ÁTOMOS: BADGES / CHIPS
-     AUTOCONTENIDOS — no referencian .badge-base vía @apply.
      ========================================================================= */
 
   .badge-neutral {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
   }
 
-  /* text-info (#0ea5e9) sobre fondo ~#0c1a25 → ~8:1 ✅ */
   .badge-accent {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-info/15 text-info border-info/25;
   }
 
-  /* text-success (#86efac) → ~8:1 ✅ */
   .badge-success {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-success/15 text-success border-success/25;
   }
@@ -361,11 +270,8 @@
 
   /* =========================================================================
      NIVEL 1 — ÁTOMOS: ÍCONOS CONTENEDORES
-     Patrón HTML: <div class="icon-wrap-md icon-wrap-accent">
-     Tamaño y color son ortogonales — se combinan en HTML.
      ========================================================================= */
 
-  /* Tamaños — autocontenidos (incluyen flex + forma) */
   .icon-wrap-sm {
     @apply flex items-center justify-center shrink-0 w-8 h-8 rounded-lg border;
   }
@@ -378,7 +284,6 @@
     @apply flex items-center justify-center shrink-0 w-12 h-12 rounded-2xl border;
   }
 
-  /* Colores — se combinan con una clase de tamaño */
   .icon-wrap-accent {
     @apply bg-info/[0.12] border-info/25 text-info;
     box-shadow: inset 0 0 12px rgba(14, 165, 233, 0.08);
@@ -406,8 +311,6 @@
 
   /* =========================================================================
      NIVEL 1 — ÁTOMOS: FEEDBACK INLINE
-     AUTOCONTENIDOS — incluyen la estructura de feedback-base.
-     Siempre acompañar de ícono + role="alert" en el HTML.
      ========================================================================= */
 
   .feedback-error {
@@ -429,7 +332,6 @@
 
   /* =========================================================================
      NIVEL 2 — MOLÉCULAS: CARDS
-     Jerarquía de padding: card-main(32px) > card-section(20px) > card-metric(20px)
      ========================================================================= */
 
   .card-main {
@@ -440,13 +342,11 @@
     @apply bg-white/[0.03] border border-white/[0.07] rounded-3xl p-5;
   }
 
-  /* No interactivo por defecto — agregar card-metric-interactive cuando sea clickeable */
   .card-metric {
     @apply bg-white/[0.03] border border-white/[0.06] rounded-3xl p-5 text-center transition-all duration-200 hover:bg-white/[0.07] hover:border-white/[0.12];
     box-shadow: var(--shadow-sm);
   }
 
-  /* Variante interactiva — AUTOCONTENIDA, no hereda card-metric vía @apply */
   .card-metric-interactive {
     @apply bg-white/[0.03] border border-white/[0.06] rounded-3xl p-5 text-center transition-all duration-200 hover:bg-white/[0.07] hover:border-white/[0.12] cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
     box-shadow: var(--shadow-sm);
@@ -456,14 +356,11 @@
     @apply flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all duration-200;
   }
 
-  /* Variante de card-section para viajes con pérdida (netMargin < 0)
-     Se aplica junto a card-section: <div class="card-section card-section-danger"> */
   .card-section-danger {
     @apply border-error/25 bg-error/[0.03];
   }
 
-  /* Variante de card-metric sin padding ni text-center — para métricas en fila
-     Usada en el header de HistoryTab donde el layout es horizontal */
+  
   .card-metric-flat {
     @apply bg-black/40 border border-white/[0.06] rounded-2xl p-4 transition-all duration-200;
   }

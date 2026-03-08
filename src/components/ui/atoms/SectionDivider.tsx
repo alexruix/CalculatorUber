@@ -1,32 +1,85 @@
 /**
- * SectionDivider.tsx — Átomo de layout
- * ─────────────────────────────────────────────────────────────
- * Reemplaza el patrón repetido de:
- *   <div className="pt-x border-t border-white/5" />
- *
- * También puede mostrar un label opcional de sección (Fluent 2
- * Section Header pattern).
+ * SectionDivider.tsx - Refactored Atom
+ * Gaming aesthetic divider with neon glow option
+ * 
+ * Uses design tokens from global.css
  */
+
 import React from 'react';
 import { cn } from '../../../lib/utils';
 
-interface SectionDividerProps {
-    label?: string;
-    className?: string;
-    /** Elimina el borde superior (solo espacio) */
-    borderless?: boolean;
+export type DividerVariant = 'default' | 'primary' | 'gradient';
+export type DividerOrientation = 'horizontal' | 'vertical';
+
+export interface SectionDividerProps {
+  variant?: DividerVariant;
+  orientation?: DividerOrientation;
+  label?: string;          // Optional centered label
+  glow?: boolean;          // Add neon glow
+  className?: string;
 }
 
+const variantStyles: Record<DividerVariant, string> = {
+  default: 'bg-gradient-to-r from-transparent via-moon/20 to-transparent',
+  primary: 'bg-gradient-to-r from-transparent via-primary/30 to-transparent',
+  gradient: 'bg-gradient-to-r from-secondary/30 via-primary/30 to-accent/30',
+};
+
 export const SectionDivider: React.FC<SectionDividerProps> = ({
-    label,
-    className,
-    borderless = false,
-}) => (
-    <div className={cn('w-full', borderless ? 'pt-4' : 'pt-4 border-t border-white/5', className)}>
-        {label && (
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3">
-                {label}
-            </p>
+  variant = 'default',
+  orientation = 'horizontal',
+  label,
+  glow = false,
+  className,
+}) => {
+  if (orientation === 'vertical') {
+    return (
+      <div
+        className={cn(
+          'w-px h-full',
+          'bg-gradient-to-b from-transparent via-moon/20 to-transparent',
+          glow && 'shadow-[0_0_10px_var(--color-primary-glow)]',
+          className
         )}
-    </div>
-);
+        role="separator"
+        aria-orientation="vertical"
+      />
+    );
+  }
+
+  if (label) {
+    return (
+      <div className={cn('relative', className)} role="separator" aria-orientation="horizontal">
+        {/* Line */}
+        <div className={cn('h-px', variantStyles[variant])} />
+        
+        {/* Label */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span
+            className={cn(
+              'px-4 bg-black text-xs font-bold uppercase tracking-widest',
+              variant === 'primary' ? 'text-primary' : 'text-moon'
+            )}
+          >
+            {label}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        'h-px',
+        variantStyles[variant],
+        glow && 'shadow-[0_0_10px_var(--color-primary-glow)]',
+        className
+      )}
+      role="separator"
+      aria-orientation="horizontal"
+    />
+  );
+};
+
+SectionDivider.displayName = 'SectionDivider';

@@ -1,37 +1,81 @@
 /**
- * Label.tsx — Átomo tipográfico
- * ─────────────────────────────────────────────────────────────
- * Envuelve el elemento <label> nativo con las clases del DS.
- * Garantiza: tamaño mínimo de 12px, contraste WCAG AA, y que
- * el target de toque del campo sea correcto en mobile.
+ * Label.tsx - Refactored Atom
+ * Gaming aesthetic label with uppercase tracking
+ * 
+ * Uses design tokens from global.css
  */
-import React, { type LabelHTMLAttributes } from 'react';
+
+import React from 'react';
 import { cn } from '../../../lib/utils';
 
-type LabelSize = 'body' | 'caption' | 'micro';
+export type LabelVariant = 'default' | 'primary' | 'secondary' | 'muted';
+export type LabelSize = 'xs' | 'sm' | 'md';
 
-interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-    size?: LabelSize;
-    required?: boolean;
+export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  variant?: LabelVariant;
+  size?: LabelSize;
+  uppercase?: boolean;     // Force uppercase (default: true)
+  required?: boolean;      // Show asterisk
+  children: React.ReactNode;
 }
 
-const sizeMap: Record<LabelSize, string> = {
-    body: 'text-sm font-semibold text-white/70 leading-none',
-    caption: 'text-xs font-bold text-white/50 tracking-wide uppercase leading-none',
-    micro: 'text-[10px] font-black text-white/30 uppercase tracking-widest leading-none',
+const variantStyles: Record<LabelVariant, string> = {
+  default: 'text-starlight',
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+  muted: 'text-moon',
 };
 
-export const Label: React.FC<LabelProps> = ({
-    children,
-    size = 'body',
-    required,
-    className,
-    ...props
-}) => (
-    <label className={cn(sizeMap[size], 'ml-1 select-none', className)} {...props}>
+const sizeStyles: Record<LabelSize, string> = {
+  xs: 'text-xs tracking-widest',      // 12px, extra wide tracking
+  sm: 'text-sm tracking-wider',       // 14px, wide tracking
+  md: 'text-base tracking-wide',      // 16px, normal wide
+};
+
+export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
+  (
+    {
+      variant = 'default',
+      size = 'sm',
+      uppercase = true,
+      required = false,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <label
+        ref={ref}
+        className={cn(
+          // Base styles
+          'block font-medium',
+          'transition-colors duration-200',
+          
+          // Variant
+          variantStyles[variant],
+          
+          // Size
+          sizeStyles[size],
+          
+          // Uppercase
+          uppercase && 'uppercase',
+          
+          // Custom classes
+          className
+        )}
+        {...props}
+      >
         {children}
         {required && (
-            <span className="ml-1 text-error" aria-hidden="true">*</span>
+          <span className="text-error ml-1" aria-label="required">
+            *
+          </span>
         )}
-    </label>
+      </label>
+    );
+  }
 );
+
+Label.displayName = 'Label';
