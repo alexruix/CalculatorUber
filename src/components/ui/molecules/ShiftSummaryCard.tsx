@@ -18,9 +18,9 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
         <div className="space-y-4 animate-in fade-in duration-500">
             {/* Warning de tiempo muerto */}
             {metrics.hasExcessiveIdle && (
-                <div className="bg-warning/10 border border-warning/20 rounded-2xl p-4 flex gap-4">
-                    <AlertTriangle className="w-6 h-6 text-warning shrink-0" />
-                    <div className="flex-1">
+                <div className="card-section-danger box-glow-accent relative overflow-hidden mb-4 p-5 flex gap-4">
+                    <AlertTriangle className="w-6 h-6 text-warning text-glow-accent shrink-0 animate-pulse" />
+                    <div className="flex-1 relative z-10">
                         <h4 className="text-xs font-black text-warning uppercase tracking-widest mb-1">
                             {SHIFT_CLOSE.excessiveIdleWarning.title(Math.round(metrics.idlePercent))}
                         </h4>
@@ -29,7 +29,7 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
                         </p>
                         <button
                             onClick={onAddTrip}
-                            className="bg-warning/20 hover:bg-warning/30 text-warning text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full transition-colors flex items-center gap-2"
+                            className="bg-warning/20 hover:bg-warning/30 text-warning text-glow-accent text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full border border-warning/30 transition-all hover:box-glow-accent flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
                             {SHIFT_CLOSE.excessiveIdleWarning.addTripBtn}
@@ -39,29 +39,29 @@ export const ShiftSummaryCard: React.FC<ShiftSummaryCardProps> = ({ metrics, onA
             )}
 
             {/* Resume Card */}
-            <div className="glass-card rounded-4xl p-6 border border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 blur-[50px] rounded-full pointer-events-none" />
+            <div className="card-main relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-info rounded-full blur-[80px] pointer-events-none opacity-20" />
 
                 <h3 className="text-xs font-black text-white/30 uppercase tracking-[0.2em] mb-4">Balance General</h3>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div>
+                    <div className="card-metric">
                         <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1">Recaudación</p>
                         <p className="text-2xl font-black text-white">${Math.round(metrics.totalFare).toLocaleString('es-AR')}</p>
                     </div>
-                    <div>
+                    <div className="card-metric border-success/30 box-glow-primary">
                         <p className="text-[10px] text-success/50 uppercase font-black tracking-widest mb-1">Ganancia Neta</p>
-                        <p className="text-2xl font-black text-success relative z-10">
+                        <p className="text-2xl font-black text-success text-glow-primary relative z-10">
                             ${Math.round(metrics.netMargin).toLocaleString('es-AR')}
                         </p>
                     </div>
-                    <div className="col-span-2 flex items-center justify-between p-3 bg-white/5 rounded-2xl">
+                    <div className="col-span-2 card-metric-interactive flex items-center justify-between p-4 border-info/30 hover:box-glow-secondary">
                         <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-info" />
+                            <TrendingUp className="w-5 h-5 text-info" />
                             <span className="text-xs font-black text-white uppercase tracking-widest">EPH</span>
                         </div>
-                        <span className="text-xl font-black text-info">
-                            ${Math.round(metrics.profitPerHour).toLocaleString('es-AR')} <span className="text-xs opacity-50">/hr</span>
+                        <span className="text-2xl font-black text-info text-glow-secondary">
+                            ${Math.round(metrics.profitPerHour).toLocaleString('es-AR')} <span className="text-sm opacity-50">/hr</span>
                         </span>
                     </div>
                 </div>

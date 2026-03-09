@@ -1,12 +1,6 @@
 import React, { useMemo } from "react";
-import {
-  Fuel,
-  Wrench,
-  ShieldCheck,
-  CheckCircle2,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { Fuel, Wrench, ShieldCheck, CheckCircle2, TrendingDown, TrendingUp } from "lucide-react";
+import { Switch } from "@ark-ui/react/switch";
 import type { ExpenseToggle } from "../../../types/calculator.types";
 
 interface ExpenseMasterTogglesProps {
@@ -112,29 +106,31 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
           const diff = previewCost - costPerKm;
 
           return (
-            <button
+            <Switch.Root
               key={expense.id}
-              type="button"
-              role="switch"
-              aria-checked={isOn}
-              onClick={() => onToggle(expense.id)}
-              className={isOn ? "toggle-row-on" : "toggle-row-off"}
+              checked={isOn}
+              onCheckedChange={() => onToggle(expense.id)}
+              className={isOn ? "toggle-row-on border-info box-glow-secondary" : "toggle-row-off border-white/10"}
             >
+              <Switch.HiddenInput />
               <div className="flex items-center gap-3.5">
+                <Switch.Control className="sr-only">
+                  <Switch.Thumb />
+                </Switch.Control>
                 <div
-                  className={`icon-wrap-md ${isOn ? "icon-wrap-accent" : "icon-wrap-neutral"}`}
+                  className={`icon-wrap-md ${isOn ? "icon-wrap-accent box-glow-secondary" : "icon-wrap-neutral"}`}
                   aria-hidden="true"
                 >
                   <Icon
                     size={18}
-                    className={isOn ? "text-info" : "text-white/40"}
+                    className={isOn ? "text-info text-glow-secondary" : "text-white/40"}
                   />
                 </div>
 
                 <div className="text-left">
-                  <p className={isOn ? "toggle-label-on" : "toggle-label-off"}>
+                  <Switch.Label className={isOn ? "toggle-label-on text-glow-secondary" : "toggle-label-off"}>
                     {label}
-                  </p>
+                  </Switch.Label>
                   <p className={isOn ? "toggle-desc-on" : "toggle-desc-off"}>
                     {desc}
                   </p>
@@ -161,14 +157,14 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
                 )}
                 <div
                   className={
-                    isOn ? "toggle-indicator-on" : "toggle-indicator-off"
+                    isOn ? "toggle-indicator-on shadow-[0_0_15px_var(--color-info-glow)]" : "toggle-indicator-off"
                   }
                   aria-hidden="true"
                 >
                   {isOn && <CheckCircle2 size={14} className="text-white" />}
                 </div>
               </div>
-            </button>
+            </Switch.Root>
           );
         })}
       </fieldset>

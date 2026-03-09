@@ -10,6 +10,7 @@
 import React from 'react';
 import { Zap } from '../../../lib/icons';
 import { PRODUCTIVITY } from '../../../data/ui-strings';
+import { formatCurrency } from '../../../lib/utils';
 
 interface ProductivityIndexProps {
     activeTime: number;
@@ -27,7 +28,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
     const fmt = (n: number) => (Number.isInteger(n) ? n : n.toFixed(1));
 
     return (
-        <div className="glass-card p-4 rounded-3xl border border-white/5 space-y-4">
+        <div className="glass-card p-4 rounded-3xl border-success/30 box-glow-primary space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -58,9 +59,9 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                         width: `${activePercent}%`,
                         transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)`, /* Fluent decelerate */
                     }}
-                    className="bg-success h-full relative"
+                    className="progress-fill-success relative"
                 >
-                    <div className="absolute inset-0 bg-white/20 animate-[pulse_2s_ease-in-out_infinite] motion-reduce:animate-none" />
+                    <div className="absolute inset-0 bg-white/20 animate-pulse motion-reduce:animate-none" />
                 </div>
                 <div
                     style={{ width: `${idlePercent}%`, transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)` }}
@@ -87,9 +88,9 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                         style={{ fontSize: 'var(--text-micro)' }}>
                         {PRODUCTIVITY.ephLabel}
                     </span>
-                    <span className="text-base font-black text-info">
-                        ${eph.toLocaleString('es-AR')}
-                        <span className="text-xs opacity-50">/hr</span>
+                    <span className="text-base font-black text-info text-glow-secondary">
+                        {formatCurrency(eph)}
+                        <span className="text-xs opacity-50 ml-1">/hr</span>
                     </span>
                 </div>
             ) : null}

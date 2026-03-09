@@ -24,32 +24,32 @@ const VERTICAL_CONFIG: Record<
   transport: {
     label: "Uber / Remis",
     Icon: Car,
-    accentBg: "bg-success/10",
+    accentBg: "bg-success/[0.12]",
     accentBorder: "border-success/30",
     accentIcon: "text-success",
     badge: "badge-success",
     badgeText: "TRANSPORTE",
-    glow: "0 0 24px var(--color-success-glow, rgba(34,197,94,0.1))",
+    glow: "var(--color-success-glow)",
   },
   delivery: {
     label: "Delivery / Rappi",
     Icon: Bike,
-    accentBg: "bg-warning/10",
+    accentBg: "bg-warning/[0.12]",
     accentBorder: "border-warning/30",
     accentIcon: "text-warning",
     badge: "badge-warning",
     badgeText: "DELIVERY",
-    glow: "0 0 24px var(--color-warning-glow, rgba(249,115,22,0.1))",
+    glow: "var(--color-warning-glow)",
   },
   logistics: {
     label: "Logística / Flete",
     Icon: Truck,
-    accentBg: "bg-info/10",
+    accentBg: "bg-info/[0.12]",
     accentBorder: "border-info/30",
     accentIcon: "text-info",
     badge: "badge-info",
     badgeText: "LOGÍSTICA",
-    glow: "0 0 24px var(--color-info-glow, rgba(14,165,233,0.1))",
+    glow: "var(--color-info-glow)",
   },
 };
 
@@ -69,9 +69,9 @@ export const VehicleIdentityCard: React.FC<VehicleIdentityCardProps> = ({
       onClick={onClick}
       className={`w-full flex items-center gap-4 p-4 rounded-3xl border-2 transition-all duration-300 text-left
         ${cfg.accentBg} ${cfg.accentBorder}
-        ${onClick ? "cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black" : "cursor-default"}
+        ${onClick ? "cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black" : "cursor-default"}
       `}
-      style={{ boxShadow: cfg.glow }}
+      style={{ boxShadow: `0 0 24px ${cfg.glow}` }}
       aria-label={`Vehículo: ${vehicleName || "Sin nombre"}. Vertical: ${cfg.label}`}
     >
       {/* Vehicle icon */}

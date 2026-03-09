@@ -9,7 +9,7 @@ import React from 'react';
 
 export const TabSkeleton: React.FC = () => {
     return (
-        <div className="w-full flex justify-center animate-pulse pt-2 pb-24 px-4">
+        <div className="w-full flex justify-center animate-skeleton pt-2 pb-24 px-4">
             <div className="w-full max-w-[500px] flex flex-col gap-4">
                 {/* Header Skeleton */}
                 <div className="flex justify-between items-center px-2 pt-2">
@@ -19,7 +19,7 @@ export const TabSkeleton: React.FC = () => {
 
                 {/* Main Card (ProfitabilityScore shape) */}
                 <div className="glass-card p-6 md:p-8 rounded-4xl border border-white/5 relative overflow-hidden h-[300px] flex flex-col justify-between">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-secondary opacity-30 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
                     {/* Top Row Skeleton */}
                     <div className="flex justify-between items-start">
@@ -48,10 +48,10 @@ export const TabSkeleton: React.FC = () => {
 
                 {/* Form Input Skeletons */}
                 <div className="glass-card p-6 rounded-4xl border border-white/5 flex flex-col gap-5 mt-2">
-                    <div className="h-5 w-32 bg-white/10 rounded-full mb-2"></div>
-                    <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5"></div>
-                    <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5"></div>
-                    <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5"></div>
+                    <div className="h-5 w-32 bg-white/5 rounded-full mb-2"></div>
+                    <div className="h-14 w-full bg-white/3 rounded-2xl border border-white/7"></div>
+                    <div className="h-14 w-full bg-white/3 rounded-2xl border border-white/7"></div>
+                    <div className="h-14 w-full bg-white/3 rounded-2xl border border-white/7"></div>
                 </div>
             </div>
         </div>

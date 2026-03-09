@@ -14,7 +14,9 @@ export type ButtonVariant =
     | 'neon'       // Primary green neon (solid)
     | 'outline'    // Outline with neon border
     | 'ghost'      // Transparent, minimal
-    | 'gradient';  // Gradient background
+    | 'gradient'   // Gradient background
+    | 'primary-white'  // Solid white bg, black text
+    | 'secondary-dark'; // Dark gray bg, white/gray text
 
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -67,6 +69,28 @@ const variantStyles: Record<ButtonVariant, string> = {
     shadow-[0_0_20px_var(--color-primary-glow)]
     hover:shadow-[0_0_30px_var(--color-primary-glow)]
   `,
+    'primary-white': `
+    bg-white
+    text-black
+    font-extrabold
+    uppercase
+    tracking-wide
+    shadow-[0_0_20px_rgba(255,255,255,0.2)]
+    hover:bg-starlight
+    hover:scale-105
+    active:scale-95
+  `,
+    'secondary-dark': `
+    bg-white/[0.05]
+    text-white/80
+    font-bold
+    uppercase
+    tracking-wide
+    border border-white/10
+    hover:bg-white/[0.1]
+    hover:text-white
+    active:scale-95
+  `
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

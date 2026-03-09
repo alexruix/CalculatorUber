@@ -34,15 +34,17 @@ export const ProfileInsightCard: React.FC<ProfileInsightCardProps> = ({
 
   return (
     <div
-      className="card-section flex gap-3 items-start"
+      className={`card-section flex gap-3 items-start border-2 ${isAvg ? "border-white/10" : isEfficient ? "border-success/30 box-glow-primary" : "border-warning/30 box-glow-accent"
+        }`}
       role="note"
       aria-label="Insight de eficiencia de combustible"
     >
       <div
-        className="icon-wrap-md icon-wrap-accent shrink-0 mt-0.5"
+        className={`icon-wrap-md shrink-0 mt-0.5 ${isAvg ? "icon-wrap-neutral" : isEfficient ? "icon-wrap-success" : "icon-wrap-warning"
+          }`}
         aria-hidden="true"
       >
-        <Zap size={18} className="text-info" />
+        <Zap size={18} className={isAvg ? "text-white/40" : isEfficient ? "text-success text-glow-primary" : "text-warning text-glow-accent"} />
       </div>
 
       <div className="flex-1 min-w-0">

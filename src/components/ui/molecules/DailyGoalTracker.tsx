@@ -1,6 +1,18 @@
-import React, { useMemo } from "react";
-import { Target, Clock } from "lucide-react";
-import type { SavedTrip } from "../../../types/calculator.types";
+/**
+ * DailyGoalTracker.tsx - Refactored Molecule
+ * Daily goal tracker with gaming progress bar and neon effects
+ * 
+ * Uses design tokens from global.css
+ * Features animated progress bar, achievement states, XP-style visuals
+ */
+
+import React, { useMemo } from 'react';
+import { Target, Clock } from 'lucide-react';
+import { cn } from '../../../lib/utils';
+import { Input } from '../atoms/Input';
+import { Label } from '../atoms/Label';
+import { formatCurrency } from '../../../lib/utils';
+import type { SavedTrip } from '../../../types/calculator.types';
 
 interface DailyGoalTrackerProps {
   dailyGoal: number;
@@ -19,7 +31,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
 }) => {
   const todayNet = useMemo(
     () => todayTrips.reduce((acc, t) => acc + t.margin, 0),
-    [todayTrips],
+    [todayTrips]
   );
 
   const progressPct =
@@ -30,120 +42,149 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Goal input row */}
+      {/* Goal Inputs */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="field-wrapper">
-          <label
+        {/* Daily Goal Input */}
+        <div className="space-y-2">
+          <Label 
             htmlFor="daily-goal"
-            className="label-base flex items-center gap-1.5"
+            variant="muted"
+            size="sm"
+            className="flex items-center gap-1.5"
           >
             <Target size={12} aria-hidden="true" />
             Meta diaria ($)
-          </label>
-          <div className="field-input-wrapper">
-            <span
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-white/30 pointer-events-none"
-              aria-hidden="true"
-            >
-              $
-            </span>
-            <input
-              id="daily-goal"
-              type="number"
-              inputMode="numeric"
-              value={dailyGoal || ""}
-              onChange={(e) => onGoalChange(Number(e.target.value))}
-              placeholder="40000"
-              min="0"
-              step="1000"
-              className="input-base input-focus text-sm pl-10"
-            />
-          </div>
+          </Label>
+          
+          <Input
+            id="daily-goal"
+            type="number"
+            inputMode="numeric"
+            value={dailyGoal || ''}
+            onChange={(e) => onGoalChange(Number(e.target.value))}
+            placeholder="40000"
+            min="0"
+            step="1000"
+            suffix="$"
+            size="sm"
+          />
         </div>
 
-        <div className="field-wrapper">
-          <label
+        {/* Daily Hours Input */}
+        <div className="space-y-2">
+          <Label 
             htmlFor="daily-hours"
-            className="label-base flex items-center gap-1.5"
+            variant="muted"
+            size="sm"
+            className="flex items-center gap-1.5"
           >
             <Clock size={12} aria-hidden="true" />
             Horas objetivo
-          </label>
-          <div className="field-input-wrapper">
-            <input
-              id="daily-hours"
-              type="number"
-              inputMode="numeric"
-              value={dailyHours || ""}
-              onChange={(e) => onHoursChange(Number(e.target.value))}
-              placeholder="8"
-              min="1"
-              max="24"
-              step="0.5"
-              className="input-base input-focus text-sm pr-11"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-white/35 pointer-events-none">
-              hs
-            </span>
-          </div>
+          </Label>
+          
+          <Input
+            id="daily-hours"
+            type="number"
+            inputMode="numeric"
+            value={dailyHours || ''}
+            onChange={(e) => onHoursChange(Number(e.target.value))}
+            placeholder="8"
+            min="1"
+            max="24"
+            step="0.5"
+            suffix="hs"
+            size="sm"
+          />
         </div>
       </div>
 
-      {/* Progress section — only shown if goal is set */}
+      {/* Progress Card (only shown if goal is set) */}
       {dailyGoal > 0 && (
         <div
-          className={`p-4 rounded-3xl border transition-all duration-500 ${isReached
-              ? "bg-success/10 border-success/30"
-              : "bg-white/3 border-white/[0.07]"
-            }`}
+          className={cn(
+            'p-4 rounded-3xl border-2 transition-all duration-500',
+            isReached ? (
+              // Achievement state (goal reached)
+              'bg-primary/10 border-primary/30 shadow-[0_0_30px_var(--color-primary-glow)] animate-glow-pulse'
+            ) : (
+              // Default state (in progress)
+              'bg-white/3 border-white/10'
+            )
+          )}
           role="status"
           aria-label={`Progreso diario: ${progressPct}% de la meta alcanzado`}
         >
-          {/* Numbers row */}
+          {/* Numbers Row */}
           <div className="flex items-end justify-between mb-3">
+            {/* Today's Earnings */}
             <div>
-              <p className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-0.5">
+              <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mb-0.5">
                 Ganado hoy
               </p>
               <p
-                className={`text-2xl font-black ${isReached ? "text-success" : "text-white"}`}
+                className={cn(
+                  'text-2xl font-extrabold leading-tight',
+                  isReached ? 'text-primary' : 'text-starlight'
+                )}
               >
-                ${todayNet.toLocaleString("es-AR")}
+                {formatCurrency(todayNet)}
               </p>
             </div>
+
+            {/* Remaining / Goal Reached */}
             <div className="text-right">
-              <p className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-0.5">
-                {isReached ? "¡Meta!" : "Faltan"}
+              <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mb-0.5">
+                {isReached ? '¡Meta!' : 'Faltan'}
               </p>
               <p
-                className={`text-base font-black ${isReached ? "text-success" : "text-white/60"}`}
+                className={cn(
+                  'text-base font-extrabold leading-tight',
+                  isReached ? 'text-primary text-2xl' : 'text-moon'
+                )}
               >
-                {isReached ? "🎯" : `$${remaining.toLocaleString("es-AR")}`}
+                {isReached ? '🎯' : formatCurrency(remaining)}
               </p>
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div className="progress-track" aria-hidden="true">
+          {/* Progress Bar */}
+          <div
+            className="h-3 bg-white/10 rounded-full overflow-hidden relative"
+            aria-hidden="true"
+          >
             <div
-              className={
-                isReached ? "progress-fill-success" : "progress-fill-default"
-              }
+              className={cn(
+                'h-full transition-all duration-500',
+                isReached ? (
+                  // Achievement gradient (green)
+                  'bg-gradient-to-r from-primary to-evergreen'
+                ) : (
+                  // Default gradient (purple to green)
+                  'bg-gradient-to-r from-secondary to-primary'
+                )
+              )}
               style={{ width: `${progressPct}%` }}
-            />
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-white/20 animate-pulse" />
+            </div>
           </div>
 
-          <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-2 text-right">
+          {/* Progress Percentage */}
+          <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mt-2 text-right">
             {progressPct}% completado
           </p>
         </div>
       )}
 
+      {/* Empty State (no goal set) */}
       {dailyGoal === 0 && (
-        <p className="label-hint text-center py-2">
+        <p className="text-sm text-moon font-medium text-center py-2">
           Seteá una meta para ver tu progreso en tiempo real 🎯
         </p>
       )}
     </div>
   );
 };
+
+DailyGoalTracker.displayName = 'DailyGoalTracker';
