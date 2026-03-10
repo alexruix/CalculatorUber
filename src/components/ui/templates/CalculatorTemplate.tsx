@@ -8,22 +8,39 @@ import { useCalculatorStore } from "../../../store/useCalculatorStore";
 import { OnboardingFlow } from "../organisms/OnboardingFlow";
 import { AuthScreen } from "../organisms/AuthScreen";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
-import { PartyPopper } from '../../../lib/icons';
+import { PartyPopper } from "../../../lib/icons";
 import { TabSkeleton } from "../molecules/TabSkeleton";
 
 // Lazy Loaded Tabs (Code Splitting)
-const TripsTab = lazy(() => import("../organisms/Tabs/TripsTab").then(m => ({ default: m.TripsTab })));
-const ShiftCloseTab = lazy(() => import("../organisms/Tabs/ShiftCloseTab").then(m => ({ default: m.ShiftCloseTab })));
-const ShiftSimulatorTab = lazy(() => import("../organisms/Tabs/ShiftSimulatorTab").then(m => ({ default: m.ShiftSimulatorTab })));
-const HistoryTab = lazy(() => import("../organisms/Tabs/HistoryTab").then(m => ({ default: m.HistoryTab })));
-const ProfileTab = lazy(() => import("../organisms/Tabs/ProfileTab").then(m => ({ default: m.ProfileTab })));
+const TripsTab = lazy(() =>
+  import("../organisms/Tabs/TripsTab").then((m) => ({ default: m.TripsTab })),
+);
+const ShiftCloseTab = lazy(() =>
+  import("../organisms/Tabs/ShiftCloseTab").then((m) => ({
+    default: m.ShiftCloseTab,
+  })),
+);
+const ShiftSimulatorTab = lazy(() =>
+  import("../organisms/Tabs/ShiftSimulatorTab").then((m) => ({
+    default: m.ShiftSimulatorTab,
+  })),
+);
+const HistoryTab = lazy(() =>
+  import("../organisms/Tabs/HistoryTab").then((m) => ({
+    default: m.HistoryTab,
+  })),
+);
+const ProfileScreen = lazy(() =>
+  import("../organisms/Tabs/ProfileScreen").then((m) => ({
+    default: m.ProfileScreen,
+  })),
+);
 
 // Refactored Tabs
 import { BottomTabNavigation } from "../organisms/BottomNavigation";
 import { useUnifiedSession } from "../../../hooks/useUnifiedSession";
 
 const CalculatorApp: React.FC = () => {
-
   // --- 1. SESSION & PROFILE (Unified Hook Interface) ---
   const {
     isReady,
@@ -34,14 +51,16 @@ const CalculatorApp: React.FC = () => {
     activeTab,
     setActiveTab,
     clearSession,
-    deleteTrip
+    deleteTrip,
   } = useUnifiedSession();
 
   const { initProfile } = useProfileStore();
   const { initTrips } = useCalculatorStore();
 
   const [showToast, setShowToast] = useState(false);
-  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([activeTab]));
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
+    new Set([activeTab]),
+  );
 
   // Keep track of visited tabs to prevent unmounting and losing state
   useEffect(() => {
@@ -146,12 +165,14 @@ const CalculatorApp: React.FC = () => {
 
           {visitedTabs.has("close") && (
             <div style={{ display: activeTab === "close" ? "block" : "none" }}>
-              <ShiftCloseTab onNavigateTrips={() => setActiveTab('trips')} />
+              <ShiftCloseTab onNavigateTrips={() => setActiveTab("trips")} />
             </div>
           )}
 
           {visitedTabs.has("history") && (
-            <div style={{ display: activeTab === "history" ? "block" : "none" }}>
+            <div
+              style={{ display: activeTab === "history" ? "block" : "none" }}
+            >
               <HistoryTab
                 onClearHistory={() => {
                   if (confirm("¿Borrar historial del día?")) clearSession();
@@ -166,7 +187,7 @@ const CalculatorApp: React.FC = () => {
               className="animate-in fade-in slide-in-from-bottom-4 duration-500"
               style={{ display: activeTab === "profile" ? "block" : "none" }}
             >
-              <ProfileTab />
+              <ProfileScreen />
             </div>
           )}
         </Suspense>
@@ -180,8 +201,12 @@ const CalculatorApp: React.FC = () => {
               <PartyPopper className="w-4 h-4 text-green-400" />
             </div>
             <div>
-              <h4 className="text-white text-sm font-black">¡A romperla hoy! 🚀</h4>
-              <p className="text-green-100/70 text-xs mt-0.5">Ayer te ahorraste mucha plata evitando viajes trampa.</p>
+              <h4 className="text-white text-sm font-black">
+                ¡A romperla hoy! 🚀
+              </h4>
+              <p className="text-green-100/70 text-xs mt-0.5">
+                Ayer te ahorraste mucha plata evitando viajes trampa.
+              </p>
             </div>
           </div>
         </div>
