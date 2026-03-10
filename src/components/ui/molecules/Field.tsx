@@ -14,7 +14,7 @@ import { Label } from '../atoms/Label';
 interface FieldProps {
   id: string;
   label: string;
-  hint?: string;
+  hint?: React.ReactNode;
   error?: string;
   required?: boolean;
   icon?: React.ElementType;
@@ -43,7 +43,7 @@ export const Field: React.FC<FieldProps> = ({
   return (
     <div className={cn('space-y-2', className)}>
       {/* Label */}
-      <Label 
+      <Label
         htmlFor={id}
         variant={error ? 'default' : 'muted'}
         size="sm"
@@ -58,12 +58,12 @@ export const Field: React.FC<FieldProps> = ({
         {/* Left Icon */}
         {Icon && (
           <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-            <Icon 
+            <Icon
               className={cn(
                 'w-5 h-5 transition-colors duration-300',
                 error ? 'text-error' : 'text-moon'
               )}
-              aria-hidden="true" 
+              aria-hidden="true"
             />
           </div>
         )}
@@ -74,7 +74,7 @@ export const Field: React.FC<FieldProps> = ({
           'aria-required': required ? 'true' : undefined,
           'aria-invalid': error ? 'true' : 'false',
           'aria-describedby': [
-            error ? errorId : null, 
+            error ? errorId : null,
             hint ? hintId : null
           ]
             .filter(Boolean)
@@ -94,7 +94,7 @@ export const Field: React.FC<FieldProps> = ({
         {/* Right Suffix (e.g., "km/L", "XP") */}
         {suffix && (
           <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-            <span 
+            <span
               className="text-xs font-extrabold text-primary uppercase tracking-widest"
               aria-hidden="true"
             >
@@ -106,8 +106,8 @@ export const Field: React.FC<FieldProps> = ({
 
       {/* Hint Text (only shown when no error) */}
       {hint && !error && (
-        <p 
-          id={hintId} 
+        <p
+          id={hintId}
           className="text-xs text-moon font-medium ml-1"
         >
           {hint}

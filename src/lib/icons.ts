@@ -63,6 +63,8 @@ export {
   User,
   X,
   Zap,
+  Wrench,
+  ShieldCheck,
   Home,
   Timer,
   Save,

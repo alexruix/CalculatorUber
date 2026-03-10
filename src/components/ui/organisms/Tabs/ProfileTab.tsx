@@ -527,7 +527,7 @@ export const ProfileTab: React.FC = () => {
                       handleFieldSave({ fuelPrice: Number(e.target.value) })
                     }
                     min="1"
-                    step="10"
+                    step="any"
                     className="input-base input-focus text-sm pl-11"
                   />
                 </div>
