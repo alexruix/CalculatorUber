@@ -39,10 +39,10 @@ export const ProfileSecuritySection: React.FC<ProfileSecuritySectionProps> = ({
             onClick={() => setIsConfirmingReset(true)}
           />
         ) : (
-          <div className="p-6 border-2 border-red-500/20 rounded-3xl bg-red-500/5 text-center shadow-[0_0_30px_rgba(255,68,68,0.15)] animate-in zoom-in-95 duration-200">
+          <div className="p-6 border-2 border-error-border bg-error-bg text-center shadow-[0_0_30px_rgba(255,68,68,0.15)] animate-in zoom-in-95 duration-200 rounded-3xl">
             <h4
               id="danger-heading"
-              className="text-sm font-black text-red-400 uppercase tracking-widest mb-2"
+              className="text-sm font-black text-error uppercase tracking-widest mb-2"
             >
               {account.confirmTitle}
             </h4>

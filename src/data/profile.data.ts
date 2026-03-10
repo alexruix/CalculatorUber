@@ -28,7 +28,7 @@ export const PROFILE_STRINGS = {
   },
   sections: {
     machine: {
-      title: "Mi Perfil",
+      title: "Mi Cuenta",
       personalData: "Datos personales",
       personalDataDesc: "Nombre, email y foto",
       myVehicle: "Mi vehículo",

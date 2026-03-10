@@ -7,18 +7,17 @@ import { SectionItemButton } from "../../atoms/SectionItemButton";
 interface ProfileMachineSectionProps {
   vehicleName: string;
   vertical: VerticalType | null;
-  // Other props kept for future detail views or hidden inline edits
-  fuelPrice: number;
-  kmPerLiter: number;
-  maintPerKm: number;
-  handleFieldSave: (data: any) => void;
-  handleVerticalSelect: (v: VerticalType) => void;
+  onEditVehicle: () => void;
+  onEditVertical: () => void;
+  onEditExpenses: () => void;
 }
 
 export const ProfileMachineSection: React.FC<ProfileMachineSectionProps> = ({
   vehicleName,
   vertical,
-  handleVerticalSelect,
+  onEditVehicle,
+  onEditVertical,
+  onEditExpenses,
 }) => {
   const { machine } = PROFILE_STRINGS.sections;
 
@@ -30,19 +29,19 @@ export const ProfileMachineSection: React.FC<ProfileMachineSectionProps> = ({
 
       <div className="space-y-2">
         {/* 1. Datos personales */}
-        <SectionItemButton
+        {/* <SectionItemButton
           icon={User}
           label={machine.personalData}
           description={machine.personalDataDesc}
           onClick={() => console.log("Personal data navigation")}
-        />
+        /> */}
 
         {/* 2. Mi vehículo */}
         <SectionItemButton
           icon={Car}
           label={machine.myVehicle}
           description={vehicleName || machine.myVehicleDesc}
-          onClick={() => console.log("Vehicle settings navigation")}
+          onClick={onEditVehicle}
         />
 
         {/* 3. Rubro (Vertical) */}
@@ -58,7 +57,7 @@ export const ProfileMachineSection: React.FC<ProfileMachineSectionProps> = ({
                   ? "Logística (Flete/Envíos)"
                   : machine.verticalDesc
           }
-          onClick={() => console.log("Vertical switch navigation/modal")}
+          onClick={onEditVertical}
         />
 
         {/* 4. Gastos y costos */}
@@ -66,7 +65,7 @@ export const ProfileMachineSection: React.FC<ProfileMachineSectionProps> = ({
           icon={DollarSign}
           label={machine.expenses}
           description={machine.expensesDesc}
-          onClick={() => console.log("Expenses settings navigation")}
+          onClick={onEditExpenses}
         />
       </div>
     </div>

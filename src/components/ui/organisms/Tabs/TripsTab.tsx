@@ -79,10 +79,10 @@ export const TripsTab: React.FC = () => {
 
                 {/* 3. Auto-detección de tráfico — solo informativo */}
                 {metrics.wasHeavyTraffic && metrics.isValid && (
-                    <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl px-4 py-3">
-                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                        <p className="text-xs text-amber-100/70 font-bold">
-                            Tráfico pesado detectado <span className="text-amber-400">(velocidad prom &lt; 20 km/h)</span>. Consumo ajustado automáticamente.
+                    <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-4 py-3">
+                        <AlertTriangle className="w-4 h-4 text-accent shrink-0" />
+                        <p className="text-xs text-starlight font-bold mb-0">
+                            Tráfico pesado detectado <span className="text-accent">(velocidad prom &lt; 20 km/h)</span>. Consumo ajustado automáticamente.
                         </p>
                     </div>
                 )}

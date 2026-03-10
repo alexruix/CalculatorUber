@@ -135,13 +135,13 @@ const CalculatorApp: React.FC = () => {
 
   return (
     <div className="page-shell">
-      {/* Header Fijo con Branding NODO */}
-      <header className="app-header">
-        <div className="max-w-md mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-black text-white tracking-tighter flex-col items-center gap-2">
+      {/* Header Fijo — Manejate Branding */}
+      <header className="app-header border-b border-white/5 bg-black/50 backdrop-blur-md">
+        <div className="max-w-md mx-auto px-6 py-5 flex justify-between items-end">
+          <h1 className="text-2xl font-extrabold text-starlight tracking-tighter mb-0">
             Manejate
           </h1>
-          <p className="caption">La posta de tus viajes</p>
+          <p className="label-hint text-[10px] mb-0.5 opacity-60">La posta de tus viajes</p>
         </div>
       </header>
 
@@ -196,15 +196,15 @@ const CalculatorApp: React.FC = () => {
       {/* Motivational Toast */}
       {showToast && (
         <div className="fixed bottom-24 left-4 right-4 z-50 animate-in slide-in-from-bottom-5 fade-in fade-out duration-500 max-w-md mx-auto pointer-events-none">
-          <div className="bg-[#111] supports-backdrop-filter:bg-green-500/10 border border-green-500/20 supports-backdrop-filter:backdrop-blur-md p-4 rounded-2xl flex items-center gap-3 shadow-lg">
-            <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-              <PartyPopper className="w-4 h-4 text-green-400" />
+          <div className="bg-slate/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl flex items-center gap-4 shadow-[0_0_30px_var(--color-primary-glow)]">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <PartyPopper className="w-5 h-5 text-primary text-glow-primary" />
             </div>
-            <div>
-              <h4 className="text-white text-sm font-black">
+            <div className="flex-1">
+              <h4 className="text-starlight text-sm font-extrabold uppercase tracking-wider">
                 ¡A romperla hoy! 🚀
               </h4>
-              <p className="text-green-100/70 text-xs mt-0.5">
+              <p className="text-moon text-xs mt-0.5 mb-0 leading-tight">
                 Ayer te ahorraste mucha plata evitando viajes trampa.
               </p>
             </div>

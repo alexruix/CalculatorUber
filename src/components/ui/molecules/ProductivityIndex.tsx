@@ -28,11 +28,11 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
     const fmt = (n: number) => (Number.isInteger(n) ? n : n.toFixed(1));
 
     return (
-        <div className="glass-card p-4 rounded-3xl border-success/30 box-glow-primary space-y-4">
+        <div className="glass-card p-4 rounded-3xl border-primary/30 box-glow-primary space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-success" aria-hidden="true" />
+                    <Zap className="w-4 h-4 text-primary" aria-hidden="true" />
                     <h3
                         className="font-black text-white uppercase tracking-widest"
                         style={{ fontSize: 'var(--text-micro)' }}
@@ -59,20 +59,20 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                         width: `${activePercent}%`,
                         transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)`, /* Fluent decelerate */
                     }}
-                    className="progress-fill-success relative"
+                    className="progress-fill-primary relative"
                 >
                     <div className="absolute inset-0 bg-white/20 animate-pulse motion-reduce:animate-none" />
                 </div>
                 <div
                     style={{ width: `${idlePercent}%`, transition: `width 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)` }}
-                    className="bg-[#111] border-y border-r border-error/20 h-full"
+                    className="bg-slate border-y border-r border-error/20 h-full"
                 />
             </div>
 
             {/* Leyenda */}
             <div className="flex justify-between" style={{ fontSize: 'var(--text-caption)' }}>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-success shrink-0" aria-hidden="true" />
+                    <div className="w-2 h-2 rounded-full bg-primary shrink-0" aria-hidden="true" />
                     <span className="text-white/60 font-bold">{PRODUCTIVITY.producing(fmt(activeTime))}</span>
                 </div>
                 <div className="flex items-center gap-1.5">

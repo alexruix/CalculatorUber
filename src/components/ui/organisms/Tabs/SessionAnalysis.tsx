@@ -22,7 +22,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({ trips, onClear
     sky: 'bg-info/20 text-info border-info/30',
     amber: 'bg-warning/20 text-warning border-warning/30',
     orange: 'bg-warning/20 text-warning border-warning/30',
-    purple: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    purple: 'bg-secondary/20 text-secondary border-secondary/30',
     red: 'bg-error/20 text-error border-error/30',
     green: 'bg-success/20 text-success border-success/30',
   };

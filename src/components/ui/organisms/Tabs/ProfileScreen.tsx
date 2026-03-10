@@ -17,6 +17,10 @@ import { ProfileSettingsSection } from "../Profile/ProfileSettingsSection";
 import { ProfileDiscoverSection } from "../Profile/ProfileDiscoverSection";
 import { ProfileSecuritySection } from "../Profile/ProfileSecuritySection";
 
+// Modals
+import { EditVehicleModal } from "../../molecules/EditVehicleModal";
+import { EditExpensesModal } from "../../molecules/EditExpensesModal";
+
 interface ToastState {
   msg: string;
   type: "success" | "info" | "warning";
@@ -51,6 +55,7 @@ export const ProfileScreen: React.FC = () => {
   const [pendingVertical, setPendingVertical] = useState<VerticalType | null>(
     null,
   );
+  const [activeModal, setActiveModal] = useState<"vehicle" | "expenses" | null>(null);
 
   // — Today's trips —
   const todayTrips = useMemo(() => {
@@ -175,15 +180,15 @@ export const ProfileScreen: React.FC = () => {
     <div className="min-h-screen bg-black animate-in fade-in duration-500 overflow-x-hidden">
       {/* ── STICKY HEADER ─────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 px-4 h-16 flex items-center justify-between">
-        <button
+        {/* <button
           onClick={onBack}
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors"
           aria-label="Volver"
         >
           <ArrowLeft size={20} className="text-starlight" />
-        </button>
+        </button> */}
 
-        <h1 className="text-xl font-extrabold text-starlight uppercase tracking-tight">
+        <h1 className="text-xl font-extrabold text-starlight tracking-tight">
           Perfil
         </h1>
 
@@ -203,12 +208,11 @@ export const ProfileScreen: React.FC = () => {
             role="status"
             aria-live="polite"
             className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-wide shadow-lg animate-in fade-in slide-in-from-top-2 duration-300
-              ${
-                toast.type === "success"
-                  ? "bg-green-500 text-black"
-                  : toast.type === "warning"
-                    ? "bg-amber-500 text-black"
-                    : "bg-sky-500 text-black"
+              ${toast.type === "success"
+                ? "bg-primary text-black box-glow-primary"
+                : toast.type === "warning"
+                  ? "bg-accent text-black box-glow-accent"
+                  : "bg-secondary text-black box-glow-secondary"
               }
             `}
           >
@@ -270,17 +274,14 @@ export const ProfileScreen: React.FC = () => {
           <section aria-labelledby="section-machine">
             <ProfileMachineSection
               vehicleName={vehicleName}
-              fuelPrice={fuelPrice}
-              kmPerLiter={kmPerLiter}
-              maintPerKm={maintPerKm}
-              vehicleValue={vehicleValue}
-              vehicleLifetimeKm={vehicleLifetimeKm}
-              expenseSettings={expenseSettings}
-              amortizationPerKm={amortizationPerKm}
               vertical={vertical}
-              handleFieldSave={handleFieldSave}
-              handleToggleExpense={handleToggleExpense}
-              handleVerticalSelect={handleVerticalSelect}
+              onEditVehicle={() => setActiveModal("vehicle")}
+              onEditVertical={() => {
+                // For now, reuse handleVerticalSelect which opens the confirmation modal
+                // or we could open a full vertical selector in the future
+                handleVerticalSelect(vertical === 'transport' ? 'delivery' : 'transport');
+              }}
+              onEditExpenses={() => setActiveModal("expenses")}
             />
           </section>
 
@@ -318,6 +319,27 @@ export const ProfileScreen: React.FC = () => {
             />
           </section>
         </div>
+
+        {/* ── EDIT MODALS ───────────────────────────────────────────────────── */}
+        <EditVehicleModal
+          isOpen={activeModal === "vehicle"}
+          onClose={() => setActiveModal(null)}
+          onSave={(data) => {
+            handleFieldSave(data);
+            setActiveModal(null);
+          }}
+          initialData={{ vehicleName, fuelPrice, kmPerLiter }}
+        />
+
+        <EditExpensesModal
+          isOpen={activeModal === "expenses"}
+          onClose={() => setActiveModal(null)}
+          onSave={(data) => {
+            handleFieldSave(data);
+            setActiveModal(null);
+          }}
+          initialData={{ expenseSettings, maintPerKm }}
+        />
 
         {/* Bottom spacing for navigation */}
         <div className="h-20" />

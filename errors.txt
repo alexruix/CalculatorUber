@@ -1,0 +1,20 @@
+src/components/ui/atoms/Input.tsx(15,18): error TS2430: Interface 'InputProps' incorrectly extends interface 'InputHTMLAttributes<HTMLInputElement>'.
+  Types of property 'size' are incompatible.
+    Type 'InputSize | undefined' is not assignable to type 'number | undefined'.
+      Type 'string' is not assignable to type 'number'.
+src/components/ui/molecules/EditTripModal.tsx(127,22): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+src/components/ui/molecules/EditTripModal.tsx(141,22): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+src/components/ui/molecules/EditTripModal.tsx(155,22): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+src/components/ui/molecules/EditTripModal.tsx(169,22): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+src/components/ui/organisms/Tabs/HistoryTab.tsx(195,49): error TS2304: Cannot find name 'SUPPORT_TIPS'.
+src/components/ui/organisms/Tabs/HistoryTab.tsx(203,54): error TS2304: Cannot find name 'Timer'.
+src/components/ui/organisms/TripInputForm.tsx(65,25): error TS2322: Type '"icon"' is not assignable to type 'ButtonVariant | undefined'.
+src/components/ui/organisms/TripInputForm.tsx(85,25): error TS2322: Type '"icon"' is not assignable to type 'ButtonVariant | undefined'.
+src/components/ui/organisms/TripInputForm.tsx(185,58): error TS2322: Type '"primary"' is not assignable to type 'ButtonVariant | undefined'.
+supabase/functions/payment-webhook/index.ts(1,23): error TS2307: Cannot find module 'https://deno.land/std@0.168.0/http/server.ts' or its corresponding type declarations.
+supabase/functions/payment-webhook/index.ts(2,30): error TS2307: Cannot find module 'https://esm.sh/@supabase/supabase-js@2.38.4' or its corresponding type declarations.
+supabase/functions/payment-webhook/index.ts(5,21): error TS2304: Cannot find name 'Deno'.
+supabase/functions/payment-webhook/index.ts(6,28): error TS2304: Cannot find name 'Deno'.
+supabase/functions/payment-webhook/index.ts(11,14): error TS7006: Parameter 'req' implicitly has an 'any' type.
+supabase/functions/payment-webhook/index.ts(64,48): error TS18046: 'error' is of type 'unknown'.
+supabase/functions/payment-webhook/index.ts(65,35): error TS18046: 'error' is of type 'unknown'.

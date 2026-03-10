@@ -219,6 +219,10 @@
   input[type="number"] {
     -moz-appearance: textfield;
   }
+
+  .flex-1 p {
+    margin-bottom: var(--space-1);;
+  }
   
   /* Placeholder styling */
   ::placeholder {

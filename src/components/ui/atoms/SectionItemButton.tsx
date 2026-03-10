@@ -34,18 +34,18 @@ export const SectionItemButton: React.FC<SectionItemButtonProps> = ({
         "transition-all duration-200",
         "flex items-center gap-4",
         "text-left",
-        danger && "hover:bg-red-500/10 hover:border-red-500/30",
+        danger && "hover:bg-error-bg hover:border-error-border",
       )}
     >
       {/* Icon Circle */}
       <div
         className={cn(
           "w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0",
-          danger && "bg-red-500/10",
+          danger && "bg-error-bg text-error",
         )}
       >
         <Icon
-          className={cn("w-6 h-6", danger ? "text-red-400" : "text-starlight")}
+          className={cn("w-6 h-6", danger ? "text-error" : "text-starlight")}
           aria-hidden="true"
         />
       </div>
@@ -55,7 +55,7 @@ export const SectionItemButton: React.FC<SectionItemButtonProps> = ({
         <p
           className={cn(
             "text-base font-bold",
-            danger ? "text-red-400" : "text-starlight",
+            danger ? "text-error" : "text-starlight",
           )}
         >
           {label}
@@ -78,7 +78,7 @@ export const SectionItemButton: React.FC<SectionItemButtonProps> = ({
       <ChevronRight
         className={cn(
           "w-5 h-5 shrink-0",
-          danger ? "text-red-400/50" : "text-moon",
+          danger ? "text-error/50" : "text-moon",
         )}
         aria-hidden="true"
       />

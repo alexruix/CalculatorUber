@@ -14,7 +14,7 @@ export const PremiumGate: React.FC<PremiumGateProps> = ({ children, featureName 
     // Evitar parpadeo del Paywall durante la hidratación inicial
     if (isInitialLoading) {
         return (
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-white/5 animate-pulse min-h-[100px] flex items-center justify-center">
+            <div className="relative overflow-hidden rounded-4xl bg-white/5 animate-pulse min-h-[100px] flex items-center justify-center">
                 <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/30 animate-spin" />
             </div>
         );
@@ -25,7 +25,7 @@ export const PremiumGate: React.FC<PremiumGateProps> = ({ children, featureName 
     }
 
     return (
-        <div className="relative overflow-hidden rounded-[2.5rem] group">
+        <div className="relative overflow-hidden rounded-4xl group">
             {/* Contenido borroso de fondo */}
             <div className="blur-sm opacity-50 pointer-events-none select-none">
                 {children}
