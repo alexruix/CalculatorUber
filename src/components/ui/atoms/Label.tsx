@@ -20,15 +20,15 @@ export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> 
 }
 
 const variantStyles: Record<LabelVariant, string> = {
-  default: 'text-starlight',
-  primary: 'text-primary',
-  secondary: 'text-secondary',
-  muted: 'text-moon',
+  default: 'text-moon font-extrabold',
+  primary: 'text-primary font-extrabold',
+  secondary: 'text-secondary font-extrabold',
+  muted: 'text-moon font-medium',
 };
 
 const sizeStyles: Record<LabelSize, string> = {
-  xs: 'text-xs tracking-widest',      // 12px, extra wide tracking
-  sm: 'text-sm tracking-wider',       // 14px, wide tracking
+  xs: 'text-xs tracking-[0.2em]',      // 12px, extra wide tracking
+  sm: 'text-sm tracking-widest',       // 14px, wide tracking
   md: 'text-base tracking-wide',      // 16px, normal wide
 };
 
@@ -36,7 +36,7 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   (
     {
       variant = 'default',
-      size = 'sm',
+      size = 'xs',
       uppercase = true,
       required = false,
       children,
@@ -52,16 +52,16 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
           // Base styles
           'block font-medium',
           'transition-colors duration-200',
-          
+
           // Variant
           variantStyles[variant],
-          
+
           // Size
           sizeStyles[size],
-          
+
           // Uppercase
           uppercase && 'uppercase',
-          
+
           // Custom classes
           className
         )}

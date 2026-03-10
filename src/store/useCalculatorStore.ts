@@ -136,14 +136,15 @@ export const useCalculatorStore = create<CalculatorState>()(
                         id: trip.id,
                         user_id: user.id,
                         shift_id: state.activeShiftId,
-                        fare: trip.fare,
-                        margin: trip.margin,
-                        distance: trip.distance,
-                        duration: trip.duration,
+                        fare: trip.fare || 0,
+                        margin: trip.margin || 0,
+                        distance: trip.distance || 0,
+                        duration: trip.duration || 0,
                         vertical: trip.vertical,
                         tip: trip.tip,
                         tolls: trip.tolls,
                         start_time: trip.startTime,
+                        active_time: trip.activeTime || trip.duration || 0,
                         avg_speed: avgSpeed,
                         wait_minutes: waitMinutes,
                         timestamp: trip.timestamp // bigint en SQL
@@ -168,11 +169,32 @@ export const useCalculatorStore = create<CalculatorState>()(
 
                 // 1. Cierre de turno en Supabase (si hay internet)
                 if (user && isSupabaseConfigured() && navigator.onLine && state.activeShiftId) {
+                    const trips = state.sessionTrips;
+                    const totalFare = trips.reduce((acc, t) => acc + (t.fare || 0), 0);
+                    const totalMargin = trips.reduce((acc, t) => acc + (t.margin || 0), 0);
+                    const productiveMinutes = trips.reduce((acc, t) => acc + (t.duration || 0), 0);
+                    const idleMinutes = trips.reduce((acc, t) => acc + (t.waitMinutes || 0), 0);
+                    const kmDriven = trips.reduce((acc, t) => acc + (t.distance || 0), 0);
+                    
+                    let totalShiftMinutes = productiveMinutes + idleMinutes;
+                    if (totalShiftMinutes === 0 && trips.length > 0 && trips[0].timestamp && trips[trips.length - 1].timestamp) {
+                         totalShiftMinutes = Math.round((trips[0].timestamp - trips[trips.length - 1].timestamp) / 60000) + (trips[0].duration || 0);
+                    }
+                    
+                    const eph = totalShiftMinutes > 0 ? (totalMargin / (totalShiftMinutes / 60)) : 0;
+                    
                     await supabase.from('shifts')
                         .update({ 
                             status: 'closed', 
                             odometer_end: Number(state.currentOdometer),
-                            end_at: new Date().toISOString()
+                            end_at: new Date().toISOString(),
+                            total_fare: totalFare,
+                            total_margin: totalMargin,
+                            productive_minutes: productiveMinutes,
+                            total_shift_minutes: totalShiftMinutes,
+                            idle_minutes: idleMinutes,
+                            km_driven: kmDriven,
+                            eph: eph
                         })
                         .eq('id', state.activeShiftId);
                 }

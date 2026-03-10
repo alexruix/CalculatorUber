@@ -1,0 +1,101 @@
+import React from 'react';
+import { Mail, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { FormField } from '../molecules/FormField';
+import { Button } from '../atoms/Button';
+import { TextLink } from '../atoms/TextLink';
+import { GoogleButton } from '../atoms/GoogleButton';
+import { useAuthForm } from '../../../hooks/useAuthForm';
+
+interface LoginFormProps {
+    onSuccess?: () => void;
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
+    // We bind directly to the existing hook functionality
+    const {
+        email, setEmail, password, setPassword,
+        loading, error, handleAuth, handleGoogleLogin
+    } = useAuthForm(onSuccess || (() => window.location.href = '/app'), 'login');
+
+    const isFormValid = email.length > 0 && password.length > 5;
+
+    return (
+        <form onSubmit={handleAuth} className="w-full flex justify-center">
+            <div className="w-full max-w-sm flex flex-col items-center">
+
+                <div className="w-full space-y-5">
+                    <FormField
+                        id="email"
+                        type="email"
+                        label="Correo electrónico"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="tu@email.com"
+                        icon={<Mail className="w-5 h-5" />}
+                        required
+                        error={error?.toLowerCase().includes('email') ? error : undefined}
+                    />
+
+                    <FormField
+                        id="password"
+                        type="password"
+                        label="Contraseña"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        icon={<Lock className="w-5 h-5" />}
+                        required
+                        isPassword
+                        minLength={6}
+                        error={error?.toLowerCase().includes('contraseña') ? error : undefined}
+                    />
+
+                    <div className="flex justify-end pr-2 -mt-2">
+                        <TextLink href="/forgot-password" className="text-xs text-moon hover:text-primary-glow font-medium">
+                            ¿Olvidaste tu contraseña?
+                        </TextLink>
+                    </div>
+                </div>
+
+                {error && !error.toLowerCase().includes('email') && !error.toLowerCase().includes('contraseña') && (
+                    <div className="w-full mt-4 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                        {error}
+                    </div>
+                )}
+
+                <Button
+                    type="submit"
+                    variant={isFormValid ? "neon" : "secondary-dark"}
+                    size="lg"
+                    fullWidth
+                    disabled={!isFormValid || loading}
+                    className="mt-8 transition-colors duration-300 gap-2 h-14"
+                >
+                    {loading ? 'Procesando...' : 'Ingresar'}
+                    {!loading && <ChevronRight className="w-5 h-5" />}
+                </Button>
+
+                <div className="w-full mt-8">
+                    <div className="flex items-center gap-4 mb-6 opacity-60">
+                        <div className="h-px bg-white/20 flex-1"></div>
+                        <span className="text-xs font-medium text-moon text-center whitespace-nowrap">
+                            o continuar con
+                        </span>
+                        <div className="h-px bg-white/20 flex-1"></div>
+                    </div>
+                    <div className="flex w-full">
+                        <GoogleButton disabled={loading} />
+                        {/* <AppleButton disabled={loading} /> */}
+                    </div>
+                </div>
+
+                <div className="mt-8 text-center text-sm font-medium text-starlight">
+                    ¿No tenés cuenta?{' '}
+                    <TextLink href="/register">
+                        Unite al club
+                    </TextLink>
+                </div>
+            </div>
+        </form>
+    );
+};

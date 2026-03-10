@@ -1,0 +1,15 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { AuthTemplate } from "../components/ui/templates/AuthTemplate";
+import { RegisterForm } from "../components/ui/organisms/RegisterForm";
+---
+
+<Layout title="Crear cuenta | Manejate">
+  <AuthTemplate
+    title="Crear cuenta"
+    description="Comenzá a medir tus ganancias de manera profesional."
+    client:only="react"
+  >
+    <RegisterForm />
+  </AuthTemplate>
+</Layout>

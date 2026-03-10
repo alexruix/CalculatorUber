@@ -86,7 +86,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     font-bold
     uppercase
     tracking-wide
-    border border-white/10
+    border-2 border-white/10
     hover:bg-white/[0.1]
     hover:text-white
     active:scale-95

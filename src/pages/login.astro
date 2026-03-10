@@ -1,0 +1,15 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { AuthTemplate } from "../components/ui/templates/AuthTemplate";
+import { LoginForm } from "../components/ui/organisms/LoginForm";
+---
+
+<Layout title="Iniciar sesión | Manejate">
+  <AuthTemplate
+    title="Iniciar sesión"
+    description="Accedé a tus métricas y retomá el control de tus ganancias."
+    client:only="react"
+  >
+    <LoginForm />
+  </AuthTemplate>
+</Layout>

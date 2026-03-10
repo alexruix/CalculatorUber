@@ -102,12 +102,14 @@ export const useProfileStore = create<ProfileState>()(
                         if (data && !error) {
                             set({
                                 user: currentUser,
-                                isConfigured: true,
+                                isConfigured: data.is_onboarded === true, // <-- Vulnerability fix: Read onboarding state
                                 isPro: data.subscription_tier === 'pro',
                                 vehicleName: data.vehicle_name,
                                 kmPerLiter: Math.max(0.1, Number(data.km_per_liter) || 10), // Safe Default
                                 maintPerKm: Number(data.maint_per_km) || 15,
                                 fuelPrice: Number(data.fuel_price) || 1400,
+                                vehicleValue: data.vehicle_value ? Number(data.vehicle_value) : initialProfileState.vehicleValue,
+                                vehicleLifetimeKm: data.vehicle_lifetime_km ? Number(data.vehicle_lifetime_km) : initialProfileState.vehicleLifetimeKm,
                                 expenseSettings: data.expense_settings || initialProfileState.expenseSettings,
                                 vertical: data.vertical || null,
                                 dailyGoal: data.daily_goal !== undefined && data.daily_goal !== null ? Number(data.daily_goal) : initialProfileState.dailyGoal,
@@ -140,6 +142,7 @@ export const useProfileStore = create<ProfileState>()(
                     const state = get();
                     const profileData = {
                         id: currentUser.id,
+                        is_onboarded: true, // <-- Mark as completely onboarded after form
                         vehicle_name: state.vehicleName,
                         km_per_liter: state.kmPerLiter,
                         maint_per_km: state.maintPerKm,
@@ -148,7 +151,10 @@ export const useProfileStore = create<ProfileState>()(
                         vertical: state.vertical,
                         daily_goal: state.dailyGoal,
                         secondary_vehicle: state.secondaryVehicle,
-                        subscription_tier: state.isPro ? 'pro' : 'free'
+                        subscription_tier: state.isPro ? 'pro' : 'free',
+                        vehicle_value: state.vehicleValue,
+                        vehicle_lifetime_km: state.vehicleLifetimeKm,
+                        amortization_per_km: state.amortizationPerKm
                     };
 
                     await supabase

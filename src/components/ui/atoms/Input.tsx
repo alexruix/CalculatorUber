@@ -23,10 +23,10 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 const variantStyles: Record<InputVariant, string> = {
   default: `
     bg-white/5 
-    border-white/10
+    border-white/20
     focus:border-primary
     focus:bg-primary/5
-    focus:shadow-[0_0_20px_var(--color-primary-glow)]
+    focus:shadow-[0_0_15px_var(--color-primary-glow)]
   `,
   error: `
     bg-error-bg
@@ -68,7 +68,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div className={cn('relative', fullWidth && 'w-full')}>
         {/* Left Icon */}
         {hasIcon && (
-          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-moon pointer-events-none transition-colors duration-300 peer-focus-within:text-primary">
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-starlight pointer-events-none transition-colors duration-300 peer-focus-within:text-primary">
             {icon}
           </div>
         )}
@@ -85,19 +85,19 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             'outline-none',
             'placeholder:text-moon',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            
+
             // Variant
             variantStyles[variant],
-            
+
             // Size
             sizeStyles[size],
-            
+
             // Icon padding
             hasIcon && 'pl-12',
-            
+
             // Suffix padding
             hasSuffix && 'pr-16',
-            
+
             // Custom classes
             className
           )}
