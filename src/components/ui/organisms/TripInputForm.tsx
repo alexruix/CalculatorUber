@@ -10,8 +10,9 @@ import React, { useEffect } from 'react';
 import { DollarSign, Navigation, Clock, Coins, Map as MapIcon, TimerReset, NotebookPen, Minus, Plus } from '../../../lib/icons';
 import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { useProfileStore } from '../../../store/useProfileStore';
-import { Button } from '../atoms/Button';
+import { cn } from '../../../lib/utils';
 import { Input } from '../atoms/Input';
+import { Button } from '../atoms/Button';
 import { Label } from '../atoms/Label';
 import { GlassCard } from '../molecules/GlassCard';
 import { TRIP_FORM } from '../../../data/ui-strings';
@@ -26,16 +27,11 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
     const {
         fare, setFare,
         distTrip, setDistTrip,
-        distPickup, setDistPickup,
         duration, setDuration,
         startTime, setStartTime,
         tip, setTip,
         tolls, setTolls
     } = useCalculatorStore();
-
-    useEffect(() => {
-        if (distPickup !== '0') setDistPickup('0');
-    }, [distPickup, setDistPickup]);
 
     const adjustValue = (value: string, setter: (v: string) => void, step: number) => {
         const current = parseFloat(value) || 0;
@@ -45,32 +41,43 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
     const f = TRIP_FORM.fields;
 
     return (
-        <div className="card-main space-y-5">
-            {/* Header de sección */}
-            <div className="text-center pb-3 border-b border-white/5">
-                <h3 className="font-black text-white uppercase tracking-widest"
-                    style={{ fontSize: 'var(--text-label)' }}>
-                    {TRIP_FORM.sectionTitle}
-                </h3>
-                <p className="text-white/40 mt-0.5" style={{ fontSize: 'var(--text-caption)' }}>
-                    {TRIP_FORM.sectionSubtitle}
-                </p>
+        <div className="space-y-6 pb-10">
+            {/* Header de sección - Telemetry HUD Style */}
+            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
+                <div className="w-1 h-6 bg-primary rounded-full shadow-[0_0_10px_var(--color-primary-glow)]" />
+                <div className="flex-1">
+                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-xs mb-0.5">
+                        {TRIP_FORM.sectionTitle}
+                    </h3>
+                    <p className="text-white/30 text-[10px] uppercase font-bold tracking-widest leading-none">
+                        {TRIP_FORM.sectionSubtitle}
+                    </p>
+                </div>
             </div>
 
-            {/* Recaudación Total — con stepper de ±5000 */}
-            <div className="field-wrapper">
-                <Label htmlFor="field-fare" required>{f.fare.label}</Label>
-                <div className="flex items-center gap-2 mt-2">
+            {/* Recaudación Total — StepperInput de alto impacto */}
+            <div className="space-y-3">
+                <label 
+                    htmlFor="field-fare" 
+                    className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1"
+                >
+                    {f.fare.label} <span className="text-accent ml-1">*</span>
+                </label>
+                
+                <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch h-20">
                     <Button
-                        variant="icon"
-                        className="border border-white/10 shrink-0"
+                        variant="secondary-dark"
+                        className="h-full w-16 px-0"
                         onClick={() => adjustValue(fare, setFare, -5000)}
                         aria-label={f.fare.adjustMinus}
                     >
-                        <Minus className="w-5 h-5" />
+                        <Minus className="w-6 h-6 text-error" />
                     </Button>
-                    <div className="field-input-wrapper flex-1">
-                        <DollarSign className="field-icon-left" aria-hidden="true" />
+                    
+                    <div className="relative group">
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-focus-within:scale-110">
+                            <DollarSign className="w-6 h-6" />
+                        </div>
                         <Input
                             id="field-fare"
                             type="number"
@@ -78,114 +85,135 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid })
                             placeholder="0"
                             value={fare}
                             onChange={(e) => setFare(e.target.value)}
-                            className="pl-12 font-black text-center text-2xl sm:text-3xl"
+                            className={cn(
+                                "h-full pl-14 pr-6 font-extrabold text-center text-3xl transition-all duration-300",
+                                !fare && "border-accent/40 shadow-[inset_0_0_15px_var(--color-accent-dim)]"
+                            )}
                         />
                     </div>
+
                     <Button
-                        variant="icon"
-                        className="border border-white/10 shrink-0"
+                        variant="secondary-dark"
+                        className="h-full w-16 px-0"
                         onClick={() => adjustValue(fare, setFare, 5000)}
                         aria-label={f.fare.adjustPlus}
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-6 h-6 text-primary" />
                     </Button>
                 </div>
             </div>
 
-            {/* Kilómetros */}
-            <div className="field-wrapper">
-                <Label htmlFor="field-dist">{f.distance.label}</Label>
-                <div className="field-input-wrapper mt-2">
-                    <Navigation className="field-icon-left" aria-hidden="true" />
+            {/* Kilómetros y Duración - Grid 2 Columnas */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
+                        {f.distance.label}
+                    </label>
                     <Input
                         id="field-dist"
                         type="number"
                         placeholder={f.distance.placeholder}
                         value={distTrip}
                         onChange={(e) => setDistTrip(e.target.value)}
-                        className="pl-12 text-xl font-black text-center"
+                        icon={<Navigation className="w-5 h-5" />}
+                        className="font-extrabold text-xl text-center"
+                    />
+                </div>
+
+                <div className="space-y-3">
+                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
+                        {f.duration.label} <span className="text-accent ml-1">*</span>
+                    </label>
+                    <Input
+                        id="field-duration"
+                        type="number"
+                        placeholder={f.duration.placeholder}
+                        value={duration}
+                        onChange={(e) => setDuration(e.target.value)}
+                        icon={<TimerReset className="w-5 h-5" />}
+                        className={cn(
+                            "font-extrabold text-xl text-center",
+                            !duration && "border-accent/40 shadow-[inset_0_0_15px_var(--color-accent-dim)]"
+                        )}
                     />
                 </div>
             </div>
 
-            {/* Horas y Minutos */}
-            <div className="grid grid-cols-2 gap-3">
-                <div className="field-wrapper">
-                    <Label htmlFor="field-duration" required>{f.duration.label}</Label>
-                    <div className="field-input-wrapper mt-2">
-                        <TimerReset className="field-icon-left text-white/30" aria-hidden="true" />
-                        <Input
-                            id="field-duration"
-                            type="number"
-                            placeholder={f.duration.placeholder}
-                            value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
-                            className="pl-12 font-black"
-                        />
-                    </div>
-                </div>
-                <div className="field-wrapper">
-                    <Label htmlFor="field-starttime">{f.startTime.label}</Label>
-                    <div className="field-input-wrapper mt-2">
-                        <Clock className="field-icon-left text-info" aria-hidden="true" />
+            {/* Hora Inicio + Gastos Extras */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
+                        {f.startTime.label}
+                    </label>
+                    <div className="relative group">
                         <Input
                             id="field-starttime"
                             type="time"
-                            placeholder={f.startTime.placeholder}
                             value={startTime}
                             onChange={(e) => setStartTime(e.target.value)}
-                            className="pl-12 font-black border-info/30 bg-info/5 appearance-none"
-                            aria-describedby="starttime-hint"
-                        />
-                    </div>
-                    <p id="starttime-hint" className="mt-1 ml-1 text-white/25 leading-tight"
-                        style={{ fontSize: 'var(--text-micro)' }}>
-                        {f.startTime.hint}
-                    </p>
-                </div>
-            </div>
-
-            {/* Propinas (Delivery) + Gastos Extras */}
-            <div className="grid grid-cols-2 gap-3">
-                {vertical === 'delivery' && (
-                    <div className="field-wrapper">
-                        <Label htmlFor="field-tips">{f.tips.label}</Label>
-                        <div className="field-input-wrapper mt-2">
-                            <Coins className="field-icon-left" aria-hidden="true" />
-                            <Input
-                                id="field-tips"
-                                type="number"
-                                inputMode="decimal"
-                                placeholder={f.tips.placeholder}
-                                value={tip}
-                                onChange={(e) => setTip(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-                    </div>
-                )}
-                <div className={vertical === 'delivery' ? 'field-wrapper' : 'field-wrapper col-span-2'}>
-                    <Label htmlFor="field-expenses">{f.expenses.label}</Label>
-                    <div className="field-input-wrapper mt-2">
-                        <MapIcon className="field-icon-left" aria-hidden="true" />
-                        <Input
-                            id="field-expenses"
-                            type="number"
-                            inputMode="decimal"
-                            placeholder={f.expenses.placeholder}
-                            value={tolls}
-                            onChange={(e) => setTolls(e.target.value)}
-                            className="pl-10"
+                            icon={<Clock className="w-5 h-5 text-secondary" />}
+                            className="font-extrabold tracking-wider bg-secondary/5 border-secondary/20 h-14"
                         />
                     </div>
                 </div>
+
+                <div className="space-y-3">
+                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
+                        {f.expenses.label}
+                    </label>
+                    <Input
+                        id="field-expenses"
+                        type="number"
+                        inputMode="decimal"
+                        placeholder={f.expenses.placeholder}
+                        value={tolls}
+                        onChange={(e) => setTolls(e.target.value)}
+                        icon={<MapIcon className="w-5 h-5" />}
+                        className="font-extrabold h-14"
+                    />
+                </div>
             </div>
 
-            {/* CTA */}
-            <Button disabled={!isValid} onClick={onSave} variant="primary">
-                <NotebookPen className="w-5 h-5" aria-hidden="true" />
-                {TRIP_FORM.saveButton}
-            </Button>
+            {/* Propinas (Solo Delivery) */}
+            {vertical === 'delivery' && (
+                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
+                        {f.tips.label}
+                    </label>
+                    <Input
+                        id="field-tips"
+                        type="number"
+                        inputMode="decimal"
+                        placeholder={f.tips.placeholder}
+                        value={tip}
+                        onChange={(e) => setTip(e.target.value)}
+                        icon={<Coins className="w-5 h-5 text-primary" />}
+                        className="font-extrabold h-14"
+                    />
+                </div>
+            )}
+
+            {/* Footer Desc - Sunlight Visibility Optimization */}
+            <div className="bg-white/5 border-l-2 border-white/20 px-4 py-3 rounded-r-xl">
+                <p className="text-white/50 text-[10px] font-bold leading-normal uppercase tracking-wider mb-0">
+                    Calculando rentabilidad basada en tus costos de combustible, mantenimiento y amortización.
+                </p>
+            </div>
+
+            {/* CTA - Thumb Zone Navigation */}
+            <div className="pt-4 sticky bottom-4 z-10 sm:static">
+                <Button 
+                    disabled={!isValid} 
+                    onClick={onSave} 
+                    variant="neon" 
+                    fullWidth 
+                    size="lg"
+                    className="h-20 sm:h-auto uppercase text-xl sm:text-lg tracking-widest shadow-[0_10px_40px_-5px_var(--color-primary-glow)]"
+                >
+                    <NotebookPen className="w-6 h-6 mr-1" />
+                    {TRIP_FORM.saveButton}
+                </Button>
+            </div>
         </div>
     );
 };

@@ -10,6 +10,7 @@
  * · Touch target correctos para mobile
  */
 import React from 'react';
+import { cn } from '../../../lib/utils';
 import { useProfileStore } from '../../../store/useProfileStore';
 import type { TripMetrics, ProfitabilityTheme } from '../../../types/calculator.types';
 import { PROFITABILITY } from '../../../data/ui-strings';
@@ -52,66 +53,91 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
 
     return (
         <div
-            className={`${theme.card} rounded-3xl p-5 sm:p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden`}
+            className={cn(
+                theme.card,
+                "rounded-3xl p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden",
+                "border-b-4 border-white/5"
+            )}
             role="status"
             aria-live="polite"
-            aria-label={`Estado de rentabilidad: ${theme.label}`}
         >
-            {/* Glow decorativo — no visible en reduced-motion */}
-            <div
-                className={`absolute -right-4 -top-4 w-24 h-24 blur-3xl rounded-full opacity-20 ${theme.text.replace('text-', 'bg-')} motion-reduce:hidden`}
-                aria-hidden="true"
-            />
-
-            {/* Estado */}
-            <span className={`text-(--text-micro) font-black tracking-widest uppercase ${theme.text}`}>
-                {theme.label}
-            </span>
-
-            {/* Valor principal — Ganancia por KM */}
-            <div className="flex items-baseline justify-center gap-1 mt-2 relative z-10">
-                <span
-                    className="font-black tracking-tighter text-white"
-                    style={{ fontSize: 'clamp(3rem,10vw,3.75rem)' }}
-                >
-                    {PROFITABILITY.currency}{metrics.isValid ? metrics.profitPerKm : 0}
-                </span>
-                <span className={`text-xl font-black ${theme.text}`}>{PROFITABILITY.perKm}</span>
+            {/* HUD Status Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+                <div 
+                    className={cn("h-full transition-all duration-1000", theme.text.replace('text-', 'bg-'))}
+                    style={{ width: metrics.isValid ? '100%' : '0%' }}
+                />
             </div>
 
-            {/* Métricas secundarias */}
+            {/* Status Label - High Energy Gaming Style */}
+            <div className="flex items-center justify-center gap-2 mb-2">
+                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
+                <span className={cn("text-[11px] font-black tracking-[0.3em] uppercase", theme.text)}>
+                    {theme.label}
+                </span>
+                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
+            </div>
+
+            {/* Main Metric - $/KM Telemetry */}
+            <div className="flex flex-col items-center justify-center py-2 relative z-10">
+                <div className="flex items-baseline gap-1">
+                    <span 
+                        className="font-black tracking-tighter text-white leading-none"
+                        style={{ fontSize: 'clamp(3.5rem, 12vw, 4.5rem)' }}
+                    >
+                        {PROFITABILITY.currency}{metrics.isValid ? metrics.profitPerKm : 0}
+                    </span>
+                    <span className={cn("text-2xl font-black italic uppercase tracking-tighter opacity-80", theme.text)}>
+                        {PROFITABILITY.perKm}
+                    </span>
+                </div>
+            </div>
+
+            {/* Secondary Metrics - Performance Readout Style */}
             {metrics.isValid && (
-                <div className="mt-3 flex items-center justify-center gap-3 text-(--text-caption) font-medium relative z-10 flex-wrap">
-                    <span>
-                        {PROFITABILITY.netLabel}:{' '}
-                        <b className="text-white font-black">
+                <div className="mt-4 grid grid-cols-2 gap-2 p-3 bg-white/5 rounded-2xl border border-white/10">
+                    <div className="text-center border-r border-white/10 px-2">
+                        <span className="block text-[10px] font-extrabold text-white/30 uppercase tracking-widest mb-1">
+                            {PROFITABILITY.netLabel}
+                        </span>
+                        <b className="text-sm font-black text-starlight">
                             ${metrics.netMargin.toLocaleString('es-AR')}
                         </b>
-                    </span>
-                    <span className="opacity-20" aria-hidden="true">|</span>
-                    <span>
-                        {PROFITABILITY.costLabel}:{' '}
-                        <b className="text-error/80 font-black">
+                    </div>
+                    <div className="text-center px-2">
+                        <span className="block text-[10px] font-extrabold text-white/30 uppercase tracking-widest mb-1">
+                            {PROFITABILITY.costLabel}
+                        </span>
+                        <b className="text-sm font-black text-accent shadow-[0_0_10px_var(--color-accent-dim)]">
                             ${Math.round(metrics.totalCost).toLocaleString('es-AR')}
                         </b>
-                    </span>
+                    </div>
                 </div>
             )}
 
-            {/* ROI + Insight */}
+            {/* ROI & Insight - HUD Deep Dive */}
             {metrics.isValid && (
-                <div className="mt-5 pt-4 border-t border-white/5 flex flex-col items-center animate-in fade-in slide-in-from-top-2 duration-700">
-                    <p className="caption tracking-widest text-(--text-micro)">
-                        {roiLabel}
-                    </p>
-                    <p className="text-white font-black text-lg mt-1">
-                        {metrics.roi}x{' '}
-                        <span className="text-xs opacity-40 font-bold uppercase tracking-widest">
+                <div className="mt-6 pt-5 border-t border-white/10 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="h-[2px] w-8 bg-linear-to-r from-transparent to-white/20" />
+                        <span className="text-[10px] font-extrabold tracking-[0.2em] text-white/40 uppercase">
+                            {roiLabel}
+                        </span>
+                        <div className="h-[2px] w-8 bg-linear-to-l from-transparent to-white/20" />
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                        <span className="text-3xl font-black text-white italic">
+                            {metrics.roi}
+                            <span className="text-xl ml-0.5 text-primary">x</span>
+                        </span>
+                        <span className="text-[10px] font-extrabold text-white/20 uppercase tracking-widest self-end pb-1.5">
                             {PROFITABILITY.roiUnit}
                         </span>
-                    </p>
-                    <p className="text-(--text-caption) mt-1.5 max-w-[220px] leading-relaxed font-bold tracking-tight">
-                        {getInsight(metrics.roi, vertical)}
+                    </div>
+
+                    <p className="text-[13px] mt-3 px-4 leading-snug font-bold text-starlight italic tracking-tight opacity-90 text-center max-w-[280px]">
+                        "{getInsight(metrics.roi, vertical)}"
                     </p>
                 </div>
             )}
