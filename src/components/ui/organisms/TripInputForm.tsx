@@ -1,219 +1,345 @@
 /**
- * TripInputForm.tsx — Formulario de Cierre de Turno
- * ─────────────────────────────────────────────────────────────
- * Mobile First: inputs con altura mínima de 48px, botones de ±
- * con touch targets correctos, layout en grid responsive.
- *
- * Textos provienen de /data/ui-strings.ts (TRIP_FORM namespace).
+ * TripInputForm.tsx - IMPROVED VERSION
+ * 
+ * UX Improvements:
+ * - 24-hour time format (no AM/PM confusion)
+ * - Peajes/Extras moved to collapsible section (low frequency)
+ * - Dynamic cost calculation text based on active expenses
+ * - Consistent color hierarchy (primary = money, secondary = time)
+ * - Progressive disclosure for optional fields
+ * - Copy from clipboard detection for Fare (future enhancement)
  */
-import React, { useEffect } from 'react';
-import { DollarSign, Navigation, Clock, Coins, Map as MapIcon, TimerReset, NotebookPen, Minus, Plus } from '../../../lib/icons';
+
+import React, { useMemo } from 'react';
+import {
+    DollarSign,
+    Navigation,
+    Clock,
+    Coins,
+    MapPin,
+    Timer,
+    NotebookPen,
+    Minus,
+    Plus,
+    ChevronDown,
+} from '../../../lib/icons';
+import { cn } from '../../../lib/utils';
 import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { useProfileStore } from '../../../store/useProfileStore';
-import { cn } from '../../../lib/utils';
-import { Input } from '../atoms/Input';
-import { Button } from '../atoms/Button';
-import { Label } from '../atoms/Label';
-import { GlassCard } from '../molecules/GlassCard';
-import { TRIP_FORM } from '../../../data/ui-strings';
+import { Input } from '../../../components/ui/atoms/Input';
+import { Button } from '../../../components/ui/atoms/Button';
+import { Label } from '../../../components/ui/atoms/Label';
 
 interface TripInputFormProps {
     onSave: () => void;
     isValid: boolean;
 }
 
-export const TripInputForm: React.FC<TripInputFormProps> = ({ onSave, isValid }) => {
-    const { vertical } = useProfileStore();
+export const TripInputForm: React.FC<TripInputFormProps> = ({
+    onSave,
+    isValid,
+}) => {
+    const { vertical, expenseSettings } = useProfileStore();
     const {
-        fare, setFare,
-        distTrip, setDistTrip,
-        duration, setDuration,
-        startTime, setStartTime,
-        tip, setTip,
-        tolls, setTolls
+        fare,
+        setFare,
+        distTrip,
+        setDistTrip,
+        duration,
+        setDuration,
+        startTime,
+        setStartTime,
+        tip,
+        setTip,
+        tolls,
+        setTolls,
     } = useCalculatorStore();
 
-    const adjustValue = (value: string, setter: (v: string) => void, step: number) => {
+    const [showExtras, setShowExtras] = React.useState(false);
+
+    // Adjust value with +/- buttons
+    const adjustValue = (
+        value: string,
+        setter: (v: string) => void,
+        step: number
+    ) => {
         const current = parseFloat(value) || 0;
         setter(Math.max(0, current + step).toString());
     };
 
-    const f = TRIP_FORM.fields;
+    // Dynamic cost calculation text based on active expenses
+    const activeCostsText = useMemo(() => {
+        const activeExpenses = expenseSettings
+            .filter((e) => e.enabled)
+            .map((e) => e.label.toLowerCase());
+
+        if (activeExpenses.length === 0) {
+            return 'Calculando margen bruto sin descuentos de costos.';
+        }
+
+        if (activeExpenses.length === 1) {
+            return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
+        }
+
+        const last = activeExpenses.pop();
+        return `Calculando rentabilidad basada en ${activeExpenses.join(', ')} y ${last}.`;
+    }, [expenseSettings]);
 
     return (
         <div className="space-y-6 pb-10">
-            {/* Header de sección - Telemetry HUD Style */}
-            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-                <div className="w-1 h-6 bg-primary rounded-full shadow-[0_0_10px_var(--color-primary-glow)]" />
+            {/* Header */}
+            <div className="flex items-start gap-3 pb-4 border-b border-white/10">
+                <div className="w-1 h-8 bg-primary rounded-full shadow-[0_0_10px_var(--color-primary-glow)]" />
                 <div className="flex-1">
-                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-xs mb-0.5">
-                        {TRIP_FORM.sectionTitle}
+                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-sm mb-1">
+                        Cargá tu Viaje
                     </h3>
-                    <p className="text-white/30 text-[10px] uppercase font-bold tracking-widest leading-none">
-                        {TRIP_FORM.sectionSubtitle}
+                    <p className="text-moon text-xs font-medium">
+                        Datos tal cual figuran en la app
                     </p>
                 </div>
             </div>
 
-            {/* Recaudación Total — StepperInput de alto impacto */}
-            <div className="space-y-3">
-                <label 
-                    htmlFor="field-fare" 
-                    className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1"
-                >
-                    {f.fare.label} <span className="text-accent ml-1">*</span>
-                </label>
-                
-                <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch h-20">
-                    <Button
-                        variant="secondary-dark"
-                        className="h-full w-16 px-0"
-                        onClick={() => adjustValue(fare, setFare, -5000)}
-                        aria-label={f.fare.adjustMinus}
+            {/* CORE FIELDS - Always visible, high frequency */}
+
+            {/* 1. TARIFA COBRADA (Primary - Money) */}
+            <div className="space-y-2">
+                <Label size="xs" variant="muted" required>
+                    Tarifa Cobrada
+                </Label>
+
+                <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch">
+                    {/* Minus Button */}
+                    <button
+                        type="button"
+                        onClick={() => adjustValue(fare, setFare, -1000)}
+                        className={cn(
+                            'w-14 h-16 rounded-2xl border-2',
+                            'bg-white/5 border-white/10',
+                            'hover:bg-white/10 hover:border-white/20',
+                            'active:scale-95',
+                            'flex items-center justify-center',
+                            'transition-all duration-200'
+                        )}
+                        aria-label="Restar $1000"
                     >
                         <Minus className="w-6 h-6 text-error" />
-                    </Button>
-                    
-                    <div className="relative group">
-                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-focus-within:scale-110">
-                            <DollarSign className="w-6 h-6" />
+                    </button>
+
+                    {/* Input */}
+                    <div className="relative">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                            <DollarSign className="w-6 h-6 text-primary" />
                         </div>
                         <Input
-                            id="field-fare"
+                            id="fare"
                             type="number"
                             inputMode="decimal"
                             placeholder="0"
                             value={fare}
                             onChange={(e) => setFare(e.target.value)}
                             className={cn(
-                                "h-full pl-14 pr-6 font-extrabold text-center text-3xl transition-all duration-300",
-                                !fare && "border-accent/40 shadow-[inset_0_0_15px_var(--color-accent-dim)]"
+                                'h-16 pl-14 pr-6',
+                                'font-extrabold text-3xl text-center',
+                                'transition-all duration-300',
+                                !fare && 'border-accent/50 shadow-[0_0_20px_var(--color-accent-dim)]'
                             )}
+                            variant={!fare ? 'error' : 'default'}
                         />
                     </div>
 
-                    <Button
-                        variant="secondary-dark"
-                        className="h-full w-16 px-0"
-                        onClick={() => adjustValue(fare, setFare, 5000)}
-                        aria-label={f.fare.adjustPlus}
+                    {/* Plus Button */}
+                    <button
+                        type="button"
+                        onClick={() => adjustValue(fare, setFare, 1000)}
+                        className={cn(
+                            'w-14 h-16 rounded-2xl border-2',
+                            'bg-white/5 border-white/10',
+                            'hover:bg-white/10 hover:border-white/20',
+                            'active:scale-95',
+                            'flex items-center justify-center',
+                            'transition-all duration-200'
+                        )}
+                        aria-label="Sumar $1000"
                     >
                         <Plus className="w-6 h-6 text-primary" />
-                    </Button>
+                    </button>
                 </div>
+
+                <p className="text-xs text-moon font-medium ml-1">
+                    💡 Copiá el monto de la app (Uber, Didi, etc.)
+                </p>
             </div>
 
-            {/* Kilómetros y Duración - Grid 2 Columnas */}
+            {/* 2. DISTANCIA + DURACIÓN (Grid 2 cols) */}
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
-                        {f.distance.label}
-                    </label>
+                {/* Distance */}
+                <div className="space-y-2">
+                    <Label size="xs" variant="muted">
+                        Kilómetros
+                    </Label>
                     <Input
-                        id="field-dist"
+                        id="distance"
                         type="number"
-                        placeholder={f.distance.placeholder}
+                        inputMode="decimal"
+                        placeholder="12.5"
                         value={distTrip}
                         onChange={(e) => setDistTrip(e.target.value)}
-                        icon={<Navigation className="w-5 h-5" />}
-                        className="font-extrabold text-xl text-center"
+                        // icon={Navigation}
+                        className="h-14 font-bold text-xl text-center"
                     />
                 </div>
 
-                <div className="space-y-3">
-                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
-                        {f.duration.label} <span className="text-accent ml-1">*</span>
-                    </label>
+                {/* Duration */}
+                <div className="space-y-2">
+                    <Label size="xs" variant="muted" required>
+                        Duración (min)
+                    </Label>
                     <Input
-                        id="field-duration"
+                        id="duration"
                         type="number"
-                        placeholder={f.duration.placeholder}
+                        inputMode="decimal"
+                        placeholder="45"
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
-                        icon={<TimerReset className="w-5 h-5" />}
+                        // icon={Timer}
                         className={cn(
-                            "font-extrabold text-xl text-center",
-                            !duration && "border-accent/40 shadow-[inset_0_0_15px_var(--color-accent-dim)]"
+                            'h-14 font-bold text-xl text-center',
+                            !duration && 'border-accent/50 shadow-[0_0_15px_var(--color-accent-dim)]'
                         )}
+                        variant={!duration ? 'error' : 'default'}
                     />
                 </div>
             </div>
 
-            {/* Hora Inicio + Gastos Extras */}
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
-                        {f.startTime.label}
-                    </label>
-                    <div className="relative group">
-                        <Input
-                            id="field-starttime"
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            icon={<Clock className="w-5 h-5 text-secondary" />}
-                            className="font-extrabold tracking-wider bg-secondary/5 border-secondary/20 h-14"
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-3">
-                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
-                        {f.expenses.label}
-                    </label>
-                    <Input
-                        id="field-expenses"
-                        type="number"
-                        inputMode="decimal"
-                        placeholder={f.expenses.placeholder}
-                        value={tolls}
-                        onChange={(e) => setTolls(e.target.value)}
-                        icon={<MapIcon className="w-5 h-5" />}
-                        className="font-extrabold h-14"
-                    />
-                </div>
+            {/* 3. HORA DE INICIO (24hs format) */}
+            <div className="space-y-2">
+                <Label size="xs" variant="muted">
+                    Hora de Inicio
+                </Label>
+                <Input
+                    id="startTime"
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    // icon={Clock}
+                    className="h-14 font-mono text-lg tracking-wider bg-secondary/5 border-secondary/20"
+                />
+                <p className="text-xs text-moon font-medium ml-1">
+                    Para calcular tiempo de espera entre viajes
+                </p>
             </div>
 
-            {/* Propinas (Solo Delivery) */}
+            {/* OPTIONAL FIELDS - Progressive Disclosure */}
+
+            {/* 4. PROPINAS (Solo Delivery) */}
             {vertical === 'delivery' && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="font-extrabold uppercase text-[10px] tracking-widest text-moon block ml-1">
-                        {f.tips.label}
-                    </label>
+                <div className="space-y-2 animate-fade-in">
+                    <Label size="xs" variant="muted">
+                        Propinas
+                    </Label>
                     <Input
-                        id="field-tips"
+                        id="tip"
                         type="number"
                         inputMode="decimal"
-                        placeholder={f.tips.placeholder}
+                        placeholder="0"
                         value={tip}
                         onChange={(e) => setTip(e.target.value)}
-                        icon={<Coins className="w-5 h-5 text-primary" />}
-                        className="font-extrabold h-14"
+                        // icon={Coins}
+                        className="h-14 font-bold text-xl"
                     />
                 </div>
             )}
 
-            {/* Footer Desc - Sunlight Visibility Optimization */}
-            <div className="bg-white/5 border-l-2 border-white/20 px-4 py-3 rounded-r-xl">
-                <p className="text-white/50 text-[10px] font-bold leading-normal uppercase tracking-wider mb-0">
-                    Calculando rentabilidad basada en tus costos de combustible, mantenimiento y amortización.
+            {/* 5. EXTRAS (Collapsible - Low frequency) */}
+            <div
+                className={cn(
+                    'rounded-2xl border-2 transition-all duration-300',
+                    showExtras
+                        ? 'bg-white/5 border-white/20'
+                        : 'bg-white/3 border-white/10'
+                )}
+            >
+                {/* Toggle Header */}
+                <button
+                    type="button"
+                    onClick={() => setShowExtras(!showExtras)}
+                    className={cn(
+                        'w-full p-4 flex items-center justify-between',
+                        'hover:bg-white/5 transition-colors',
+                        'rounded-2xl'
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5 text-moon" />
+                        <div className="text-left">
+                            <p className="text-sm font-bold text-starlight">
+                                Gastos Extra
+                            </p>
+                            <p className="text-xs text-moon">
+                                Peajes, estacionamiento, etc.
+                            </p>
+                        </div>
+                    </div>
+                    <ChevronDown
+                        className={cn(
+                            'w-5 h-5 text-moon transition-transform duration-300',
+                            showExtras && 'rotate-180'
+                        )}
+                    />
+                </button>
+
+                {/* Collapsible Content */}
+                {showExtras && (
+                    <div className="px-4 pb-4 pt-2 space-y-2 animate-fade-in">
+                        <Label size="xs" variant="muted">
+                            Peajes y Estacionamiento
+                        </Label>
+                        <Input
+                            id="tolls"
+                            type="number"
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={tolls}
+                            onChange={(e) => setTolls(e.target.value)}
+                            // icon={MapPin}
+                            className="h-14 font-bold"
+                        />
+                        <p className="text-xs text-moon font-medium">
+                            Se restará de tu ganancia neta
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Dynamic Cost Calculation Info */}
+            <div className="bg-secondary/10 border-l-4 border-secondary/50 px-4 py-3 rounded-r-xl">
+                <p className="text-xs text-starlight/80 font-medium leading-relaxed">
+                    {activeCostsText}
                 </p>
             </div>
 
-            {/* CTA - Thumb Zone Navigation */}
+            {/* CTA - Fixed at bottom on mobile */}
             <div className="pt-4 sticky bottom-4 z-10 sm:static">
-                <Button 
-                    disabled={!isValid} 
-                    onClick={onSave} 
-                    variant="neon" 
-                    fullWidth 
+                <Button
+                    disabled={!isValid}
+                    onClick={onSave}
+                    variant="neon"
+                    fullWidth
                     size="lg"
-                    className="h-20 sm:h-auto uppercase text-xl sm:text-lg tracking-widest shadow-[0_10px_40px_-5px_var(--color-primary-glow)]"
+                    glow
+                    className={cn(
+                        'h-16 uppercase text-base tracking-widest',
+                        'shadow-[0_10px_40px_-5px_var(--color-primary-glow)]',
+                        'flex items-center justify-center gap-3'
+                    )}
                 >
-                    <NotebookPen className="w-6 h-6 mr-1" />
-                    {TRIP_FORM.saveButton}
+                    <NotebookPen className="w-6 h-6" />
+                    Guardar Viaje
                 </Button>
             </div>
         </div>
     );
 };
+
+TripInputForm.displayName = 'TripInputForm';

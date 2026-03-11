@@ -42,6 +42,7 @@ export {
   Minus,
   Navigation,
   NotebookPen,
+  MapPin,
   Package,
   PartyPopper,
   Plus,
