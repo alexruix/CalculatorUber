@@ -262,7 +262,6 @@ export const HOME_SCREEN = {
     dateLabel:    'Fecha del viaje',
     cancelBtn:    'Cancelar',
     confirmBtn:   'Continuar',
-    longPressHint: 'Mantené presionado el + para agregar un viaje de los últimos 7 días.',
   },
 
   journey: {
@@ -272,3 +271,59 @@ export const HOME_SCREEN = {
   },
 } as const;
 
+// ─────────────────────────────────────────────────────────────
+// STATS DASHBOARD — SessionAnalysis v3
+// ─────────────────────────────────────────────────────────────
+export const STATS = {
+  // Empty & Partial States
+  emptyTitle:   'Garage vacío',
+  emptyBody:    'Anotá tus viajes del día para activar el radar Manejate.',
+  partialTitle: 'Calentando motores',
+  partialBody:  (remaining: number) => `Anotá ${remaining} viaje${remaining > 1 ? 's' : ''} más para activar el análisis completo.`,
+
+  // Level / Rank
+  rankNames: ['NOVATO', 'CONDUCTOR', 'ACTIVO', 'PROFESIONAL', 'VETERANO', 'MAESTRO', 'LEYENDA'],
+  xpLabel:       'RANGO',
+  xpToNext:      (pts: number) => `${pts} pts para subir`,
+
+  // Hero Metric
+  heroLabel:     'GANADO HOY',
+  heroVsYest:    (diff: number, pct: number) =>
+    diff >= 0
+      ? `+${diff.toLocaleString('es-AR')} vs ayer (+${pct}%) ↑`
+      : `${diff.toLocaleString('es-AR')} vs ayer (${pct}%) ↓`,
+
+  // Quick Stats
+  quickEph:   'EPH',
+  quickTrips: 'VIAJES',
+  quickAim:   'PUNTERÍA',
+
+  // Meta
+  metaLabel:   'META DEL DÍA',
+  metaMissing: (amount: string) => `Faltan ${amount}`,
+  metaDone:    '¡Meta cumplida! 🏆',
+  metaSuffix:  (pct: number) => `${pct}% completado`,
+
+  // Tips
+  tipCritical:  '🚨 ACCIÓN PRIORITARIA',
+  tipOptimize:  '📈 OPTIMIZACIONES',
+  tipPositive:  '💡 BIEN HECHO',
+  tipDismiss:   'Entendido',
+
+  // Badges
+  badgesTitle:       'MIS LOGROS',
+  badgesUnlocked:    (n: number) => `DESBLOQUEADOS (${n})`,
+  badgesInProgress:  'EN PROGRESO',
+  badgesRemaining:   (n: number) => `Faltan ${n} más`,
+
+  // Premium
+  premiumTitle:    'ANÁLISIS PRO',
+  weeklyLabel:     'ESTA SEMANA',
+  weeklyVsPrev:    (pct: number) => pct >= 0 ? `+${pct}% vs semana anterior` : `${pct}% vs semana anterior`,
+  peakHoursTitle:  'MEJORES HORARIOS',
+  peakHoursRec:    (slot: string, gain: string) => `Trabajá más en ${slot}. Potencial: +${gain}`,
+  projectionTitle: 'PROYECCIÓN DEL DÍA',
+  projectionBody:  (total: string) => `A este ritmo, cerrarías el día con ${total}`,
+  verticalTitle:   'POR VERTICAL',
+  verticalRec:     (name: string, pct: number) => `${name} te rinde +${pct}% más. Priorizalo.`,
+} as const;
