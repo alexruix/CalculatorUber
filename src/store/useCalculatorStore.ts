@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useProfileStore } from './useProfileStore';
 import { getJourneyDate, calculateWaitMinutes, getTodayJourneyDate } from '../lib/journey';
 
-export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
+export type TabId = 'home' | 'stats' | 'history' | 'profile';
 
 
 interface CalculatorState {

@@ -59,10 +59,26 @@ export const getTodayJourneyDate = (): string => {
  * @param time - Hora en formato "HH:MM". Si está vacío, usa la hora actual.
  * @returns Unix timestamp en milisegundos
  */
-export const calculateTimestamp = (date: string, time?: string): number => {
+export const calculateTimestamp = (journeyDate: string, time?: string): number => {
     if (!time) return Date.now();
-    const isoString = `${date}T${time}:00`;
-    const ts = new Date(isoString).getTime();
+    
+    // 1. Desarmamos la fecha de la jornada (ej: "2026-03-12")
+    const [year, month, day] = journeyDate.split('-').map(Number);
+    const [hour, minute] = time.split(':').map(Number);
+    
+    // 2. Creamos la fecha base
+    // Nota: El mes en `Date` es 0-indexed, así que restamos 1.
+    const date = new Date(year, month - 1, day, hour, minute);
+    
+    // 3. Bug de la Madrugada Fix:
+    // Si la hora del viaje es menor a las 04:00 (ej 02:15 AM)
+    // pertenece al calendario del "Día Siguiente" en la vida real.
+    if (hour < JOURNEY_CUTOFF_HOUR) {
+        date.setDate(date.getDate() + 1);
+    }
+    
+    const ts = date.getTime();
+    
     // Fallback si el string es inválido
     return isNaN(ts) ? Date.now() : ts;
 };

@@ -25,6 +25,8 @@ interface QuickStatsGridProps {
     trips: SavedTrip[];
     /** Si es true, pulsa las stats (animación al agregar viaje) */
     pulseOnUpdate?: boolean;
+    /** Versión minimalista sin fondo/bordes propios */
+    compact?: boolean;
     className?: string;
 }
 
@@ -72,6 +74,7 @@ interface StatCardProps {
     color?: 'default' | 'primary' | 'accent' | 'success' | 'streak' | 'error';
     glow?: boolean;
     pulse?: boolean;
+    compact?: boolean;
     className?: string;
 }
 
@@ -82,6 +85,7 @@ const StatCard: React.FC<StatCardProps> = ({
     color = 'default',
     glow = false,
     pulse = false,
+    compact = false,
     className,
 }) => {
     const colorMap = {
@@ -108,6 +112,7 @@ const StatCard: React.FC<StatCardProps> = ({
                 'card-metric flex flex-col items-center justify-center gap-1 py-4 min-h-[80px] transition-all',
                 glow && glowMap[color],
                 pulse && 'animate-pulse-once',
+                compact && 'border-none bg-transparent shadow-none py-2 min-h-0',
                 className
             )}
         >
@@ -132,6 +137,7 @@ const StatCard: React.FC<StatCardProps> = ({
 export const QuickStatsGrid = memo(({
     trips,
     pulseOnUpdate = false,
+    compact = false,
     className,
 }: QuickStatsGridProps) => {
     // Rendimiento: Evita recalcular O(N) si el array de viajes no cambió.
@@ -159,13 +165,15 @@ export const QuickStatsGrid = memo(({
                     value={String(stats.trips)}
                     color="default"
                     pulse={pulseOnUpdate}
+                    compact={compact}
                 />
                 <StatCard
                     label={s.earned.label}
                     value={formatCurrency(stats.earned)}
                     color={stats.earned < 0 ? 'error' : 'primary'}
-                    glow={stats.earned !== 0}
+                    glow={!compact && stats.earned !== 0}
                     pulse={pulseOnUpdate}
+                    compact={compact}
                 />
                 <StatCard
                     label={s.eph.label}
@@ -173,6 +181,7 @@ export const QuickStatsGrid = memo(({
                     unit={s.eph.unit}
                     color={stats.eph >= 3000 ? 'success' : (stats.eph < 0 ? 'error' : 'default')}
                     pulse={pulseOnUpdate}
+                    compact={compact}
                 />
             </div>
 
@@ -183,6 +192,7 @@ export const QuickStatsGrid = memo(({
                     value={String(stats.activeMinutes)}
                     unit={s.active.unit}
                     color="default"
+                    compact={compact}
                 />
                 <StatCard
                     // Fallback de seguridad por si no actualizas ui-strings.ts
@@ -190,13 +200,15 @@ export const QuickStatsGrid = memo(({
                     value={String(stats.waitMinutes)}
                     unit={(s as any).wait?.unit || 'min'}
                     color="default"
+                    compact={compact}
                 />
                 {showStreak && (
                     <StatCard
                         label={s.streak.label}
                         value={`${stats.profitableStreak}×`}
                         color="streak"
-                        glow
+                        glow={!compact}
+                        compact={compact}
                         className="animate-in zoom-in-95 duration-500"
                     />
                 )}

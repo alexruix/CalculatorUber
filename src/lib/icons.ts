@@ -37,6 +37,7 @@ export {
   History,
   Info,
   HelpCircle,
+  LayoutDashboard,
   Lightbulb,
   Lock,
   Map,

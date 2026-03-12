@@ -10,7 +10,7 @@
 import React from 'react';
 import { NAV_TABS } from '../../../data/nav.data';
 
-export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
+export type TabId = 'home' | 'stats' | 'history' | 'profile';
 
 interface BottomTabNavigationProps {
   activeTab: TabId;
@@ -29,7 +29,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
       aria-label="Navegación principal de la aplicación"
     >
       {/* Grid de 5 columnas: layout fijo para mobile */}
-      <div className="max-w-md mx-auto grid grid-cols-5 h-15 sm:h-20">
+      <div className="max-w-md mx-auto grid grid-cols-4 h-15 sm:h-20">
         {NAV_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -67,7 +67,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                 />
 
                 {/* Badge de notificación */}
-                {tab.id === 'close' && badgeCount > 0 && (
+                {tab.id === 'stats' && badgeCount > 0 && (
                   <span
                     className="absolute -top-2 -right-2.5 min-w-[16px] h-4 bg-error border border-black rounded-full flex items-center justify-center px-1"
                     aria-label={`${badgeCount} registros pendientes`}

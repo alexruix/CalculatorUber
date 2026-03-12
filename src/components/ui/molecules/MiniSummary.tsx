@@ -16,26 +16,31 @@ interface MiniSummaryProps {
   tripCount?: number;
   /** Ganancia Por Hora acumulada del día (EPH) */
   eph?: number;
+  /** Versión minimalista sin fondo/bordes propios */
+  compact?: boolean;
 }
 
 export const MiniSummary: React.FC<MiniSummaryProps> = ({ 
   totalMargin = 0, 
   tripCount = 0, 
-  eph 
+  eph,
+  compact = false
 }) => {
   // Don't render if no trips
   if (tripCount === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-3 animate-fade-in animate-zoom-in">
+    <div className={cn(
+      "grid gap-3 animate-fade-in animate-zoom-in",
+      compact ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2"
+    )}>
       {/* Ganancia Neta (Success State) */}
       <div
         className={cn(
           'glass rounded-2xl p-4',
-          'border-2 border-primary/30 bg-primary/5',
-          'shadow-[0_0_20px_var(--color-primary-glow)]',
+          compact ? 'border-none bg-transparent shadow-none p-0' : 'border-2 border-primary/30 bg-primary/5 shadow-[0_0_20px_var(--color-primary-glow)]',
           'transition-all duration-300',
-          'hover:scale-105 hover:shadow-[0_0_30px_var(--color-primary-glow)]'
+          !compact && 'hover:scale-105 hover:shadow-[0_0_30px_var(--color-primary-glow)]'
         )}
       >
         {/* Header */}
@@ -47,30 +52,36 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
         </div>
         
         {/* Value */}
-        <p className="text-xl font-extrabold text-primary leading-tight">
+        <p className={cn(
+          "font-extrabold text-primary leading-tight",
+          compact ? "text-lg" : "text-xl"
+        )}>
           {formatCurrency(totalMargin)}
         </p>
       </div>
 
-      {/* Cantidad de Turnos (Info State) */}
+      {/* Cantidad de Viajes (Info State) */}
       <div
         className={cn(
           'glass rounded-2xl p-4',
-          'border-2 border-secondary/30 bg-secondary/5',
+          compact ? 'border-none bg-transparent shadow-none p-0' : 'border-2 border-secondary/30 bg-secondary/5',
           'transition-all duration-300',
-          'hover:scale-105'
+          !compact && 'hover:scale-105'
         )}
       >
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <Target className="w-3 h-3 text-secondary" />
           <span className="text-[10px] font-extrabold text-moon uppercase tracking-widest">
-            Turnos
+            Viajes
           </span>
         </div>
         
         {/* Value */}
-        <p className="text-xl font-extrabold text-starlight leading-tight">
+        <p className={cn(
+          "font-extrabold text-starlight leading-tight",
+          compact ? "text-lg" : "text-xl"
+        )}>
           {tripCount}
         </p>
       </div>
@@ -79,26 +90,28 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
       {eph && eph > 0 && (
         <div
           className={cn(
-            'col-span-2',
+            compact ? 'col-span-1' : 'col-span-2',
             'glass rounded-2xl p-4',
-            'border-2 border-secondary/30 bg-secondary/5',
-            'shadow-[0_0_15px_var(--color-secondary-glow)]',
+            compact ? 'border-none bg-transparent shadow-none p-0' : 'border-2 border-secondary/30 bg-secondary/5 shadow-[0_0_15px_var(--color-secondary-glow)]',
             'transition-all duration-300',
-            'hover:scale-105 hover:shadow-[0_0_25px_var(--color-secondary-glow)]'
+            !compact && 'hover:scale-105 hover:shadow-[0_0_25px_var(--color-secondary-glow)]'
           )}
         >
           {/* Header */}
           <div className="flex items-center gap-2 mb-1">
             <Clock className="w-3 h-3 text-secondary" />
             <span className="text-[10px] font-extrabold text-moon uppercase tracking-widest">
-              EPH — Ganancia Por Hora
+              EPH
             </span>
           </div>
           
           {/* Value */}
-          <p className="text-xl font-extrabold text-secondary leading-tight">
+          <p className={cn(
+            "font-extrabold text-secondary leading-tight",
+            compact ? "text-lg" : "text-xl"
+          )}>
             {formatCurrency(eph)}
-            <span className="text-xs font-bold text-moon ml-1">/hr</span>
+            <span className="text-[10px] font-bold text-moon ml-1">/hr</span>
           </p>
         </div>
       )}

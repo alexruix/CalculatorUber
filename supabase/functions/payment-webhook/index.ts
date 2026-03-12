@@ -60,7 +60,7 @@ serve(async (req) => {
 
     return new Response("Webhook received (ignored type)", { status: 200 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Webhook processing error:", error.message);
     return new Response(`Error: ${error.message}`, { status: 400 });
   }

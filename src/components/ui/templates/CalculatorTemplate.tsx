@@ -20,11 +20,6 @@ const ShiftCloseTab = lazy(() =>
     default: m.ShiftCloseTab,
   })),
 );
-const ShiftSimulatorTab = lazy(() =>
-  import("../organisms/Tabs/ShiftSimulatorTab").then((m) => ({
-    default: m.ShiftSimulatorTab,
-  })),
-);
 const HistoryTab = lazy(() =>
   import("../organisms/Tabs/HistoryTab").then((m) => ({
     default: m.HistoryTab,
@@ -149,36 +144,23 @@ const CalculatorApp: React.FC = () => {
       <main className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
         <Suspense fallback={<TabSkeleton />}>
           {visitedTabs.has("home") && (
-            <div style={{ display: activeTab === "home" ? "block" : "none" }}>
-              <ShiftSimulatorTab />
-            </div>
-          )}
-
-          {visitedTabs.has("trips") && (
             <div
               className="animate-in fade-in slide-in-from-right-4 duration-500"
-              style={{ display: activeTab === "trips" ? "block" : "none" }}
+              style={{ display: activeTab === "home" ? "block" : "none" }}
             >
               <TripsTab />
             </div>
           )}
 
-          {visitedTabs.has("close") && (
-            <div style={{ display: activeTab === "close" ? "block" : "none" }}>
-              <ShiftCloseTab onNavigateTrips={() => setActiveTab("trips")} />
+          {visitedTabs.has("stats") && (
+            <div style={{ display: activeTab === "stats" ? "block" : "none" }}>
+              <ShiftCloseTab onNavigateTrips={() => setActiveTab("home")} />
             </div>
           )}
 
           {visitedTabs.has("history") && (
-            <div
-              style={{ display: activeTab === "history" ? "block" : "none" }}
-            >
-              <HistoryTab
-                onClearHistory={() => {
-                  if (confirm("¿Borrar historial del día?")) clearSession();
-                }}
-                onDeleteTrip={deleteTrip}
-              />
+            <div style={{ display: activeTab === "history" ? "block" : "none" }}>
+              <HistoryTab />
             </div>
           )}
 

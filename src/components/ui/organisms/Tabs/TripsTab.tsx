@@ -3,7 +3,7 @@ import { AlertTriangle, RotateCcw } from '../../../../lib/icons';
 import { useProfileStore } from '../../../../store/useProfileStore';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
 import { useProfitability } from '../../../../hooks/useProfitability';
-import { calculateTimestamp, getTodayString } from '../../../../lib/journey';
+import { calculateTimestamp, getTodayString, getJourneyDate } from '../../../../lib/journey';
 import type { SavedTrip } from '../../../../types/calculator.types';
 import { formatDateLatam } from '../../../../lib/utils';
 
@@ -32,12 +32,17 @@ export const TripsTab: React.FC = () => {
         vertical,
         { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings }
     );
-
+    
+    const journeyDate = overrideDate ?? getTodayString();
     // ✅ FIX DE RENDIMIENTO: Memoizamos el filtrado localmente
     const tripsToday = useMemo(() => {
-        const todayDate = getTodayString();
-        return sessionTrips.filter(trip => trip.date === todayDate);
-    }, [sessionTrips]);
+    const todayDate = getTodayString();
+    return sessionTrips.filter(trip => {
+        // Si el viaje no tiene fecha grabada (legacy), la calculamos al vuelo
+        const tripJourneyDate = trip.date ?? getJourneyDate(trip.timestamp);
+        return tripJourneyDate === todayDate;
+    });
+}, [sessionTrips]);
 
     const totalMargin = useMemo(
         () => tripsToday.reduce((acc: number, t: SavedTrip) => acc + t.margin, 0),
@@ -70,6 +75,7 @@ export const TripsTab: React.FC = () => {
             duration: parseFloat(duration) || 0,
             startTime: startTime || undefined,
             timestamp,
+            date: journeyDate,
             vertical: vertical || undefined,
             tip: parseFloat(tip) || 0,
             tolls: parseFloat(tolls) || 0,
@@ -85,37 +91,48 @@ export const TripsTab: React.FC = () => {
         setShowDateOverride(false);
     };
 
+
+    
+
     return (
         <div className="pb-32 space-y-5 animate-in fade-in duration-500">
-            <div className="sticky top-0 z-20 bg-black/80 supports-backdrop-filter:backdrop-blur-md -mx-4 px-4 py-4 border-b border-white/5">
+            {/* 1. HUD DE RENTABILIDAD (Sticky & Compact) */}
+            <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-md -mx-4 px-4 py-3 border-b border-white/5">
                 <ProfitabilityScore metrics={metrics} />
             </div>
 
             <div className="space-y-5">
+                {/* 2. RESUMEN DE HOY (Unificado y más compacto) */}
                 {tripCount > 0 && (
-                    <QuickStatsGrid trips={tripsToday} />
+                    <div className="space-y-3 px-1 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2 mb-1">
+                            {/* <Activity className="w-3 h-3 text-white/20" /> */}
+                            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Tu jornada hoy</span>
+                        </div>
+                        {/* Consolidamos los dos en un grupo visual */}
+                        <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
+                            <QuickStatsGrid trips={tripsToday} compact />
+                            <div className="h-px bg-white/5 w-full" />
+                            <MiniSummary totalMargin={totalMargin} tripCount={tripCount} eph={totalEPH} compact />
+                        </div>
+                    </div>
                 )}
 
-                {tripCount > 0 && (
-                    <MiniSummary totalMargin={totalMargin} tripCount={tripCount} eph={totalEPH} />
-                )}
-
+                {/* 3. ALERTAS CRÍTICAS */}
                 {metrics.wasHeavyTraffic && metrics.isValid && (
-                    <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-4 py-3">
+                    <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-4 py-3 mx-1">
                         <AlertTriangle className="w-4 h-4 text-accent shrink-0" />
-                        <p className="text-xs text-starlight font-bold mb-0">
-                            Tráfico pesado detectado <span className="text-accent">(velocidad prom &lt; 20 km/h)</span>. Consumo ajustado.
+                        <p className="text-[11px] text-starlight font-bold mb-0 leading-tight">
+                            Tráfico pesado detectado. Consumo ajustado automáticamente.
                         </p>
                     </div>
                 )}
 
-                
-
+                {/* 4. EL FORMULARIO (Ahora respira más) */}
                 <TripInputForm
                     onSave={saveTrip}
                     isValid={metrics.isValid}
                     onOpenDateOverride={() => setShowDateOverride(true)}
-                    // Inyectamos el estado y la acción de limpieza
                     overrideDate={overrideDate}
                     onClearDateOverride={() => setOverrideDate(undefined)}
                 />
@@ -126,7 +143,7 @@ export const TripsTab: React.FC = () => {
                     className="w-full py-4 text-xs font-black text-white/20 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
                 >
                     <RotateCcw className="w-3 h-3" />
-                    Limpiar Formulario
+                    Limpiar formulario
                 </button>
             </div>
 
@@ -140,3 +157,5 @@ export const TripsTab: React.FC = () => {
         </div>
     );
 };
+
+
