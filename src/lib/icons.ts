@@ -23,6 +23,7 @@ export {
   Calendar,
   Car,
   Check,
+  Flame,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,

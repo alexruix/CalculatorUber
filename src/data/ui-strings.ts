@@ -87,17 +87,18 @@ export const TRIP_FORM = {
       adjustPlus:  'Sumar 1000',
     },
     distance: {
-      label:       'Kilómetros del viaje',
-      placeholder: 'Ej: 12.5',
+      label:       'Recorrido (KM)',
+      placeholder: '5 km',
     },
     duration: {
-      label:       'Duración (minutos)',
-      placeholder: 'Ej: 45',
+      label:       'Duración (min)',
+      placeholder: '20 min',
     },
     startTime: {
       label:       'Hora de inicio',
-      placeholder: 'HH:MM (Opcional)',
+      placeholder: '12:00',
       hint:        'Para calcular tiempo de espera entre viajes',
+      dateTrigger: '¿Cargar viaje de otro día?'
     },
     tips: {
       label:       'Propinas',
@@ -224,3 +225,50 @@ export const PRODUCTIVITY = {
   idle:       (h: string | number) => `Tiempo Muerto (${h}h)`,
   ephLabel:   'EPH — Ganancia por hora',
 } as const;
+
+// ─────────────────────────────────────────────────────────────
+// HOME SCREEN — Dashboard de Jornada
+// ─────────────────────────────────────────────────────────────
+export const HOME_SCREEN = {
+  greeting:       (name: string) => `Arrancaste, ${name} 🚀`,
+  greetingNoName: '¡A romperla!',
+
+  dailyGoal: {
+    title:       'META DEL DÍA',
+    editHint:    'Tocá para editar tu meta',
+    placeholder: '10000',
+    achieved:    '¡Meta cumplida! 🏆',
+  },
+
+  stats: {
+    trips:    { label: 'VIAJES', unit: '' },
+    earned:   { label: 'GANADO', unit: '$' },
+    eph:      { label: 'EPH', unit: '$/h' },
+    wait:     { label: 'ESPERA', unit: 'min' },
+    active:   { label: 'ACTIVO', unit: 'min' },
+    streak:   { label: 'RACHA', unit: '🔥' },
+  },
+  
+  timePeriods: {
+    morning: 'MAÑANA',
+    afternoon: 'TARDE',
+    night: 'NOCHE',
+    dawn: 'MADRUGADA',
+  },
+
+  dateOverride: {
+    title:        'Cargar viaje retroactivo',
+    warning:      'El viaje se asignará a la jornada del día seleccionado.',
+    dateLabel:    'Fecha del viaje',
+    cancelBtn:    'Cancelar',
+    confirmBtn:   'Continuar',
+    longPressHint: 'Mantené presionado el + para agregar un viaje de los últimos 7 días.',
+  },
+
+  journey: {
+    startLabel: 'Inicio jornada',
+    endLabel:   'Cierre estimado',
+    totalLabel: 'Total activo',
+  },
+} as const;
+

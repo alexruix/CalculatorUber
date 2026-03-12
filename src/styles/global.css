@@ -194,7 +194,7 @@
   h6 { font-size: var(--text-xl); }
   
   p {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-1);
   }
   
   a {
@@ -217,6 +217,7 @@
   }
   
   input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
   }
 

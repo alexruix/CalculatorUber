@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { SavedTrip, ShiftClose } from '../types/calculator.types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useProfileStore } from './useProfileStore';
+import { getJourneyDate, calculateWaitMinutes, getTodayJourneyDate } from '../lib/journey';
 
 export type TabId = 'home' | 'trips' | 'close' | 'history' | 'profile';
 
@@ -92,44 +93,51 @@ export const useCalculatorStore = create<CalculatorState>()(
                 }
             },
 
+
+            
+
             setCurrentOdometer: (val) => set({ currentOdometer: val }),
             setShiftClose: (data) => set({ shiftClose: data }),
             setActiveTab: (val) => set({ activeTab: val }),
 
             addTrip: async (trip) => {
+                const { getJourneyDate, calculateWaitMinutes } = await import('../lib/journey');
                 const state = get();
-                
-                // 1. Lógica de cálculo (UI enrichment)
+
+                // 1. Calcular métricas de telemetría
                 const km = trip.distance || 0;
                 const mins = trip.duration || 0;
-                const avgSpeed = (km > 0 && mins > 0) ? km / (mins / 60) : 0;
+                const avgSpeed = km > 0 && mins > 0 ? km / (mins / 60) : 0;
 
+                // 2. Encontrar el viaje inmediatamente anterior (Soporta Date Override)
+                // Ordenamos una copia temporal para buscar cronológicamente hacia atrás
+                const sortedTrips = [...state.sessionTrips].sort((a, b) => b.timestamp - a.timestamp);
+                const prevTrip = sortedTrips.find(t => t.timestamp < trip.timestamp);
+
+                // 3. Calcular espera — método robusto usando timestamps absolutos
                 let waitMinutes = 0;
-                if (trip.startTime && state.sessionTrips.length > 0) {
-                    const prevTrip = state.sessionTrips[0];
-                    if (prevTrip.startTime) {
-                        const [prevH, prevM] = prevTrip.startTime.split(':').map(Number);
-                        const prevEndTotalMins = prevH * 60 + prevM + prevTrip.duration;
-                        const [currH, currM] = trip.startTime.split(':').map(Number);
-                        let currStartTotalMins = currH * 60 + currM;
-                        if (currStartTotalMins < prevEndTotalMins && (prevEndTotalMins - currStartTotalMins) > 12 * 60) {
-                            currStartTotalMins += 24 * 60;
-                        }
-                        waitMinutes = Math.max(0, currStartTotalMins - prevEndTotalMins);
-                    }
+                if (prevTrip) {
+                    waitMinutes = calculateWaitMinutes(
+                        { timestamp: prevTrip.timestamp, duration: prevTrip.duration || 0 },
+                        trip.timestamp
+                    );
                 }
 
-                const enrichedTrip = { 
-                    ...trip, 
-                    avgSpeed, 
-                    waitMinutes, 
-                    shift_id: state.activeShiftId || undefined 
+                // 4. Enriquecer con campos de Journey System V3
+                const journeyDate = getJourneyDate(trip.timestamp);
+                const enrichedTrip: SavedTrip = {
+                    ...trip,
+                    avgSpeed,
+                    waitMinutes,
+                    date: journeyDate,
+                    isProfitable: trip.margin > 0,
                 };
 
-                // 2. Persistencia Local Inmediata (Zustand + LocalStorage)
-                set((s) => ({ sessionTrips: [enrichedTrip, ...s.sessionTrips] }));
-
-                // 3. Sincronización con Supabase si hay internet
+                // 5. Persistencia local inmediata (SIEMPRE ordenado por más reciente primero)
+                set((s) => ({ 
+                    sessionTrips: [enrichedTrip, ...s.sessionTrips].sort((a, b) => b.timestamp - a.timestamp) 
+                }));
+                // 6. Sincronización con Supabase
                 const user = useProfileStore.getState().user;
                 if (user && isSupabaseConfigured() && navigator.onLine) {
                     await supabase.from('trips').insert({
@@ -147,7 +155,9 @@ export const useCalculatorStore = create<CalculatorState>()(
                         active_time: trip.activeTime || trip.duration || 0,
                         avg_speed: avgSpeed,
                         wait_minutes: waitMinutes,
-                        timestamp: trip.timestamp // bigint en SQL
+                        timestamp: trip.timestamp,
+                        journey_date: journeyDate,
+                        is_profitable: trip.margin > 0,
                     });
                 }
             },
@@ -247,7 +257,9 @@ export const useCalculatorStore = create<CalculatorState>()(
                                 startTime: dbTrip.start_time,
                                 avgSpeed: Number(dbTrip.avg_speed || 0),
                                 waitMinutes: Number(dbTrip.wait_minutes || 0),
-                                shift_id: dbTrip.shift_id
+                                shift_id: dbTrip.shift_id,
+                                date: dbTrip.journey_date ?? undefined,
+                                isProfitable: dbTrip.is_profitable ?? (Number(dbTrip.margin) > 0),
                             }));
                             set({ sessionTrips: loadedTrips });
                         }
@@ -258,9 +270,35 @@ export const useCalculatorStore = create<CalculatorState>()(
             resetInputs: () => set({ 
                 fare: '', distTrip: '', distPickup: '', duration: '', tip: '', tolls: '', startTime: '' 
             }),
+
+            // ─── Journey Selectors ──────────────────────────────────────────────────────
+            getTodayTrips: () => {
+                const todayDate = getTodayJourneyDate();
+                return get().sessionTrips.filter(trip => trip.date === todayDate);
+            },
+
+            getJourneyTrips: (date: string) => {
+                return get().sessionTrips.filter(trip => trip.date === date);
+            },
         }),
         {
-            name: 'nodo_session_v2', 
+            name: 'nodo_session_v3',
+            version: 3,
+            migrate: (persistedState: unknown, version: number) => {
+                const state = persistedState as { sessionTrips?: SavedTrip[] };
+                if (version < 3 && Array.isArray(state.sessionTrips)) {
+                    state.sessionTrips = state.sessionTrips.map((trip) => {
+                        // Usamos la función pura de journey.ts
+                        const calcDate = getJourneyDate(trip.timestamp);
+                        return {
+                            ...trip,
+                            date: trip.date ?? calcDate,
+                            isProfitable: trip.isProfitable ?? (trip.margin > 0),
+                        };
+                    });
+                }
+                return state;
+            },
             partialize: (state) => ({ 
                 sessionTrips: state.sessionTrips, 
                 shiftClose: state.shiftClose,

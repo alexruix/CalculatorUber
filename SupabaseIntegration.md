@@ -91,9 +91,24 @@ CREATE TABLE IF NOT EXISTS public.trips (
   wait_minutes integer,
   timestamp bigint not null,
 
+  -- Arquitectura V3 (Journey System)
+  journey_date text, -- Fecha de jornada comercial "YYYY-MM-DD"
+  is_profitable boolean default true,
+
   created_at timestamptz default now(),
   primary key (id, user_id) -- Llave compuesta para evitar colisiones
 );
+```
+
+---
+
+## 🚀 Migración Rápida (Si ya tenías la tabla `trips` creada)
+Si no querés borrar todos los viajes y turnos y preferís actualizar la base de datos existente con los nuevos campos de la arquitectura V3 (Journey System), ejecutá esto:
+
+```sql
+ALTER TABLE public.trips 
+ADD COLUMN IF NOT EXISTS journey_date text,
+ADD COLUMN IF NOT EXISTS is_profitable boolean default true;
 ```
 
 ---

@@ -53,7 +53,7 @@ export interface SavedTrip {
   fare: number;
   /** Margen de ganancia neta */
   margin: number;
-  /** Timestamp de cuando se guardó el viaje */
+  /** Timestamp Unix preciso del inicio del viaje */
   timestamp: number;
   distance: number;
   duration: number;
@@ -61,14 +61,20 @@ export interface SavedTrip {
   tip?: number;
   tolls?: number;
   activeTime?: number;
-  
-  // Nuevos campos de Arquitectura V2
+
+  // Arquitectura V2
   /** Velocidad promedio del viaje (km/h). 0 si no hay datos suficientes. */
   avgSpeed?: number;
   /** "HH:MM" — hora de inicio del viaje (opcional) */
   startTime?: string;
-  /** minutos de espera desde el fin del viaje anterior */
+  /** Minutos de espera desde el fin del viaje anterior */
   waitMinutes?: number;
+
+  // Arquitectura V3 — Journey System
+  /** Fecha de jornada comercial: "YYYY-MM-DD" (corte 04:00 AM) */
+  date?: string;
+  /** Si el viaje fue rentable (margin > 0). Usado para racha de viajes. */
+  isProfitable?: boolean;
 }
 
 /**
@@ -184,3 +190,34 @@ export interface Badge {
   /** Si fue desbloqueado en esta sesión */
   unlockedNow: boolean;
 }
+
+/**
+ * Agrupación de viajes por jornada comercial
+ */
+export interface JourneyData {
+  /** "YYYY-MM-DD" */
+  date: string;
+  trips: SavedTrip[];
+  /** Ganancia neta total */
+  net: number;
+  /** Recaudación bruta total */
+  fare: number;
+}
+
+/**
+ * Métricas calculadas para una jornada completa
+ */
+export interface JourneyMetrics {
+  eph: number;
+  startTime: string;
+  endTime: string;
+  totalHours: string;
+  totalHoursRaw: number;
+  activeHours: string;
+  productivity: number;
+  goalProgress: number;
+  goalAchieved: boolean;
+  profitableStreak: number;
+  bestTripId: string | number | null;
+  worstTripId: string | number | null;
+}

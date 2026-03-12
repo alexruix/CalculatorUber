@@ -1,13 +1,12 @@
 /**
- * TripInputForm.tsx - IMPROVED VERSION
- * 
- * UX Improvements:
- * - 24-hour time format (no AM/PM confusion)
- * - Peajes/Extras moved to collapsible section (low frequency)
- * - Dynamic cost calculation text based on active expenses
- * - Consistent color hierarchy (primary = money, secondary = time)
- * - Progressive disclosure for optional fields
- * - Copy from clipboard detection for Fare (future enhancement)
+ * TripInputForm.tsx — Formulario de Carga de Viaje v2
+ * ─────────────────────────────────────────────────────────────
+ * Mejoras UX:
+ * - Hora en formato 24hs (sin AM/PM)
+ * - Peajes/Extras en sección colapsable (baja frecuencia)
+ * - Texto dinámico basado en gastos activos del perfil
+ * - Ley de Proximidad: Bloque de tiempo unificado (Día + Hora)
+ * - Errores en frío eliminados (UX amigable)
  */
 
 import React, { useMemo } from 'react';
@@ -23,262 +22,295 @@ import {
     Plus,
     ChevronDown,
 } from '../../../lib/icons';
-import { cn } from '../../../lib/utils';
+// Importamos formatDateLatam desde utilidades
+import { cn, formatDateLatam } from '../../../lib/utils';
 import { useCalculatorStore } from '../../../store/useCalculatorStore';
 import { useProfileStore } from '../../../store/useProfileStore';
-import { Input } from '../../../components/ui/atoms/Input';
-import { Button } from '../../../components/ui/atoms/Button';
-import { Label } from '../../../components/ui/atoms/Label';
+import { Input } from '../atoms/Input';
+import { Button } from '../atoms/Button';
+import { Label } from '../atoms/Label';
+import { TRIP_FORM, HOME_SCREEN } from '../../../data/ui-strings';
 
 interface TripInputFormProps {
     onSave: () => void;
     isValid: boolean;
+    onOpenDateOverride: () => void;
+    // Nuevas props para la Ley de Proximidad
+    overrideDate?: string;
+    onClearDateOverride: () => void;
 }
 
 export const TripInputForm: React.FC<TripInputFormProps> = ({
     onSave,
     isValid,
+    onOpenDateOverride,
+    overrideDate,
+    onClearDateOverride
 }) => {
     const { vertical, expenseSettings } = useProfileStore();
     const {
-        fare,
-        setFare,
-        distTrip,
-        setDistTrip,
-        duration,
-        setDuration,
-        startTime,
-        setStartTime,
-        tip,
-        setTip,
-        tolls,
-        setTolls,
+        fare, setFare,
+        distTrip, setDistTrip,
+        duration, setDuration,
+        startTime, setStartTime,
+        tip, setTip,
+        tolls, setTolls,
     } = useCalculatorStore();
 
     const [showExtras, setShowExtras] = React.useState(false);
 
-    // Adjust value with +/- buttons
-    const adjustValue = (
-        value: string,
-        setter: (v: string) => void,
-        step: number
-    ) => {
+    // LÓGICA DE SEGMENTACIÓN HORARIA
+    const timeBadge = useMemo(() => {
+        if (!startTime || !startTime.includes(':')) return null;
+
+        const hour = parseInt(startTime.split(':')[0]);
+        const t = HOME_SCREEN.timePeriods;
+
+        // Madrugada (Corte de jornada)
+        if (hour >= 0 && hour < 6) return {
+            label: t.dawn,
+            color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+        };
+        // Mañana
+        if (hour >= 6 && hour < 12) return {
+            label: t.morning,
+            color: 'bg-primary/20 text-primary border-primary/30'
+        };
+        // Tarde
+        if (hour >= 12 && hour < 19) return {
+            label: t.afternoon,
+            color: 'bg-accent/20 text-accent border-accent/30'
+        };
+        // Noche
+        return {
+            label: t.night,
+            color: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+        };
+    }, [startTime]);
+
+    const adjustValue = (value: string, setter: (v: string) => void, step: number) => {
         const current = parseFloat(value) || 0;
         setter(Math.max(0, current + step).toString());
     };
 
-    // Dynamic cost calculation text based on active expenses
     const activeCostsText = useMemo(() => {
-        const activeExpenses = expenseSettings
+        const activeExpenses = (expenseSettings ?? [])
             .filter((e) => e.enabled)
             .map((e) => e.label.toLowerCase());
 
-        if (activeExpenses.length === 0) {
-            return 'Calculando margen bruto sin descuentos de costos.';
-        }
-
-        if (activeExpenses.length === 1) {
-            return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
-        }
-
-        const last = activeExpenses.pop();
-        return `Calculando rentabilidad basada en ${activeExpenses.join(', ')} y ${last}.`;
+        if (activeExpenses.length === 0) return 'Calculando margen bruto sin descuentos de costos.';
+        if (activeExpenses.length === 1) return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
+        const last = [...activeExpenses].pop();
+        const rest = activeExpenses.slice(0, -1);
+        return `Calculando rentabilidad basada en ${rest.join(', ')} y ${last}.`;
     }, [expenseSettings]);
 
+    const f = TRIP_FORM.fields;
+
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6 pb-6">
             {/* Header */}
-            <div className="flex items-start gap-3 pb-4 border-b border-white/10">
+            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
                 <div className="w-1 h-8 bg-primary rounded-full shadow-[0_0_10px_var(--color-primary-glow)]" />
                 <div className="flex-1">
-                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-sm mb-1">
-                        Cargá tu Viaje
+                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-sm mb-0.5">
+                        {TRIP_FORM.sectionTitle}
                     </h3>
                     <p className="text-moon text-xs font-medium">
-                        Datos tal cual figuran en la app
+                        {TRIP_FORM.sectionSubtitle}
                     </p>
                 </div>
             </div>
 
-            {/* CORE FIELDS - Always visible, high frequency */}
-
-            {/* 1. TARIFA COBRADA (Primary - Money) */}
-            <div className="space-y-2">
-                <Label size="xs" variant="muted" required>
-                    Tarifa Cobrada
+            {/* 1. TARIFA COBRADA */}
+            <div className="space-y-3">
+                <Label htmlFor="field-fare" size="xs" variant="muted" required>
+                    {f.fare.label}
                 </Label>
 
-                <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch">
-                    {/* Minus Button */}
+                <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch h-16">
                     <button
                         type="button"
                         onClick={() => adjustValue(fare, setFare, -1000)}
-                        className={cn(
-                            'w-14 h-16 rounded-2xl border-2',
-                            'bg-white/5 border-white/10',
-                            'hover:bg-white/10 hover:border-white/20',
-                            'active:scale-95',
-                            'flex items-center justify-center',
-                            'transition-all duration-200'
-                        )}
-                        aria-label="Restar $1000"
+                        className="w-14 h-16 rounded-2xl border-2 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0"
                     >
                         <Minus className="w-6 h-6 text-error" />
                     </button>
 
-                    {/* Input */}
                     <div className="relative">
-                        <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-                            <DollarSign className="w-6 h-6 text-primary" />
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-primary">
+                            <DollarSign className="w-6 h-6" />
                         </div>
                         <Input
-                            id="fare"
+                            id="field-fare"
                             type="number"
                             inputMode="decimal"
                             placeholder="0"
                             value={fare}
                             onChange={(e) => setFare(e.target.value)}
-                            className={cn(
-                                'h-16 pl-14 pr-6',
-                                'font-extrabold text-3xl text-center',
-                                'transition-all duration-300',
-                                !fare && 'border-accent/50 shadow-[0_0_20px_var(--color-accent-dim)]'
-                            )}
-                            variant={!fare ? 'error' : 'default'}
+                            className="h-16 pl-14 pr-4 font-extrabold text-3xl text-center transition-all duration-300"
                         />
                     </div>
 
-                    {/* Plus Button */}
                     <button
                         type="button"
                         onClick={() => adjustValue(fare, setFare, 1000)}
-                        className={cn(
-                            'w-14 h-16 rounded-2xl border-2',
-                            'bg-white/5 border-white/10',
-                            'hover:bg-white/10 hover:border-white/20',
-                            'active:scale-95',
-                            'flex items-center justify-center',
-                            'transition-all duration-200'
-                        )}
-                        aria-label="Sumar $1000"
+                        className="w-14 h-16 rounded-2xl border-2 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0"
                     >
                         <Plus className="w-6 h-6 text-primary" />
                     </button>
                 </div>
-
-                <p className="text-xs text-moon font-medium ml-1">
-                    💡 Copiá el monto de la app (Uber, Didi, etc.)
+                <p className="text-[11px] text-moon font-medium ml-1">
+                    💡 Copiá el monto directo de la app
                 </p>
             </div>
 
-            {/* 2. DISTANCIA + DURACIÓN (Grid 2 cols) */}
+            {/* 2. BLOQUE TEMPORAL (Unificado: Fecha + Hora + Contexto) */}
+            <div className={cn(
+                "p-4 rounded-3xl border-2 transition-all duration-500",
+                overrideDate
+                    ? "bg-warning/5 border-warning/20 shadow-[0_0_20px_rgba(234,179,8,0.05)]"
+                    : "bg-white/5 border-white/5"
+            )}>
+                {/* Header del bloque: Label + Trigger de Fecha */}
+                <div className="flex items-center justify-between mb-3 px-1">
+                    <Label htmlFor="field-starttime" size="xs" variant="muted" className="mb-0">
+                        {overrideDate ? 'Datos del viaje anterior' : f.startTime.label}
+                    </Label>
+                </div>
+
+                <div className="space-y-3">
+                    {/* Banner Retroactivo (Solo si existe overrideDate) */}
+                    {overrideDate && (
+                        <div className="flex items-center justify-between bg-warning/20 border border-warning/30 rounded-xl px-4 py-2.5 animate-in zoom-in-95 duration-300">
+                            <div className="flex items-center gap-2">
+                                <span className="text-base">📅</span>
+                                <p className="text-[11px] font-extrabold text-warning uppercase tracking-wider">
+                                    Agregar viaje del {formatDateLatam(overrideDate, 'short')}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClearDateOverride}
+                                className="text-xs font-bold text-white/40 hover:text-white transition-colors p-1"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Input de Hora con Badge Dinámico */}
+                    <div className="relative group">
+                        <Input
+                            id="field-starttime"
+                            type="time"
+                            step="60" // Evita que aparezcan los segundos en algunos navegadores
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            icon={<Clock className="w-5 h-5 text-secondary" />}
+                            // Aplicamos scheme-dark para que el picker nativo sea oscuro
+                            className="h-14 font-mono text-lg tracking-wider bg-secondary/5 border-secondary/20 scheme-dark"
+                        />
+                    </div>
+
+                    <div className="flex items-end justify-between mt-1">                        
+
+                        {!overrideDate && (
+                            <button
+                                type="button"
+                                onClick={onOpenDateOverride}
+                                className="text-[11px] font-bold text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+                            >
+                                {f.startTime.dateTrigger}
+                            </button>
+                        )}
+                    </div>
+                    {/* Hint inferior (Feedback sutil) */}
+                    {/* <div className="px-1 flex justify-between items-center">
+                        <p className="text-[10px] text-moon font-medium italic">
+                            {f.startTime.hint}
+                        </p>
+                        {overrideDate && (
+                            <span className="text-[9px] font-bold text-warning/50 animate-pulse">
+                                MODO RETROACTIVO
+                            </span>
+                        )}
+                    </div> */}
+                </div>
+            </div>
+
+            {/* 3. DISTANCIA + DURACIÓN */}
             <div className="grid grid-cols-2 gap-4">
-                {/* Distance */}
                 <div className="space-y-2">
-                    <Label size="xs" variant="muted">
-                        Kilómetros
+                    <Label htmlFor="field-dist" size="xs" variant="muted">
+                        {f.distance.label}
                     </Label>
                     <Input
-                        id="distance"
+                        id="field-dist"
                         type="number"
                         inputMode="decimal"
-                        placeholder="12.5"
+                        placeholder={f.distance.placeholder}
                         value={distTrip}
                         onChange={(e) => setDistTrip(e.target.value)}
-                        // icon={Navigation}
+                        icon={<Navigation className="w-5 h-5" />}
                         className="h-14 font-bold text-xl text-center"
                     />
                 </div>
 
-                {/* Duration */}
                 <div className="space-y-2">
-                    <Label size="xs" variant="muted" required>
-                        Duración (min)
+                    <Label htmlFor="field-duration" size="xs" variant="muted" required>
+                        {f.duration.label}
                     </Label>
                     <Input
-                        id="duration"
+                        id="field-duration"
                         type="number"
                         inputMode="decimal"
-                        placeholder="45"
+                        placeholder={f.duration.placeholder}
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
-                        // icon={Timer}
-                        className={cn(
-                            'h-14 font-bold text-xl text-center',
-                            !duration && 'border-accent/50 shadow-[0_0_15px_var(--color-accent-dim)]'
-                        )}
-                        variant={!duration ? 'error' : 'default'}
+                        icon={<Timer className="w-5 h-5" />}
+                        className="h-14 font-bold text-xl text-center"
                     />
                 </div>
             </div>
 
-            {/* 3. HORA DE INICIO (24hs format) */}
-            <div className="space-y-2">
-                <Label size="xs" variant="muted">
-                    Hora de Inicio
-                </Label>
-                <Input
-                    id="startTime"
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    // icon={Clock}
-                    className="h-14 font-mono text-lg tracking-wider bg-secondary/5 border-secondary/20"
-                />
-                <p className="text-xs text-moon font-medium ml-1">
-                    Para calcular tiempo de espera entre viajes
-                </p>
-            </div>
 
-            {/* OPTIONAL FIELDS - Progressive Disclosure */}
 
-            {/* 4. PROPINAS (Solo Delivery) */}
+            {/* 4. PROPINAS — Solo Delivery */}
             {vertical === 'delivery' && (
-                <div className="space-y-2 animate-fade-in">
-                    <Label size="xs" variant="muted">
-                        Propinas
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <Label htmlFor="field-tips" size="xs" variant="muted">
+                        {f.tips.label}
                     </Label>
                     <Input
-                        id="tip"
+                        id="field-tips"
                         type="number"
                         inputMode="decimal"
-                        placeholder="0"
+                        placeholder={f.tips.placeholder}
                         value={tip}
                         onChange={(e) => setTip(e.target.value)}
-                        // icon={Coins}
+                        icon={<Coins className="w-5 h-5 text-primary" />}
                         className="h-14 font-bold text-xl"
                     />
                 </div>
             )}
 
-            {/* 5. EXTRAS (Collapsible - Low frequency) */}
-            <div
-                className={cn(
-                    'rounded-2xl border-2 transition-all duration-300',
-                    showExtras
-                        ? 'bg-white/5 border-white/20'
-                        : 'bg-white/3 border-white/10'
-                )}
-            >
-                {/* Toggle Header */}
+            {/* 5. GASTOS EXTRAS */}
+            <div className={cn(
+                'rounded-2xl border-2 transition-all duration-300',
+                showExtras ? 'bg-white/5 border-white/20' : 'bg-white/2 border-white/10'
+            )}>
                 <button
                     type="button"
                     onClick={() => setShowExtras(!showExtras)}
-                    className={cn(
-                        'w-full p-4 flex items-center justify-between',
-                        'hover:bg-white/5 transition-colors',
-                        'rounded-2xl'
-                    )}
+                    className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
+                    aria-expanded={showExtras}
                 >
                     <div className="flex items-center gap-3">
                         <MapPin className="w-5 h-5 text-moon" />
                         <div className="text-left">
-                            <p className="text-sm font-bold text-starlight">
-                                Gastos Extra
-                            </p>
-                            <p className="text-xs text-moon">
-                                Peajes, estacionamiento, etc.
-                            </p>
+                            <p className="text-sm font-bold text-starlight">{f.expenses.label}</p>
+                            <p className="text-xs text-moon">Toca para agregar peajes</p>
                         </div>
                     </div>
                     <ChevronDown
@@ -289,53 +321,45 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     />
                 </button>
 
-                {/* Collapsible Content */}
                 {showExtras && (
-                    <div className="px-4 pb-4 pt-2 space-y-2 animate-fade-in">
-                        <Label size="xs" variant="muted">
-                            Peajes y Estacionamiento
-                        </Label>
+                    <div className="px-4 pb-4 pt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
                         <Input
-                            id="tolls"
+                            id="field-expenses"
                             type="number"
                             inputMode="decimal"
                             placeholder="0"
                             value={tolls}
                             onChange={(e) => setTolls(e.target.value)}
-                            // icon={MapPin}
+                            icon={<MapPin className="w-5 h-5" />}
                             className="h-14 font-bold"
                         />
-                        <p className="text-xs text-moon font-medium">
+                        <p className="text-xs text-moon font-medium ml-1">
                             Se restará de tu ganancia neta
                         </p>
                     </div>
                 )}
             </div>
 
-            {/* Dynamic Cost Calculation Info */}
-            <div className="bg-secondary/10 border-l-4 border-secondary/50 px-4 py-3 rounded-r-xl">
-                <p className="text-xs text-starlight/80 font-medium leading-relaxed">
+            {/* Costos activos */}
+            <div className="bg-secondary/10 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
+                <p className="text-[11px] text-starlight/70 font-medium leading-relaxed mb-0">
                     {activeCostsText}
                 </p>
             </div>
 
-            {/* CTA - Fixed at bottom on mobile */}
-            <div className="pt-4 sticky bottom-4 z-10 sm:static">
+            {/* CTA */}
+            <div className="pt-6">
                 <Button
                     disabled={!isValid}
                     onClick={onSave}
                     variant="neon"
                     fullWidth
                     size="lg"
-                    glow
-                    className={cn(
-                        'h-16 uppercase text-base tracking-widest',
-                        'shadow-[0_10px_40px_-5px_var(--color-primary-glow)]',
-                        'flex items-center justify-center gap-3'
-                    )}
+                    glow={isValid}
+                    className="h-16 uppercase text-base tracking-widest shadow-[0_10px_40px_-5px_var(--color-primary-glow)]"
                 >
                     <NotebookPen className="w-6 h-6" />
-                    Guardar Viaje
+                    {TRIP_FORM.saveButton}
                 </Button>
             </div>
         </div>

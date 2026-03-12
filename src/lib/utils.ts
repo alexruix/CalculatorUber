@@ -46,3 +46,27 @@ export function generateId(): string {
   // Si no usás una librería como uuid, esto es liviano y funcional
   return Math.random().toString(36).substring(2, 10);
 }
+
+// 5. FORMATEADOR DE FECHAS (Contexto Latam/Argentina)
+export function formatDateLatam(dateString: string, style: 'short' | 'long' | 'full' = 'long'): string {
+  if (!dateString) return '';
+  
+  // 1. Evitar el bug de zona horaria desarmando el string manualmente
+  // '2026-03-12' -> [2026, 3, 12]
+  const [year, month, day] = dateString.split('-').map(Number);
+  
+  // Nota: los meses en JS empiezan en 0 (Enero = 0)
+  const localDate = new Date(year, month - 1, day);
+
+  // 2. Formateador nativo para Argentina
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric' };
+  
+  if (style === 'short') options.month = 'short'; // "12 mar"
+  if (style === 'long') options.month = 'long';   // "12 de marzo"
+  if (style === 'full') {
+      options.month = 'long';
+      options.year = 'numeric'; // "12 de marzo de 2026"
+  }
+
+  return new Intl.DateTimeFormat('es-AR', options).format(localDate);
+}

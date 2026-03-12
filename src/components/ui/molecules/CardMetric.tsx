@@ -60,10 +60,10 @@ export const CardMetric: React.FC<CardMetricProps> = ({
       glow: 'shadow-[0_0_30px_var(--color-secondary-glow)]',
     },
     fare: {
-      value: 'text-primary',
-      border: 'border-primary/20',
-      bg: 'bg-primary/5',
-      glow: 'shadow-[0_0_20px_var(--color-primary-glow)]',
+      value: 'text-starlight',
+      border: 'border-white/20',
+      bg: 'bg-white/5',
+      glow: 'shadow-[0_0_20px_rgba(255,255,255,0.1)]',
     },
     warning: {
       value: 'text-accent',
