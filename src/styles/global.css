@@ -472,6 +472,11 @@
     white-space: nowrap;
     border-width: 0;
   }
+
+  /* Safe Area Utilities (Mobile) */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 /* ============================================

@@ -25,7 +25,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
 }) => {
   return (
     <nav
-      className="nav-bar"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-t border-white/5 py-1 safe-area-bottom"
       aria-label="Navegación principal de la aplicación"
     >
       {/* Grid de 5 columnas: layout fijo para mobile */}
