@@ -2,6 +2,7 @@
 // src/layouts/Layout.astro
 import "../styles/global.css"; // 👈 Design System Tokens
 import "../styles/tailwind.css"; // 👈 Tailwind v4 Utilities
+import { ReloadPrompt } from "../components/ui/molecules/ReloadPrompt";
 interface Props {
   title: string;
   description?: string;
@@ -50,5 +51,6 @@ const {
   </head>
   <body class="bg-black text-white antialiased overflow-x-hidden">
     <slot />
+    <ReloadPrompt client:load />
   </body>
 </html>

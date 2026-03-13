@@ -61,6 +61,8 @@ export interface SavedTrip {
   tip?: number;
   tolls?: number;
   activeTime?: number;
+  /** ID del turno al que pertenece el viaje */
+  shift_id?: string | number | null;
 
   // Arquitectura V2
   /** Velocidad promedio del viaje (km/h). 0 si no hay datos suficientes. */
@@ -75,6 +77,8 @@ export interface SavedTrip {
   date?: string;
   /** Si el viaje fue rentable (margin > 0). Usado para racha de viajes. */
   isProfitable?: boolean;
+  /** Estado de sincronización con el servidor */
+  syncStatus?: 'synced' | 'pending';
 }
 
 /**

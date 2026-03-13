@@ -6,6 +6,7 @@ import react from '@astrojs/react';
 import node from '@astrojs/node';
 import vercel from '@astrojs/vercel';
 import viteCompression from 'vite-plugin-compression';
+import pwa from '@vite-pwa/astro';
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,5 +20,46 @@ export default defineConfig({
     ]
   },
 
-  integrations: [react()]
+  integrations: [
+    react(),
+    pwa({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      manifest: {
+        name: 'Manejate',
+        short_name: 'Manejate',
+        description: 'La posta de tus viajes. Dashboard con inteligencia financiera.',
+        theme_color: '#000000',
+        background_color: '#000000',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'images-cache',
+            }
+          },
+          {
+            urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'static-resources',
+            }
+          }
+        ]
+      }
+    })
+  ]
 });

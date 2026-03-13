@@ -131,34 +131,49 @@ export const useCalculatorStore = create<CalculatorState>()(
                     waitMinutes,
                     date: journeyDate,
                     isProfitable: trip.margin > 0,
+                    syncStatus: 'pending' // Por defecto pendiente hasta confirmar subida
                 };
 
-                // 5. Persistencia local inmediata (SIEMPRE ordenado por más reciente primero)
+                // 5. Persistencia local inmediata
                 set((s) => ({ 
                     sessionTrips: [enrichedTrip, ...s.sessionTrips].sort((a, b) => b.timestamp - a.timestamp) 
                 }));
-                // 6. Sincronización con Supabase
+
+                // 6. Sincronización con Supabase (en segundo plano)
                 const user = useProfileStore.getState().user;
                 if (user && isSupabaseConfigured() && navigator.onLine) {
-                    await supabase.from('trips').insert({
-                        id: trip.id,
-                        user_id: user.id,
-                        shift_id: state.activeShiftId,
-                        fare: trip.fare || 0,
-                        margin: trip.margin || 0,
-                        distance: trip.distance || 0,
-                        duration: trip.duration || 0,
-                        vertical: trip.vertical,
-                        tip: trip.tip,
-                        tolls: trip.tolls,
-                        start_time: trip.startTime,
-                        active_time: trip.activeTime || trip.duration || 0,
-                        avg_speed: avgSpeed,
-                        wait_minutes: waitMinutes,
-                        timestamp: trip.timestamp,
-                        journey_date: journeyDate,
-                        is_profitable: trip.margin > 0,
-                    });
+                    try {
+                        const { error } = await supabase.from('trips').upsert({
+                            id: trip.id,
+                            user_id: user.id,
+                            shift_id: state.activeShiftId,
+                            fare: trip.fare || 0,
+                            margin: trip.margin || 0,
+                            distance: trip.distance || 0,
+                            duration: trip.duration || 0,
+                            vertical: trip.vertical,
+                            tip: trip.tip,
+                            tolls: trip.tolls,
+                            start_time: trip.startTime,
+                            active_time: trip.activeTime || trip.duration || 0,
+                            avg_speed: avgSpeed,
+                            wait_minutes: waitMinutes,
+                            timestamp: trip.timestamp,
+                            journey_date: journeyDate,
+                            is_profitable: trip.margin > 0,
+                        });
+
+                        if (!error) {
+                            // Marcar como sincronizado localmente
+                            set((s) => ({
+                                sessionTrips: s.sessionTrips.map(t => 
+                                    t.id === trip.id ? { ...t, syncStatus: 'synced' } : t
+                                )
+                            }));
+                        }
+                    } catch (err) {
+                        console.error("Error syncing trip:", err);
+                    }
                 }
             },
 
@@ -234,35 +249,90 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             initTrips: async () => {
                 const user = useProfileStore.getState().user;
-                if (user && isSupabaseConfigured()) {
-                    // Si estamos online, reconciliamos con la base de datos
-                    if (navigator.onLine) {
-                        const { data, error } = await supabase
-                            .from('trips')
-                            .select('*')
-                            .eq('user_id', user.id)
-                            .order('timestamp', { ascending: false });
+                if (!user || !isSupabaseConfigured()) return;
 
-                        if (data && !error) {
-                            const loadedTrips: SavedTrip[] = data.map(dbTrip => ({
-                                id: Number(dbTrip.id),
-                                fare: Number(dbTrip.fare),
-                                margin: Number(dbTrip.margin),
-                                distance: Number(dbTrip.distance),
-                                duration: Number(dbTrip.duration),
-                                vertical: dbTrip.vertical,
-                                tip: Number(dbTrip.tip || 0),
-                                tolls: Number(dbTrip.tolls || 0),
-                                timestamp: Number(dbTrip.timestamp),
-                                startTime: dbTrip.start_time,
-                                avgSpeed: Number(dbTrip.avg_speed || 0),
-                                waitMinutes: Number(dbTrip.wait_minutes || 0),
-                                shift_id: dbTrip.shift_id,
-                                date: dbTrip.journey_date ?? undefined,
-                                isProfitable: dbTrip.is_profitable ?? (Number(dbTrip.margin) > 0),
+                // 1. PUSH: Sincronizar viajes pendientes (Outbox)
+                const pendingTrips = get().sessionTrips.filter(t => t.syncStatus === 'pending');
+                if (pendingTrips.length > 0 && navigator.onLine) {
+                    const pushData = pendingTrips.map(t => ({
+                        id: t.id,
+                        user_id: user.id,
+                        shift_id: t.shift_id,
+                        fare: t.fare,
+                        margin: t.margin,
+                        distance: t.distance,
+                        duration: t.duration,
+                        vertical: t.vertical,
+                        tip: t.tip,
+                        tolls: t.tolls,
+                        start_time: t.startTime,
+                        timestamp: t.timestamp,
+                        journey_date: t.date,
+                        is_profitable: t.isProfitable,
+                        avg_speed: t.avgSpeed,
+                        wait_minutes: t.waitMinutes
+                    }));
+                    
+                    try {
+                        const { error } = await supabase.from('trips').upsert(pushData);
+                        if (!error) {
+                            set(state => ({
+                                sessionTrips: state.sessionTrips.map(t => 
+                                    pendingTrips.find(p => p.id === t.id) 
+                                    ? { ...t, syncStatus: 'synced' as const } 
+                                    : t
+                                )
                             }));
-                            set({ sessionTrips: loadedTrips });
                         }
+                    } catch (e) {
+                        console.error("Push sync failed", e);
+                    }
+                }
+
+                // 2. PULL: Cargar últimos 7 días (Background)
+                if (navigator.onLine) {
+                    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                    
+                    const { data, error } = await supabase
+                        .from('trips')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .gte('timestamp', sevenDaysAgo)
+                        .order('timestamp', { ascending: false });
+
+                    if (data && !error) {
+                        const remoteTrips: SavedTrip[] = data.map(dbTrip => ({
+                            id: Number(dbTrip.id),
+                            fare: Number(dbTrip.fare),
+                            margin: Number(dbTrip.margin),
+                            distance: Number(dbTrip.distance),
+                            duration: Number(dbTrip.duration),
+                            vertical: dbTrip.vertical,
+                            tip: Number(dbTrip.tip || 0),
+                            tolls: Number(dbTrip.tolls || 0),
+                            timestamp: Number(dbTrip.timestamp),
+                            startTime: dbTrip.start_time,
+                            avgSpeed: Number(dbTrip.avg_speed || 0),
+                            waitMinutes: Number(dbTrip.wait_minutes || 0),
+                            shift_id: dbTrip.shift_id,
+                            date: dbTrip.journey_date ?? undefined,
+                            isProfitable: dbTrip.is_profitable ?? (Number(dbTrip.margin) > 0),
+                            syncStatus: 'synced'
+                        }));
+
+                        // Reconciliación: Mantener locales pendientes + Mergear remotos
+                        set(state => {
+                            const stillPending = state.sessionTrips.filter(t => t.syncStatus === 'pending');
+                            const combined = [...stillPending];
+                            
+                            remoteTrips.forEach(remote => {
+                                if (!combined.some(c => c.id === remote.id)) {
+                                    combined.push(remote);
+                                }
+                            });
+
+                            return { sessionTrips: combined.sort((a, b) => b.timestamp - a.timestamp) };
+                        });
                     }
                 }
             },
@@ -304,7 +374,14 @@ export const useCalculatorStore = create<CalculatorState>()(
                 shiftClose: state.shiftClose,
                 startingOdometer: state.startingOdometer,
                 currentOdometer: state.currentOdometer,
-                activeShiftId: state.activeShiftId
+                activeShiftId: state.activeShiftId,
+                fare: state.fare,
+                distTrip: state.distTrip,
+                distPickup: state.distPickup,
+                duration: state.duration,
+                tip: state.tip,
+                tolls: state.tolls,
+                startTime: state.startTime
             }), 
         }
     )

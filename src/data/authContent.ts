@@ -53,7 +53,7 @@ export const authCopy = {
     },
     password: {
       label: 'Contraseña',
-      placeholder: 'Mínimo 6 caracteres',
+      placeholder: 'Mínimo 8 caracteres, mayúscula y símbolo',
     },
     confirmPassword: {
       label: 'Confirmar Contraseña',

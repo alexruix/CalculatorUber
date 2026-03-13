@@ -50,10 +50,10 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({ title, description, 
             {/* Footer Legal Links */}
             <footer className="absolute bottom-6 left-0 w-full flex items-center justify-center gap-6 z-20">
                 <a href="#" className="text-xs font-medium text-white/40 hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/50">
-                    Terms of Use
+                    Términos de Uso
                 </a>
                 <a href="#" className="text-xs font-medium text-white/40 hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/50">
-                    Privacy Policy
+                    Política de Privacidad
                 </a>
             </footer>
 

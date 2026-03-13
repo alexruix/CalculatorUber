@@ -17,37 +17,45 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         email, setEmail, password, setPassword,
         confirmPassword, setConfirmPassword,
         otpCode, setOtpCode,
-        loading, error, handleAuth, handleVerifyOtp, handleResendOtp,
+        loading, error, setError, handleAuth, handleVerifyOtp, handleResendOtp,
         validatePassword, validateName
     } = useAuthForm(onSuccess || (() => window.location.href = '/app'), 'signup');
 
-    const [countdown, setCountdown] = useState(60);
+    const [countdown, setCountdown] = useState(0);
 
     useEffect(() => {
-        if (view === 'check-email' && countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
+        // Cuando aterrizamos en la vista por primera vez, disparamos el timer
+        if (view === 'check-email' && countdown === 0 && !error) {
+            setCountdown(60);
         }
-    }, [countdown, view]);
+
+        let timer: NodeJS.Timeout;
+        if (view === 'check-email' && countdown > 0) {
+            timer = setTimeout(() => setCountdown(prev => prev - 1), 1000);
+        }
+        return () => clearTimeout(timer);
+    }, [countdown, view, error]);
 
     const handleResend = async () => {
         if (countdown > 0) return;
         const success = await handleResendOtp('signup');
         if (success) {
+            // Reiniciamos el timer a 60 si el backend confirma el envío
             setCountdown(60);
         }
     };
 
-    const isFormValid = email.length > 0 && validateName(fullName) && validatePassword(password) && password === confirmPassword;
+    const isFormValid = email.length > 0 && validateName(fullName) && validatePassword(password) && password === confirmPassword && !loading;
 
     if (view === 'check-email') {
         const isOtpValid = otpCode.length === 6;
         return (
-            <div className="w-full flex justify-center mt-4">
+            <div className="w-full flex justify-center mt-4 animate-in fade-in zoom-in-95 duration-300">
                 <div className="w-full max-w-sm flex flex-col items-center">
                     <h2 className="text-2xl font-bold mb-3">Verificá tu correo</h2>
-                    <p className="text-sm font-medium text-starlight text-center mb-8">
-                        Ingresá el código de 6 dígitos que enviamos a <strong>{email}</strong>.
+                    <p className="text-sm font-medium text-starlight text-center mb-8 leading-relaxed">
+                        Ingresá el código de 6 dígitos que enviamos a <br />
+                        <strong className="text-white">{email}</strong>.
                     </p>
 
                     <div className="w-full mb-8">
@@ -60,13 +68,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                     </div>
 
                     {error && (
-                        <div className="w-full mb-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                        <div className="w-full mb-6 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-xs font-medium text-center animate-in shake">
                             {error}
                         </div>
                     )}
 
                     <Button
-                        type="button"
+                        type="button" // Cambiar a submit si se envuelve en un <form> propio
                         onClick={() => handleVerifyOtp('signup')}
                         variant={isOtpValid ? "neon" : "secondary-dark"}
                         size="lg"
@@ -78,17 +86,25 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                         {!loading && <ChevronRight className="w-5 h-5" />}
                     </Button>
 
-                    <div className="mt-6 flex justify-center w-full">
+                    <div className="mt-6 flex flex-col items-center justify-center w-full gap-2">
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             disabled={countdown > 0 || loading}
                             onClick={handleResend}
-                            className="text-starlight hover:text-white"
+                            className="text-starlight hover:text-white transition-colors"
                         >
-                            {countdown > 0 ? `Reenviar código en ${countdown}s` : 'Reenviar código'}
+                            {countdown > 0 ? `Reenviar código en ${countdown}s` : 'Volver a enviar el código'}
                         </Button>
+
+                        {/* ✅ Mejora UX: Salida de emergencia si el usuario se equivocó de email */}
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="text-[10px] text-white/30 hover:text-white transition-colors uppercase tracking-widest mt-2"
+                        >
+                            Usar otro correo
+                        </button>
                     </div>
                 </div>
             </div>
@@ -139,13 +155,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
                     {/* Validaciones de Seguridad Visuales */}
                     {password.length > 0 && (
-                        <div className="flex flex-col gap-1.5 px-1">
+                        <div className="flex flex-col gap-1.5 px-1 animate-in fade-in slide-in-from-top-1 duration-300">
                             {[
                                 { label: '8 caracteres mínimos', met: password.length >= 8 },
                                 { label: 'Una mayúscula', met: /[A-Z]/.test(password) },
-                                { label: 'Una minúscula', met: /[a-z]/.test(password) },
-                                { label: 'Un número', met: /\d/.test(password) },
-                                { label: 'Un caracter especial', met: /[!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/\-]/.test(password) }
+                                { label: 'Un caracter especial', met: /[!@#$%^&*]/.test(password) }
                             ].map((check, idx) => (
                                 <div key={idx} className={`text-[11px] font-semibold tracking-wide flex items-center gap-2 transition-colors duration-300 ${check.met ? 'text-primary' : 'text-error'}`}>
                                     <span className="text-base leading-none">{check.met ? '✓' : '✗'}</span>

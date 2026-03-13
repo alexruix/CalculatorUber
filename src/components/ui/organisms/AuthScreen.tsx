@@ -15,6 +15,7 @@ import { cn } from "../../../lib/utils";
 import { Input } from "../atoms/Input";
 import { Button } from "../atoms/Button";
 import { Label } from "../atoms/Label";
+import { OtpInput } from "../molecules/OtpInput";
 
 interface AuthScreenProps {
   onSuccess: () => void;
@@ -24,25 +25,57 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
   const {
     view, setView, email, setEmail, password, setPassword,
     confirmPassword, setConfirmPassword,
+    otpCode, setOtpCode,
     loading, error, handleAuth, handleGoogleLogin,
-    handleResetPassword, handleUpdatePassword,
+    handleResetPassword, handleUpdatePassword, handleVerifyOtp,
     toggleView, showPassword, setShowPassword
   } = useAuthForm(onSuccess);
 
   if (view === 'check-email') {
+    const isOtpValid = otpCode.length === 6;
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 py-12 animate-in fade-in zoom-in-95 duration-500 text-center">
         <div className="w-20 h-20 bg-secondary/20 rounded-4xl flex items-center justify-center mb-8 border-2 border-secondary/30 box-glow-secondary">
           <Inbox className="w-10 h-10 text-secondary" />
         </div>
         <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-4">¡Casi listo!</h1>
-        <p className="text-sm font-medium text-white/60 leading-relaxed mb-10 max-w-xs">
-          Enviamos un enlace de confirmación a <b className="text-white">{email}</b>.
-          Verificá tu casilla para activar tu cuenta.
+        <p className="text-sm font-medium text-white/60 leading-relaxed mb-8 max-w-xs text-center">
+          Enviamos un código de verificación a <br />
+          <b className="text-white">{email}</b>.
         </p>
+
+        <div className="w-full max-w-sm mb-10">
+          <OtpInput
+            value={otpCode}
+            onChange={setOtpCode}
+            disabled={loading}
+          />
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-error/10 border border-error/20 text-error text-left mb-6 max-w-sm">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span className="text-xs font-medium">{error}</span>
+          </div>
+        )}
+
+        <Button
+          onClick={() => handleVerifyOtp('signup')}
+          loading={loading}
+          disabled={!isOtpValid || loading}
+          fullWidth
+          size="lg"
+          variant="neon"
+          className="mb-8"
+        >
+          Confirmar cuenta
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </Button>
+
         <button
           onClick={() => setView('login')}
-          className="flex items-center gap-2 text-xs font-black text-secondary uppercase tracking-widest hover:text-secondary-glow transition-colors"
+          disabled={loading}
+          className="flex items-center gap-2 text-xs font-black text-secondary uppercase tracking-widest hover:text-secondary-glow transition-colors disabled:opacity-50"
         >
           <ArrowLeft className="w-4 h-4" /> Volver al ingreso
         </button>
@@ -82,6 +115,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
           <Button
             type="submit"
             loading={loading}
+            disabled={loading}
             fullWidth
             size="lg"
             className="mt-6"
@@ -232,6 +266,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
         <Button
           type="submit"
           loading={loading}
+          disabled={loading}
           fullWidth
           size="lg"
           variant={isResetLayout ? "outline" : "neon"}
