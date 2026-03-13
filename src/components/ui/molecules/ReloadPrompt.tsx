@@ -27,7 +27,7 @@ export const ReloadPrompt: React.FC = () => {
   if (!offlineReady && !needRefresh) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:w-80 z-[100] animate-in slide-in-from-bottom-5 duration-500">
+    <div className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:w-80 z-100 animate-in slide-in-from-bottom-5 duration-500">
       <div className="p-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-primary/30 shadow-[0_0_30px_rgba(0,242,255,0.15)] flex flex-col gap-4">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">

@@ -11,7 +11,11 @@ import pwa from '@vite-pwa/astro';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  }),
   vite: {
     plugins: [
       tailwindcss(),
@@ -61,5 +65,10 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  })
 });
