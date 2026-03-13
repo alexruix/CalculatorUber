@@ -101,17 +101,9 @@ const CalculatorApp: React.FC = () => {
     }
   }, [isReady, isConfigured, user]);
 
-  if (!isReady) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black gap-4">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-        <span className="text-white/50 text-xs font-black uppercase tracking-widest animate-pulse">
-          Sincronizando...
-        </span>
-      </div>
-    );
-  }
-
+  // No bloqueamos con "Sincronizando" de pantalla completa. 
+  // La app se carga instantáneamente con la data local de Zustand Persist.
+  
   // Auth Gate
   if (!user && isSupabaseConfigured()) {
     return (

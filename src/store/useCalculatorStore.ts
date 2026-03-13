@@ -251,29 +251,29 @@ export const useCalculatorStore = create<CalculatorState>()(
                 const user = useProfileStore.getState().user;
                 if (!user || !isSupabaseConfigured()) return;
 
-                // 1. PUSH: Sincronizar viajes pendientes (Outbox)
+                // 1. PUSH: Sincronizar viajes pendientes (Outbox) - Sin bloquear el flujo
                 const pendingTrips = get().sessionTrips.filter(t => t.syncStatus === 'pending');
                 if (pendingTrips.length > 0 && navigator.onLine) {
-                    const pushData = pendingTrips.map(t => ({
-                        id: t.id,
-                        user_id: user.id,
-                        shift_id: t.shift_id,
-                        fare: t.fare,
-                        margin: t.margin,
-                        distance: t.distance,
-                        duration: t.duration,
-                        vertical: t.vertical,
-                        tip: t.tip,
-                        tolls: t.tolls,
-                        start_time: t.startTime,
-                        timestamp: t.timestamp,
-                        journey_date: t.date,
-                        is_profitable: t.isProfitable,
-                        avg_speed: t.avgSpeed,
-                        wait_minutes: t.waitMinutes
-                    }));
-                    
                     try {
+                        const pushData = pendingTrips.map(t => ({
+                            id: t.id,
+                            user_id: user.id,
+                            shift_id: t.shift_id,
+                            fare: t.fare,
+                            margin: t.margin,
+                            distance: t.distance,
+                            duration: t.duration,
+                            vertical: t.vertical,
+                            tip: t.tip,
+                            tolls: t.tolls,
+                            start_time: t.startTime,
+                            timestamp: t.timestamp,
+                            journey_date: t.date,
+                            is_profitable: t.isProfitable,
+                            avg_speed: t.avgSpeed,
+                            wait_minutes: t.waitMinutes
+                        }));
+                        
                         const { error } = await supabase.from('trips').upsert(pushData);
                         if (!error) {
                             set(state => ({
@@ -285,54 +285,65 @@ export const useCalculatorStore = create<CalculatorState>()(
                             }));
                         }
                     } catch (e) {
-                        console.error("Push sync failed", e);
+                        console.error("Silent Push failed:", e);
                     }
                 }
 
-                // 2. PULL: Cargar últimos 7 días (Background)
+                // 2. PULL: Cargar últimos 50 viajes (Background Sync)
                 if (navigator.onLine) {
-                    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-                    
-                    const { data, error } = await supabase
-                        .from('trips')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .gte('timestamp', sevenDaysAgo)
-                        .order('timestamp', { ascending: false });
+                    try {
+                        const { data, error } = await supabase
+                            .from('trips')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .order('timestamp', { ascending: false })
+                            .limit(50); // ✅ Velocidad máxima: solo los últimos 50
 
-                    if (data && !error) {
-                        const remoteTrips: SavedTrip[] = data.map(dbTrip => ({
-                            id: Number(dbTrip.id),
-                            fare: Number(dbTrip.fare),
-                            margin: Number(dbTrip.margin),
-                            distance: Number(dbTrip.distance),
-                            duration: Number(dbTrip.duration),
-                            vertical: dbTrip.vertical,
-                            tip: Number(dbTrip.tip || 0),
-                            tolls: Number(dbTrip.tolls || 0),
-                            timestamp: Number(dbTrip.timestamp),
-                            startTime: dbTrip.start_time,
-                            avgSpeed: Number(dbTrip.avg_speed || 0),
-                            waitMinutes: Number(dbTrip.wait_minutes || 0),
-                            shift_id: dbTrip.shift_id,
-                            date: dbTrip.journey_date ?? undefined,
-                            isProfitable: dbTrip.is_profitable ?? (Number(dbTrip.margin) > 0),
-                            syncStatus: 'synced'
-                        }));
+                        if (data && !error) {
+                            const remoteTrips: SavedTrip[] = data.map(dbTrip => ({
+                                id: Number(dbTrip.id),
+                                fare: Number(dbTrip.fare),
+                                margin: Number(dbTrip.margin),
+                                distance: Number(dbTrip.distance),
+                                duration: Number(dbTrip.duration),
+                                vertical: dbTrip.vertical,
+                                tip: Number(dbTrip.tip || 0),
+                                tolls: Number(dbTrip.tolls || 0),
+                                timestamp: Number(dbTrip.timestamp),
+                                startTime: dbTrip.start_time,
+                                avgSpeed: Number(dbTrip.avg_speed || 0),
+                                waitMinutes: Number(dbTrip.wait_minutes || 0),
+                                shift_id: dbTrip.shift_id,
+                                date: dbTrip.journey_date ?? undefined,
+                                isProfitable: dbTrip.is_profitable ?? (Number(dbTrip.margin) > 0),
+                                syncStatus: 'synced'
+                            }));
 
-                        // Reconciliación: Mantener locales pendientes + Mergear remotos
-                        set(state => {
-                            const stillPending = state.sessionTrips.filter(t => t.syncStatus === 'pending');
-                            const combined = [...stillPending];
-                            
-                            remoteTrips.forEach(remote => {
-                                if (!combined.some(c => c.id === remote.id)) {
-                                    combined.push(remote);
-                                }
+                            // 3. SILENT RECONCILIATION: Evitar re-renders si la data es idéntica
+                            set(state => {
+                                const currentTrips = state.sessionTrips;
+                                
+                                // Comprobación simplificada: ¿Son los mismos IDs en el mismo orden?
+                                const isIdentical = currentTrips.length === remoteTrips.length && 
+                                                  currentTrips.every((t, i) => t.id === remoteTrips[i].id && t.syncStatus === 'synced');
+                                
+                                if (isIdentical) return state;
+
+                                // Mergear manteniendo los locales que sigan 'pending'
+                                const stillPending = currentTrips.filter(t => t.syncStatus === 'pending');
+                                const combined = [...stillPending];
+                                
+                                remoteTrips.forEach(remote => {
+                                    if (!combined.some(c => c.id === remote.id)) {
+                                        combined.push(remote);
+                                    }
+                                });
+
+                                return { sessionTrips: combined.sort((a, b) => b.timestamp - a.timestamp) };
                             });
-
-                            return { sessionTrips: combined.sort((a, b) => b.timestamp - a.timestamp) };
-                        });
+                        }
+                    } catch (e) {
+                        console.error("Silent Pull failed:", e);
                     }
                 }
             },
