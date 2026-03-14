@@ -2,12 +2,18 @@
 import Layout from "../layouts/Layout.astro";
 import { AuthTemplate } from "../components/ui/templates/AuthTemplate";
 import { RegisterForm } from "../components/ui/organisms/RegisterForm";
+import { getImage } from "astro:assets";
+import iconLogo from "../assets/icon5.png";
+
+const optimizedLogo = await getImage({ src: iconLogo, format: 'webp', width: 200, height: 200 });
 ---
 
 <Layout title="Crear cuenta | Manejate">
+  <h1 class="sr-only">Crear una cuenta nueva en Manejate</h1>
   <AuthTemplate
     title="Crear cuenta"
     description="Comenzá a medir tus ganancias de manera profesional."
+    logoUrl={optimizedLogo.src}
     client:only="react"
   >
     <RegisterForm client:load />

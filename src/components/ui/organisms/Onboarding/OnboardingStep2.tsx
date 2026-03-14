@@ -289,7 +289,7 @@ export const OnboardingStep2: React.FC<OnboardingStep2Props> = ({
                                 <h3 className="text-sm font-extrabold text-starlight uppercase tracking-tight flex items-center gap-2">
                                     {textConfig.fields.amortization.label}
                                     <span className={cn(
-                                        "text-[10px] px-2 py-0.5 rounded-full",
+                                        "text-xs px-2 py-0.5 rounded-full font-black uppercase tracking-widest",
                                         useAutoAmortization ? "bg-secondary/20 text-secondary" : "bg-white/10 text-moon"
                                     )}>
                                         {useAutoAmortization ? textConfig.fields.amortization.recommended : textConfig.fields.amortization.optional}

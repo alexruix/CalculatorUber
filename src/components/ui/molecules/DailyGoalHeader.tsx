@@ -93,7 +93,7 @@ export const DailyGoalHeader: React.FC<DailyGoalHeaderProps> = ({
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-primary" aria-hidden="true" />
-                    <span className="text-white/60 uppercase tracking-widest font-bold text-[10px]">
+                    <span className="text-white/60 uppercase tracking-widest font-bold text-xs">
                         {g.title}
                     </span>
                 </div>

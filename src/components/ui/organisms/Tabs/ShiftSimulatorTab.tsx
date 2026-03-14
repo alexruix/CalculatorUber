@@ -37,7 +37,7 @@ export const ShiftSimulatorTab: React.FC = () => {
     if (costPerKm === 0) {
         return (
             <div className="h-[60vh] flex flex-col items-center justify-center text-center px-8 animate-in fade-in">
-                <TrafficCone className="w-16 h-16 text-white/20 mb-4" />
+                <TrafficCone className="w-16 h-16 text-white/40 mb-4" />
                 <h2 className="text-xl font-black text-white mb-2">Configurá tus Válvulas</h2>
                 <p className="text-sm text-white/50 mb-6">Necesitamos saber cuánto gasta tu {vehicleName || 'vehículo'} para darte el número mágico.</p>
                 <button onClick={() => setActiveTab('profile')} className="btn-primary">
@@ -84,9 +84,9 @@ export const ShiftSimulatorTab: React.FC = () => {
                 <h2 className="text-sm text-white/50 uppercase tracking-widest font-black mb-1">Costo Operativo</h2>
                 <div className="flex justify-center items-end gap-1 mb-2">
                     <span className="text-5xl font-black text-white tracking-tighter">${Math.round(costPerKm)}</span>
-                    <span className="text-lg text-white/40 font-bold mb-1">/km</span>
+                    <span className="text-lg text-white/70 font-bold mb-1">/km</span>
                 </div>
-                <p className="text-xs text-white/40 mx-auto max-w-[250px] leading-relaxed">
+                <p className="text-xs text-white/70 mx-auto max-w-[250px] leading-relaxed">
                     Esto te cuesta mover tu {vehicleName || 'vehículo'} 1 kilómetro (nafta, arreglos y desgaste).
                 </p>
             </div>
@@ -95,7 +95,7 @@ export const ShiftSimulatorTab: React.FC = () => {
             <div className="space-y-3">
                 <div className="flex items-center justify-between px-2">
                     <h3 className="text-xs font-black text-white uppercase tracking-widest">Semáforo de Viajes</h3>
-                    <span className="text-[10px] bg-white/5 text-white/50 px-2 py-1 rounded-full uppercase font-bold text-center">
+                    <span className="text-xs bg-white/5 text-white/50 px-2 py-1 rounded-full uppercase font-bold text-center">
                         Piso a cobrar
                     </span>
                 </div>
@@ -112,7 +112,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <p className="text-xs text-success/50 leading-tight mt-0.5">Ganás más del doble</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Pedir más de</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Pedir más de</span>
                             <span className="text-xl font-black text-success">${Math.round(greenMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -128,7 +128,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <p className="text-xs text-warning/50 leading-tight mt-0.5">Cubre gastos y deja margen</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Ronda los</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Ronda los</span>
                             <span className="text-xl font-black text-warning">${Math.round(yellowMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -144,7 +144,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <p className="text-xs text-error/50 leading-tight mt-0.5">Estás pagando por trabajar</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold block mb-0.5">Menos de</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Menos de</span>
                             <span className="text-xl font-black text-error">${Math.round(yellowMin - 1)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -172,7 +172,7 @@ export const ShiftSimulatorTab: React.FC = () => {
                         onChange={(e) => setSimulatedDistance(Number(e.target.value))}
                         className="w-full accent-success bg-white/10 rounded-full h-2 appearance-none outline-none"
                     />
-                    <div className="flex justify-between text-[10px] text-white/30 uppercase font-black mt-2">
+                    <div className="flex justify-between text-xs text-white/60 uppercase font-black mt-2">
                         <span>Corto (1km)</span>
                         <span>Largo (30km)</span>
                     </div>
@@ -180,12 +180,12 @@ export const ShiftSimulatorTab: React.FC = () => {
 
                 <div className="bg-black/50 rounded-2xl p-4 flex justify-between items-center">
                     <div>
-                        <span className="block text-[10px] uppercase text-white/40 font-bold mb-1">En {simulatedDistance}km pedí más de:</span>
+                        <span className="block text-xs uppercase text-white/70 font-black tracking-widest mb-1">En {simulatedDistance}km pedí más de:</span>
                         <span className="text-2xl font-black text-white">${simYellow}</span>
                     </div>
                     <ArrowRight className="w-5 h-5 text-white/20" />
                     <div className="text-right">
-                        <span className="block text-[10px] uppercase text-success/50 font-bold mb-1">Para clavar un viaje ideal:</span>
+                        <span className="block text-xs uppercase text-success/50 font-black tracking-widest mb-1">Para clavar un viaje ideal:</span>
                         <span className="text-2xl font-black text-success">${simGreen}</span>
                     </div>
                 </div>

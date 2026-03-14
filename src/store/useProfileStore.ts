@@ -48,7 +48,7 @@ interface ProfileState {
 const initialProfileState = {
     isConfigured: false,
     isFetchingProfile: false,
-    isInitialLoading: true, // Inicia en true hasta que termina initProfile
+    isInitialLoading: false, // Inicia en false para favorecer Instant-First (Zustand Persist)
     isPro: false,
     driverName: '',
     vehicleName: '',
@@ -80,7 +80,15 @@ export const useProfileStore = create<ProfileState>()(
             },
             setUser: (user) => set({ user }),
             initProfile: async () => {
-                set({ isFetchingProfile: true, isInitialLoading: true });
+                const state = get();
+                // Si ya tenemos datos (estamos configurados), no bloqueamos la UI con un loading agresivo
+                // Solo activamos isFetchingProfile para indicar sync en background si es necesario
+                const shouldBlockUI = !state.isConfigured;
+                
+                set({ 
+                    isFetchingProfile: true, 
+                    isInitialLoading: shouldBlockUI 
+                });
                 
                 if (!isSupabaseConfigured()) {
                     set({ isFetchingProfile: false, isInitialLoading: false });
@@ -102,10 +110,10 @@ export const useProfileStore = create<ProfileState>()(
                         if (data && !error) {
                             set({
                                 user: currentUser,
-                                isConfigured: data.is_onboarded === true, // <-- Vulnerability fix: Read onboarding state
+                                isConfigured: data.is_onboarded === true,
                                 isPro: data.subscription_tier === 'pro',
                                 vehicleName: data.vehicle_name,
-                                kmPerLiter: Math.max(0.1, Number(data.km_per_liter) || 10), // Safe Default
+                                kmPerLiter: Math.max(0.1, Number(data.km_per_liter) || 10),
                                 maintPerKm: Number(data.maint_per_km) || 15,
                                 fuelPrice: Number(data.fuel_price) || 1400,
                                 vehicleValue: data.vehicle_value ? Number(data.vehicle_value) : initialProfileState.vehicleValue,

@@ -109,7 +109,7 @@ export const HistoryTab: React.FC = () => {
                     Cargá tus viajes para empezar a trackear tu rentabilidad y ver tu historial detallado.
                 </p>
                 {/* Visual context suggests a button or knowing how to proceed */}
-                <div className="text-[10px] font-black text-white/20 uppercase tracking-widest border border-white/10 rounded-full px-6 py-3">
+                <div className="text-xs font-black text-white/40 uppercase tracking-widest border border-white/10 rounded-full px-6 py-3">
                    Empezá desde la pestaña de Viajes
                 </div>
             </div>
@@ -123,7 +123,7 @@ export const HistoryTab: React.FC = () => {
                 <div className="glass-card rounded-3xl p-5 border border-white/5 bg-white/2">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                           <HistoryIcon className="w-4 h-4 text-white/20" />
+                           <HistoryIcon className="w-4 h-4 text-white/40" />
                            <h2 className="text-sm font-black uppercase tracking-widest text-white/50 mb-0">
                                 {HISTORY.sectionTitle}
                             </h2>
@@ -143,7 +143,7 @@ export const HistoryTab: React.FC = () => {
                                 </button>
                                 <button 
                                     onClick={onClearHistory}
-                                    className="px-4 py-2 rounded-xl bg-error text-white text-[10px] font-black uppercase"
+                                    className="px-4 py-2 rounded-xl bg-error text-white text-xs font-black uppercase tracking-widest"
                                 >
                                     Confirmar
                                 </button>
@@ -151,7 +151,7 @@ export const HistoryTab: React.FC = () => {
                         ) : (
                             <button 
                                 onClick={() => setIsConfirmingClear(true)}
-                                className="p-2 text-white/20 hover:text-error transition-colors"
+                                className="p-2 text-white/40 hover:text-error transition-colors"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -160,13 +160,13 @@ export const HistoryTab: React.FC = () => {
                     
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Margen Neto</p>
+                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Margen Neto</p>
                             <p className="text-2xl font-black text-primary leading-none">
                                 {formatCurrency(totalMetrics.margin)}
                             </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Viajes Totales</p>
+                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Viajes Totales</p>
                             <p className="text-2xl font-black text-starlight leading-none">
                                 {totalMetrics.count}
                             </p>
@@ -191,7 +191,7 @@ export const HistoryTab: React.FC = () => {
                                 onClick={() => !isLocked && setActiveFilter(fId)}
                                 disabled={isLocked}
                                 className={cn(
-                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border-2",
+                                    "px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shrink-0 border-2",
                                     isActive 
                                         ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(0,240,104,0.3)]" 
                                         : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:border-white/20",

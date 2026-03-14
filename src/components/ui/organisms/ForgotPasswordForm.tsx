@@ -61,7 +61,7 @@ export const ForgotPasswordForm: React.FC = () => {
                         <div 
                             role="alert" 
                             aria-live="polite" 
-                            className="w-full mb-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                            className="w-full mb-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-bold text-center animate-in shake"
                         >
                             {error}
                         </div>
@@ -124,17 +124,17 @@ export const ForgotPasswordForm: React.FC = () => {
                         {/* Validaciones de Seguridad Visuales */}
                         {password.length > 0 && (
                             <div className="flex flex-col gap-1.5 px-3 py-3 animate-in fade-in slide-in-from-top-1 duration-300 bg-white/2 rounded-2xl border border-white/5">
-                                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Tu contraseña debe tener:</p>
+                                <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Tu contraseña debe tener:</p>
                                 {PASSWORD_REQUIREMENTS.map((check) => {
                                     const met = check.test(password);
                                     return (
                                         <div key={check.id} className={cn(
-                                            "text-[11px] font-bold tracking-wide flex items-center gap-2 transition-all duration-300",
-                                            met ? 'text-primary' : 'text-white/20'
+                                            "text-xs font-bold tracking-wide flex items-center gap-2 transition-all duration-300",
+                                            met ? 'text-primary' : 'text-white/60'
                                         )}>
                                             <div className={cn(
-                                                "w-4 h-4 rounded-full flex items-center justify-center text-[10px] border transition-all duration-300",
-                                                met ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/10 text-white/20"
+                                                "w-4 h-4 rounded-full flex items-center justify-center text-xs border transition-all duration-300",
+                                                met ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/10 text-white/30"
                                             )}>
                                                 {met ? '✓' : '•'}
                                             </div>
@@ -164,7 +164,7 @@ export const ForgotPasswordForm: React.FC = () => {
                         <div 
                             role="alert" 
                             aria-live="polite" 
-                            className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                            className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-bold text-center animate-in shake"
                         >
                             {error}
                         </div>
@@ -208,7 +208,7 @@ export const ForgotPasswordForm: React.FC = () => {
                     <div 
                         role="alert" 
                         aria-live="polite" 
-                        className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                        className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-bold text-center animate-in shake"
                     >
                         {error}
                     </div>

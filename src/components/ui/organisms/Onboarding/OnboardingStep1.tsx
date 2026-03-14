@@ -79,7 +79,7 @@ export const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ vertical, onSe
                                         <span
                                             key={app}
                                             className={cn(
-                                                'px-2 py-1 rounded-md text-[10px] uppercase tracking-wider font-extrabold',
+                                                'px-2 py-1 rounded-md text-xs uppercase tracking-widest font-black',
                                                 isSelected ? 'bg-black/40 text-starlight' : 'bg-white/10 text-moon/60'
                                             )}
                                         >

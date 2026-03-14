@@ -92,17 +92,13 @@ export const TripsTab: React.FC = () => {
     return (
         <div className="pb-32 space-y-5 animate-in fade-in duration-500">
             {/* 1. HUD DE RENTABILIDAD (Sticky & Compact) */}
-            <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-md -mx-4 px-4 py-3 border-b border-white/5">
-                <ProfitabilityScore metrics={metrics} />
-            </div>
-
-            <div className="space-y-5">
-                {/* 2. RESUMEN DE HOY (Unificado y más compacto) */}
-                {tripCount > 0 && (
+            
+            {tripCount > 0 && (
                     <div className="space-y-3 px-1 animate-in slide-in-from-top-2">
+                        <h2 className="sr-only">Resumen de jornada hoy</h2>
                         <div className="flex items-center gap-2 mb-1">
                             {/* <Activity className="w-3 h-3 text-white/20" /> */}
-                            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Tu jornada hoy</span>
+                            <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Tu jornada hoy</span>
                         </div>
                         {/* Consolidamos los dos en un grupo visual */}
                         <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
@@ -113,11 +109,20 @@ export const TripsTab: React.FC = () => {
                     </div>
                 )}
 
+            
+
+            <div className="space-y-5">
+                {/* 2. RESUMEN DE HOY (Unificado y más compacto) */}
+                <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-md -mx-4 px-4 py-3 border-b border-white/5">
+                <h2 className="sr-only">Radar de Metas y Rentabilidad</h2>
+                <ProfitabilityScore metrics={metrics} />
+            </div>
+
                 {/* 3. ALERTAS CRÍTICAS */}
                 {metrics.wasHeavyTraffic && metrics.isValid && (
                     <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-4 py-3 mx-1">
-                        <AlertTriangle className="w-4 h-4 text-accent shrink-0" />
-                        <p className="text-[11px] text-starlight font-bold mb-0 leading-tight">
+                        <AlertTriangle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
+                        <p className="text-xs text-starlight font-bold mb-0 leading-tight">
                             Tráfico pesado detectado. Consumo ajustado automáticamente.
                         </p>
                     </div>
@@ -135,9 +140,9 @@ export const TripsTab: React.FC = () => {
                 <button
                     type="button"
                     onClick={resetInputs}
-                    className="w-full py-4 text-xs font-black text-white/20 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
+                    className="w-full py-4 text-xs font-black text-white/60 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
                 >
-                    <RotateCcw className="w-3 h-3" />
+                    <RotateCcw className="w-3 h-3" aria-hidden="true" />
                     Limpiar formulario
                 </button>
             </div>

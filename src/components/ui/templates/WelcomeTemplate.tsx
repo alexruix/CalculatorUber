@@ -1,9 +1,13 @@
 import React from 'react';
 import { Button } from '../atoms/Button';
-import iconLogo from '../../../assets/icon4.png';
+import iconLogo from '../../../assets/icon5.png';
 import { useAuthForm } from '../../../hooks/useAuthForm';
 
-export const WelcomeTemplate: React.FC = () => {
+interface WelcomeTemplateProps {
+    logoUrl?: string;
+}
+
+export const WelcomeTemplate: React.FC<WelcomeTemplateProps> = ({ logoUrl }) => {
     const { handleGoogleLogin, loading } = useAuthForm(() => {
         window.location.href = `${window.location.origin}/app`;
     });
@@ -22,12 +26,12 @@ export const WelcomeTemplate: React.FC = () => {
                         <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
                         {/* Contenedor del Logo (Estilo Glassmorphism Cuadrado Redondeado) */}
-                        <div className="relative w-28 h-28 bg-white/[0.03] backdrop-blur-md rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(var(--color-primary-rgb),0.15)] border border-white/10 overflow-hidden group-hover:border-primary/40 transition-colors duration-500">
+                        <div className="relative w-40 h-40 bg-white/3 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(var(--color-primary-rgb),0.15)] border border-white/10 overflow-hidden group-hover:border-primary/40 transition-colors duration-500">
                             {/* Overlay de luz interna */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
 
                             <img
-                                src={iconLogo.src}
+                                src={logoUrl || iconLogo.src}
                                 alt="Manejate Logo"
                                 className="w-full h-full object-contain animate-in zoom-in duration-700 ease-out"
                             />

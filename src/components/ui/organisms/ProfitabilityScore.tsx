@@ -1,15 +1,10 @@
 /**
- * ProfitabilityScore.tsx
+ * ProfitabilityScore.tsx - Refactored for Critical Loss Awareness
  * ─────────────────────────────────────────────────────────────
- * Componente 100% presentacional. No contiene strings de negocio.
- * Todos los textos provienen de /data/ui-strings.ts.
- *
- * Fluent 2:
- * · Semáforo de rentabilidad (Excellent / Fair / Poor / Danger)
- * · Tipografía via clases DS (@theme tokens)
- * · Touch target correctos para mobile
+ * Ahora detecta rentabilidad negativa y activa el "Modo Emergencia".
  */
 import React from 'react';
+import { AlertTriangle } from 'lucide-react'; // Icono para impacto visual
 import { cn } from '../../../lib/utils';
 import { useProfileStore } from '../../../store/useProfileStore';
 import type { TripMetrics, ProfitabilityTheme } from '../../../types/calculator.types';
@@ -22,30 +17,46 @@ interface ProfitabilityScoreProps {
 const getTheme = (status: TripMetrics['status']): ProfitabilityTheme => {
     const themes: Record<TripMetrics['status'], ProfitabilityTheme> = {
         excellent: { card: 'score-card-excellent', text: 'text-success', label: PROFITABILITY.statusLabels.excellent },
-        fair: { card: 'score-card-fair', text: 'text-warning', label: PROFITABILITY.statusLabels.fair },
-        poor: { card: 'score-card-poor', text: 'text-error', label: PROFITABILITY.statusLabels.poor },
+        fair: { card: 'score-card-fair', text: 'text-amber-200', label: PROFITABILITY.statusLabels.fair },
+        poor: { card: 'score-card-fair', text: 'text-accent', label: PROFITABILITY.statusLabels.poor },
         danger: { card: 'score-card-poor', text: 'text-error', label: PROFITABILITY.statusLabels.danger },
         neutral: { card: 'score-card-neutral', text: 'text-white/20', label: PROFITABILITY.statusLabels.neutral },
     };
     return themes[status];
 };
 
-/** Devuelve el mensaje de insight contextual según ROI y vertical */
 const getInsight = (roi: number, vertical: string | null): string => {
-    if (roi >= 1.8) {
-        return vertical === 'delivery'
-            ? PROFITABILITY.insights.excellent.delivery
-            : PROFITABILITY.insights.excellent.default;
+    // 🔴 NIVEL CRÍTICO: Pérdida real (ROI < 1)
+    if (roi < 1) {
+        return PROFITABILITY.insights.critical;
     }
-    if (roi >= 1) return PROFITABILITY.insights.fair.default;
-    return vertical === 'transport'
-        ? PROFITABILITY.insights.poor.transport
-        : PROFITABILITY.insights.poor.default;
+
+    // 🟠 NIVEL AL HORNO: Ganancia marginal (1.0 a 1.3)
+    // El conductor no pierde plata física, pero su trabajo vale poco.
+    if (roi < 1.3) {
+        return vertical === 'transport'
+            ? PROFITABILITY.insights.poor.transport
+            : PROFITABILITY.insights.poor.default;
+    }
+
+    // 🟡 NIVEL NORMAL/FAIR: Aceptable (1.3 a 1.8)
+    if (roi < 1.8) {
+        return PROFITABILITY.insights.fair.default;
+    }
+
+    // 🟢 NIVEL EXCELENTE: Alta eficiencia ( > 1.8)
+    return vertical === 'delivery'
+        ? PROFITABILITY.insights.excellent.delivery
+        : PROFITABILITY.insights.excellent.default;
 };
 
 export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics }) => {
     const { vertical } = useProfileStore();
     const theme = getTheme(metrics.status);
+
+    // 🚨 Lógica de Emergencia: ¿Estamos perdiendo plata?
+    const isNegative = metrics.isValid && metrics.netMargin < 0;
+
 
     const roiLabel = vertical === 'delivery'
         ? PROFITABILITY.roiLabel.delivery
@@ -56,87 +67,98 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
             className={cn(
                 theme.card,
                 "rounded-3xl p-6 text-center transition-all duration-500 shadow-2xl relative overflow-hidden",
-                "border-b-4 border-white/5"
+                "border-b-4 border-white/5",
+                // 🌪️ Efecto de sacudida y brillo rojo si hay pérdida
+                isNegative && "animate-in shake border-error shadow-[0_0_40px_rgba(255,68,68,0.25)] ring-2 ring-error/50"
             )}
             role="status"
-            aria-live="polite"
+            aria-live="assertive" // Subimos la prioridad de accesibilidad
         >
-            {/* HUD Status Bar */}
+            {/* HUD Status Bar - Pulsante en emergencia */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
-                <div 
-                    className={cn("h-full transition-all duration-1000", theme.text.replace('text-', 'bg-'))}
+                <div
+                    className={cn(
+                        "h-full transition-all duration-1000",
+                        theme.text.replace('text-', 'bg-'),
+                        isNegative && "animate-pulse"
+                    )}
                     style={{ width: metrics.isValid ? '100%' : '0%' }}
                 />
             </div>
 
-            {/* Status Label - High Energy Gaming Style */}
+            {/* Status Label con Icono de Alerta */}
             <div className="flex items-center justify-center gap-2 mb-2">
-                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
-                <span className={cn("text-[11px] font-black tracking-[0.3em] uppercase", theme.text)}>
-                    {theme.label}
+                {isNegative ? (
+                    <AlertTriangle className="w-4 h-4 text-error animate-bounce" />
+                ) : (
+                    <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
+                )}
+                <span className={cn("text-xs font-black tracking-[0.3em] uppercase", isNegative ? "text-error" : theme.text)}>
+                    {isNegative ? "ALERTA DE PÉRDIDA" : theme.label}
                 </span>
-                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
+                {!isNegative && <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />}
             </div>
 
-            {/* Main Metric - $/KM Telemetry */}
+            {/* Main Metric - Net Margin (Money in pocket) */}
             <div className="flex flex-col items-center justify-center py-2 relative z-10">
+                <span className={cn(
+                    "block text-[11px] font-black uppercase tracking-widest mb-1 opacity-80",
+                    theme.text
+                )}>
+                    {/* ✅ Ahora la etiqueta cambia según la realidad */}
+                    {isNegative ? "Pérdida Neta" : "Dinero en mano"}
+                </span>
                 <div className="flex items-baseline gap-1">
-                    <span 
-                        className="font-black tracking-tighter text-white leading-none"
+                    <span
+                        className={cn(
+                            "font-black tracking-tighter text-white leading-none transition-transform duration-500",
+                            isNegative && "scale-110 text-error"
+                        )}
                         style={{ fontSize: 'clamp(3.5rem, 12vw, 4.5rem)' }}
                     >
-                        {PROFITABILITY.currency}{metrics.isValid ? metrics.profitPerKm : 0}
-                    </span>
-                    <span className={cn("text-2xl font-black italic uppercase tracking-tighter opacity-80", theme.text)}>
-                        {PROFITABILITY.perKm}
+                        {/* ✅ Usamos Math.abs para mostrar el número limpio, 
+                ya que la etiqueta "Pérdida" y el color rojo dan el contexto */}
+                        ${metrics.isValid ? Math.abs(metrics.netMargin).toLocaleString('es-AR') : 0}
                     </span>
                 </div>
             </div>
 
-            {/* Secondary Metrics - Performance Readout Style */}
+            {/* Secondary Metrics - Efficiency Score & Total Cost */}
             {metrics.isValid && (
-                <div className="mt-4 grid grid-cols-2 gap-2 p-3 bg-white/5 rounded-2xl border border-white/10">
+                <div className={cn(
+                    "mt-4 grid grid-cols-2 gap-2 p-3 rounded-2xl border transition-colors duration-500",
+                    isNegative ? "bg-error/10 border-error/20" : "bg-white/5 border-white/10"
+                )}>
                     <div className="text-center border-r border-white/10 px-2">
-                        <span className="block text-[10px] font-extrabold text-white/30 uppercase tracking-widest mb-1">
-                            {PROFITABILITY.netLabel}
+                        <span className={cn(
+                            "block text-[10px] font-black uppercase tracking-widest mb-1",
+                            "text-white/60"
+                        )}>
+                            {PROFITABILITY.qualityLabel}
                         </span>
-                        <b className="text-sm font-black text-starlight">
-                            ${metrics.netMargin.toLocaleString('es-AR')}
+                        <b className={cn("text-base font-black tabular-nums", theme.text)}>
+                            {PROFITABILITY.currency}{metrics.profitPerKm}
+                            <span className="text-[10px] ml-0.5 opacity-80">{PROFITABILITY.perKm}</span>
                         </b>
                     </div>
                     <div className="text-center px-2">
-                        <span className="block text-[10px] font-extrabold text-white/30 uppercase tracking-widest mb-1">
+                        <span className="block text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">
                             {PROFITABILITY.costLabel}
                         </span>
-                        <b className="text-sm font-black text-accent shadow-[0_0_10px_var(--color-accent-dim)]">
-                            ${Math.round(metrics.totalCost).toLocaleString('es-AR')}
+                        <b className="text-base font-black text-accent/90 tabular-nums">
+                            {PROFITABILITY.currency}{Math.round(metrics.totalCost).toLocaleString('es-AR')}
                         </b>
                     </div>
                 </div>
             )}
 
-            {/* ROI & Insight - HUD Deep Dive */}
+            {/* ROI & Insight */}
             {metrics.isValid && (
-                <div className="mt-6 pt-5 border-t border-white/10 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-700">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-[2px] w-8 bg-linear-to-r from-transparent to-white/20" />
-                        <span className="text-[10px] font-extrabold tracking-[0.2em] text-white/40 uppercase">
-                            {roiLabel}
-                        </span>
-                        <div className="h-[2px] w-8 bg-linear-to-l from-transparent to-white/20" />
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                        <span className="text-3xl font-black text-white italic">
-                            {metrics.roi}
-                            <span className="text-xl ml-0.5 text-primary">x</span>
-                        </span>
-                        <span className="text-[10px] font-extrabold text-white/20 uppercase tracking-widest self-end pb-1.5">
-                            {PROFITABILITY.roiUnit}
-                        </span>
-                    </div>
-
-                    <p className="text-[13px] mt-3 px-4 leading-snug font-bold text-starlight italic tracking-tight opacity-90 text-center max-w-[280px]">
+                <div className="mt-6 pt-5 border-t border-white/10 flex flex-col items-center">
+                    <p className={cn(
+                        "text-[13px] px-4 leading-snug font-bold italic tracking-tight text-center max-w-[280px]",
+                        isNegative ? "text-error animate-pulse" : "text-starlight opacity-90"
+                    )}>
                         "{getInsight(metrics.roi, vertical)}"
                     </p>
                 </div>

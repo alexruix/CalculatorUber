@@ -2,10 +2,10 @@
   
   --text-primary: rgba(255, 255, 255, 1);
   --text-secondary: rgba(255, 255, 255, 0.90);
-  --text-tertiary: rgba(255, 255, 255, 0.70);
-  --text-quaternary: rgba(255, 255, 255, 0.50);
-  --text-placeholder: rgba(255, 255, 255, 0.35);
-  --text-disabled: rgba(255, 255, 255, 0.30);
+  --text-tertiary: rgba(255, 255, 255, 0.75);
+  --text-quaternary: rgba(255, 255, 255, 0.60);
+  --text-placeholder: rgba(255, 255, 255, 0.60);
+  --text-disabled: rgba(255, 255, 255, 0.50);
 
   --brand-navy: #355872;
   --brand-sea: #7AAACE;
@@ -75,8 +75,8 @@
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.6875rem;
-  /* 11px */
+  font-size: 0.75rem;
+  /* 12px — mínimo para badges */
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -148,8 +148,8 @@
 
 /* ── Nav label ───────────────────────────────────────────────────────────── */
 .nav-label {
-  font-size: 0.6875rem;
-  /* 11px — mínimo recomendado para uppercase */
+  font-size: 0.75rem;
+  /* 12px — mínimo recomendado para uppercase */
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -183,19 +183,19 @@
     @apply text-base font-black text-white uppercase tracking-[0.12em] leading-tight;
   }
 
-  /* Mínimo text-white/70 (~12:1) en labels ✅ */
+  /* Mínimo white/75 (~12:1) en labels ✅ */
   .label-base {
-    @apply block text-xs font-black text-white/70 uppercase tracking-[0.14em] leading-none;
+    @apply block text-xs font-black text-white/75 uppercase tracking-[0.14em] leading-none;
   }
 
-  /* text-white/50 (~7.5:1) a ≥ 12px ✅ */
+  /* white/60 (~7.5:1) a 12px ✅ */
   .label-hint {
-    @apply text-xs text-white/50 font-medium leading-relaxed;
+    @apply text-xs text-white/60 font-medium leading-relaxed;
   }
 
-  /* Sólo para información no crítica */
+  /* Sólo para información no crítica - Subido a 60% */
   .caption {
-    @apply text-xs text-white/40 font-bold uppercase tracking-widest leading-none;
+    @apply text-xs text-white/60 font-bold uppercase tracking-widest leading-none;
   }
 
 
@@ -214,11 +214,11 @@
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-transparent text-white/60 border border-white/10 hover:bg-white/[0.06] hover:text-white/80 hover:border-white/20 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] w-full px-6 py-4 text-[13px] font-black uppercase tracking-[0.12em] rounded-2xl cursor-pointer select-none transition-all duration-200 bg-transparent text-white/70 border border-white/20 hover:bg-white/[0.06] hover:text-white/90 hover:border-white/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
   .btn-icon {
-    @apply inline-flex items-center justify-center min-h-[48px] min-w-[48px] rounded-xl cursor-pointer text-white/60 hover:text-white hover:bg-white/[0.08] transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply inline-flex items-center justify-center min-h-[48px] min-w-[48px] rounded-xl cursor-pointer text-white/70 hover:text-white hover:bg-white/[0.08] transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
 
@@ -231,7 +231,7 @@
   }
 
   .input-focus {
-    @apply focus:border-info/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-info/20;
+    @apply focus:border-info/60 focus:bg-white/[0.07] focus:ring-2 focus:ring-info/50;
   }
 
   .input-error {
@@ -248,7 +248,7 @@
      ========================================================================= */
 
   .badge-neutral {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/60 border-white/10;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.1em] border transition-colors duration-200 bg-white/[0.06] text-white/75 border-white/20;
   }
 
   .badge-accent {
@@ -381,9 +381,9 @@
     box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
   }
 
-  /* Inactivo — fondo sutil, texto legible white/55 (~6:1 ✅) */
+  /* Inactivo — fondo sutil, texto legible white/70 (~7:1 ✅) */
   .filter-chip-inactive {
-    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white/[0.06] text-white/55 border border-white/10 hover:bg-white/[0.12] hover:text-white/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply inline-flex items-center justify-center min-h-[40px] px-5 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap cursor-pointer transition-all duration-200 bg-white/[0.06] text-white/70 border border-white/20 hover:bg-white/[0.12] hover:text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
 
@@ -422,11 +422,11 @@
   }
 
   .field-icon-left {
-    @apply absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 pointer-events-none;
+    @apply absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none;
   }
 
   .field-suffix {
-    @apply absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-white/35 pointer-events-none;
+    @apply absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-white/60 pointer-events-none;
   }
 
 
@@ -458,15 +458,15 @@
   }
 
   .toggle-label-off {
-    @apply text-[13px] font-black text-white/55 uppercase tracking-tight;
+    @apply text-[13px] font-black text-white/75 uppercase tracking-tight;
   }
 
   .toggle-desc-on {
-    @apply text-xs font-medium text-white/55 mt-0.5;
+    @apply text-xs font-medium text-white/70 mt-0.5;
   }
 
   .toggle-desc-off {
-    @apply text-xs font-medium text-white/35 mt-0.5;
+    @apply text-xs font-medium text-white/60 mt-0.5;
   }
 
 
@@ -494,7 +494,7 @@
   /* AUTOCONTENIDOS — no referencian .nav-label vía @apply
      Se escriben con propiedades nativas para los valores no cubiertos por utilities */
   .nav-label-active {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.18em;
@@ -503,15 +503,15 @@
     @apply text-info;
   }
 
-  /* text-white/50 (~7.5:1) ✅ */
+  /* text-white/60 (~9:1) ✅ */
   .nav-label-inactive {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.18em;
     line-height: 1;
     transition: color 300ms ease;
-    @apply text-white/50;
+    @apply text-white/75;
   }
 
   .nav-indicator {

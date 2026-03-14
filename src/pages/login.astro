@@ -2,12 +2,18 @@
 import Layout from "../layouts/Layout.astro";
 import { AuthTemplate } from "../components/ui/templates/AuthTemplate";
 import { LoginForm } from "../components/ui/organisms/LoginForm";
+import { getImage } from "astro:assets";
+import iconLogo from "../assets/icon5.png";
+
+const optimizedLogo = await getImage({ src: iconLogo, format: 'webp', width: 200, height: 200 });
 ---
 
 <Layout title="Iniciar sesión | Manejate">
+  <h1 class="sr-only">Iniciar sesión en Manejate</h1>
   <AuthTemplate
     title="Iniciar sesión"
     description="Accedé a tus métricas y retomá el control de tus ganancias."
+    logoUrl={optimizedLogo.src}
     client:only="react"
   >
     <LoginForm client:load />

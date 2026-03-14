@@ -58,11 +58,10 @@ export const ShiftCloseForm: React.FC = () => {
         <div className="card-main space-y-5">
             {/* Header */}
             <div className="text-center pb-3 border-b border-white/5">
-                <h3 className="font-black text-white uppercase tracking-widest"
-                    style={{ fontSize: 'var(--text-label)' }}>
+                <h3 className="text-xs font-black text-white uppercase tracking-widest">
                     {SHIFT_CLOSE.sectionTitle}
                 </h3>
-                <p className="text-white/40 mt-0.5" style={{ fontSize: 'var(--text-caption)' }}>
+                <p className="text-xs text-white/70 mt-0.5">
                     {SHIFT_CLOSE.sectionSubtitle}
                 </p>
             </div>
@@ -146,12 +145,12 @@ export const ShiftCloseForm: React.FC = () => {
                         className="pl-12"
                     />
                 </div>
-                <p className="mt-1 ml-1 text-white/25" style={{ fontSize: 'var(--text-micro)' }}>
+                <p className="mt-1 ml-1 text-xs text-white/60">
                     {f.extraExpenses.hint}
                 </p>
             </div>
 
-            <Button onClick={handleClear} variant="ghost" className="w-full text-white/30 hover:text-white/60">
+            <Button onClick={handleClear} variant="ghost" className="w-full text-white/60 hover:text-white/80">
                 <RotateCcw className="w-4 h-4 mr-2" />
                 {SHIFT_CLOSE.clearButton}
             </Button>

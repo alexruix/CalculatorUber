@@ -52,25 +52,27 @@ export const PROFITABILITY = {
 
   // Mensajes de insight contextual (Rioplatense auténtico)
   insights: {
-    excellent: {
-      delivery:  '¡Propina salvadora! Este viaje es oro puro.',
-      default:   'Una joyita. Meté un par más de estos y cortás temprano.',
+    critical: "¡Ojo! Este viaje no cubre tus costos operativos. Estás perdiendo plata.", // ROI < 1
+    poor: {
+        default: "Ganancia mínima detectada. Apenas cubrís los gastos y el desgaste.", // 1.0 - 1.3
+        transport: "Rendimiento bajo para pasajeros. El desgaste es mayor a la ganancia."
     },
     fair: {
-      default:   'Suma y no castiga el auto. Es por acá, seguí metiéndole.',
+        default: "Rendimiento aceptable. Vas por buen camino para tu meta." // 1.3 - 1.8
     },
-    poor: {
-      transport: 'Ojo que es un viaje trampa. Casi ni cubrís los gastos.',
-      default:   'Margen muy ajustado. Evaluá si el esfuerzo vale la pena.',
-    },
+    excellent: {
+        default: "¡Excelente rentabilidad! Estás maximizando cada kilómetro.", // > 1.8
+        delivery: "¡Ritmo de delivery nivel pro! Alta eficiencia."
+    }
   },
 
   // Labels de métricas en el card
-  netLabel:   'En mano',
-  costLabel:  'Costo',
-  roiUnit:    'ROI',
-  currency:   '$',
-  perKm:      '/KM',
+  netLabel:     'En mano',
+  costLabel:    'Costo total',
+  qualityLabel: 'Rendimiento',
+  roiUnit:      'ROI',
+  currency:     '$',
+  perKm:        '/KM',
 } as const;
 
 // ─────────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ export const TRIP_FORM = {
 
   fields: {
     fare: {
-      label:       'Tarifa cobrada',
+      label:       'Total del viaje',
       adjustMinus: 'Restar 1000',
       adjustPlus:  'Sumar 1000',
     },
@@ -105,8 +107,8 @@ export const TRIP_FORM = {
       placeholder: '0',
     },
     expenses: {
-      label:       'Peajes/Extras del viaje',
-      placeholder: '0',
+      label:       'Gastos extras del viaje',
+      placeholder: 'Peajes, etc.',
     },
   },
 

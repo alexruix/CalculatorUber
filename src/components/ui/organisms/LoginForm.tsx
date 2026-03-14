@@ -91,7 +91,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                     <div 
                         role="alert" 
                         aria-live="polite" 
-                        className="w-full mt-4 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-[11px] font-bold text-center animate-in shake"
+                        className="w-full mt-4 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-xs font-bold text-center animate-in shake"
                     >
                         {error}
                     </div>

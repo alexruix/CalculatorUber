@@ -74,7 +74,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
       <div className="flex items-center justify-between px-1 mb-2">
         <span className="label-base">Incluir en el Costo</span>
         <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-4 py-2">
-          <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">
+          <span className="text-xs font-black text-white/40 uppercase tracking-widest">
             Costo/KM
           </span>
           <span className="text-base font-black text-white">${costPerKm}</span>
@@ -141,7 +141,7 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
                 {/* Preview of cost impact when toggling */}
                 {diff !== 0 && (
                   <span
-                    className={`text-[10px] font-black uppercase tracking-tight flex items-center gap-0.5 ${isOn
+                    className={`text-xs font-black uppercase tracking-tight flex items-center gap-0.5 ${isOn
                       ? "text-success" // turning OFF → cost goes down → green
                       : "text-error" // turning ON  → cost goes up   → red
                       }`}

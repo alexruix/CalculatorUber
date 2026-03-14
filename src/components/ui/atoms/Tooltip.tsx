@@ -45,7 +45,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, className }) => {
                         'absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50',
                         'w-48 rounded-xl px-3 py-2',
                         'bg-dark-bg border border-white/10 shadow-lg',
-                        'text-[11px] font-medium text-white/80 leading-relaxed',
+                        'text-xs font-medium text-white/80 leading-relaxed',
                         'animate-in fade-in zoom-in-95 duration-150',
                     )}
                 >

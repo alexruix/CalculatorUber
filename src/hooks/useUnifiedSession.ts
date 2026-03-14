@@ -59,7 +59,7 @@ export const useUnifiedSession = () => {
 
     return {
         // Status
-        isReady: !isInitialLoading && !isFetchingProfile,
+        isReady: !isInitialLoading, // ✅ Zero-flicker: Ready apenas termina la hidratación local
         isInitialLoading,
         isConfigured,
         user,

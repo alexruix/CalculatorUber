@@ -381,6 +381,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                 return state;
             },
             partialize: (state) => ({ 
+                activeTab: state.activeTab,
                 sessionTrips: state.sessionTrips, 
                 shiftClose: state.shiftClose,
                 startingOdometer: state.startingOdometer,

@@ -44,7 +44,7 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                 transition-colors duration-200
                 /* touch target mínimo 44px via padding */
                 px-1 py-2
-                ${isActive ? 'text-info' : 'text-white/30 hover:text-white/50'}
+                ${isActive ? 'text-info' : 'text-white/65 hover:text-white/80'}
               `}
             >
               {/* Indicador superior — Fluent 2 pill */}
@@ -72,17 +72,15 @@ export const BottomTabNavigation: React.FC<BottomTabNavigationProps> = ({
                     className="absolute -top-2 -right-2.5 min-w-[16px] h-4 bg-error border border-black rounded-full flex items-center justify-center px-1"
                     aria-label={`${badgeCount} registros pendientes`}
                   >
-                    <span className="text-[10px] font-black text-white leading-none">
+                    <span className="text-xs font-black text-white leading-none">
                       {badgeCount > 99 ? '99+' : badgeCount}
                     </span>
                   </span>
                 )}
               </span>
 
-              {/* Label — visible desde 360px, oculta en pantallas muy pequeñas */}
               <span
-                className="font-black tracking-wider leading-none hidden xs:block"
-                style={{ fontSize: 'var(--text-micro)' }}
+                className="text-xs font-black tracking-wider leading-none hidden xs:block"
               >
                 {tab.label}
               </span>

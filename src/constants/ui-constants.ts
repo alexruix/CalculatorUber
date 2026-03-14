@@ -21,5 +21,5 @@ export const TEXT_OPACITY = {
   PRIMARY: 'text-white',           // 21:1 ratio
   SECONDARY: 'text-white/80',      // 12:1 ratio
   TERTIARY: 'text-white/60',       // 7.2:1 ratio
-  DISABLED: 'text-white/40',       // 4.8:1 ratio
+  DISABLED: 'text-white/70',       // Accessible contrast for secondary/disabled text
 } as const;

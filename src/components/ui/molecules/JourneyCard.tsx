@@ -173,7 +173,7 @@ export const JourneyCard = memo<{
                                 "text-2xl font-black text-primary leading-none tracking-tight truncate",
                                 "tabular-nums"
                             )}
-                            aria-label={`Ganancia neta: ${formatCurrency(journey.net)}`}
+                            aria-label={`Ganancia: ${formatCurrency(journey.net)}`}
                         >
                             {formatCurrency(journey.net)}
                         </span>
@@ -195,7 +195,7 @@ export const JourneyCard = memo<{
                         <div className="flex items-center gap-1.5">
                             <span 
                                 className={cn(
-                                    "text-[10px] font-bold uppercase tracking-wider",
+                                    "text-xs font-bold uppercase tracking-wider",
                                     TEXT_OPACITY.TERTIARY
                                 )}
                                 aria-label={`${journey.trips.length} ${journey.trips.length === 1 ? 'viaje' : 'viajes'}`}
@@ -248,7 +248,7 @@ export const JourneyCard = memo<{
                                 <p className={cn("text-sm font-black tabular-nums", TEXT_OPACITY.PRIMARY)}>
                                     {metrics.startTime} — {metrics.endTime}
                                 </p>
-                                <p className={cn("text-[10px] uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
+                                <p className={cn("text-xs uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
                                     {metrics.totalHours}hs totales
                                 </p>
                             </div>
@@ -264,7 +264,7 @@ export const JourneyCard = memo<{
                                 <p className={cn("text-sm font-black tabular-nums", productivityColor)}>
                                     {metrics.productivity}% activo
                                 </p>
-                                <p className={cn("text-[10px] uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
+                                <p className={cn("text-xs uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
                                     {metrics.activeHours}hs manejadas
                                 </p>
                             </div>

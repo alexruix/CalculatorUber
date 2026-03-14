@@ -1,207 +1,76 @@
-# Manejate - Calculadora de Rentabilidad
+# Manejate 🚀
+> "La posta de tus viajes"
 
-Sistema modular para cálculo de rentabilidad de viajes para conductores de Uber y economía gig.
-
-## 📂 Estructura de Archivos
-
-```
-src/
-├── types/
-│   └── calculator.types.ts          # Interfaces y tipos TypeScript
-│
-├── hooks/
-│   ├── useProfitability.ts          # Hook de cálculos de rentabilidad
-│   └── useSessionStorage.ts         # Hook de persistencia en localStorage
-│
-└── components/
-    └── Calculator/
-        ├── index.ts                 # Barrel export
-        ├── Calculator.tsx           # Componente principal (orquestador)
-        ├── ProfitabilityScore.tsx   # Score visual con colores (verde/amarillo/rojo)
-        ├── SessionControls.tsx      # Tráfico y precio de combustible
-        ├── TripInputForm.tsx        # Formulario de entrada de datos
-        ├── SessionSummary.tsx       # Resumen de viajes del día
-        └── ProfileSettings.tsx      # Configuración de vehículo
-```
+**Manejate** es un dashboard de carreras con inteligencia financiera diseñado específicamente para choferes de plataformas (Uber, Cabify, Rappi, etc.) en Argentina. Transforma los datos crudos de las apps en métricas de rentabilidad en tiempo real con una estética *High-energy gaming*.
 
 ---
 
-## 🚀 Uso
-
-### Importación Básica
-
-```tsx
-// Opción 1: Importar solo el componente principal
-import Calculator from './components/Calculator/Calculator';
-
-// Opción 2: Usar barrel export para importaciones múltiples
-import { Calculator, ProfitabilityScore } from './components/Calculator';
-
-// Uso
-function App() {
-  return <Calculator />;
-}
-```
-
-### Uso de Hooks Personalizados
-
-```tsx
-import { useProfitability } from './hooks/useProfitability';
-import { useSessionStorage } from './hooks/useSessionStorage';
-
-// En tu componente
-const metrics = useProfitability(
-  fare, distTrip, distPickup, kmPerLiter, 
-  maintPerKm, fuelPrice, isHeavyTraffic, expenseSettings
-);
-
-const [trips, setTrips] = useSessionStorage('key', []);
-```
+## 🛠️ Stack Tecnológico
+- **Core:** Astro 5 (SSR & Islands Architecture)
+- **UI:** React 19 + Tailwind CSS v4
+- **Componentes:** Park UI (Ark UI + Panda CSS tokens)
+- **Estado:** Zustand + Persist Middleware (Zero-Flicker Sync)
+- **Backend:** Supabase (Auth, DB, Realtime)
+- **Mobile:** PWA (Vite PWA) con soporte offline
 
 ---
 
-## 🧩 Componentes
+## 🏗️ Arquitectura: Atomic Design
+Seguimos una metodología de diseño atómico estricta para garantizar escalabilidad y consistencia:
 
-### Calculator
-**Ubicación:** `components/Calculator/Calculator.tsx`  
-**Descripción:** Componente principal que orquesta toda la aplicación.  
-**Responsabilidades:** Manejo de estado global, coordinación de sub-componentes.
-
-### ProfitabilityScore
-**Ubicación:** `components/Calculator/ProfitabilityScore.tsx`  
-**Props:** `{ metrics: TripMetrics }`  
-**Descripción:** Muestra el score visual de rentabilidad con colores dinámicos.
-
-### SessionControls
-**Ubicación:** `components/Calculator/SessionControls.tsx`  
-**Props:** `{ isHeavyTraffic, setIsHeavyTraffic, fuelPrice, setFuelPrice }`  
-**Descripción:** Controles de ajuste de jornada (tráfico y combustible).
-
-### TripInputForm
-**Ubicación:** `components/Calculator/TripInputForm.tsx`  
-**Props:** `{ fare, setFare, distTrip, setDistTrip, ... }`  
-**Descripción:** Formulario completo para entrada de datos de viaje.
-
-### SessionSummary
-**Ubicación:** `components/Calculator/SessionSummary.tsx`  
-**Props:** `{ trips, onClear }`  
-**Descripción:** Resumen agregado de viajes (ganancia, cantidad, ingresos).
-
-### ProfileSettings
-**Ubicación:** `components/Calculator/ProfileSettings.tsx`  
-**Props:** `{ vehicleName, setVehicleName, kmPerLiter, setKmPerLiter, ... }`  
-**Descripción:** Configuración de perfil de vehículo (nombre y consumo).
+- `src/components/ui/atoms`: Componentes base (Buttons, Inputs, Badges).
+- `src/components/ui/molecules`: Combinación de átomos (JourneyCard, DailyGoal).
+- `src/components/ui/organisms`: Complejidad lógica (ProfitabilityScore, TripForm).
+- `src/components/ui/templates`: Layouts de página reactivos.
+- `src/pages`: Rutas de Astro.
 
 ---
 
-## 🔧 Hooks Personalizados
-
-### useProfitability
-**Ubicación:** `hooks/useProfitability.ts`  
-**Params:** `(fare, distTrip, distPickup, kmPerLiter, maintPerKm, fuelPrice, isHeavyTraffic, expenseSettings)`  
-**Returns:** `TripMetrics`  
-**Descripción:** Calcula todas las métricas de rentabilidad con lógica de negocio completa.
-
-### useSessionStorage
-**Ubicación:** `hooks/useSessionStorage.ts`  
-**Params:** `(key: string, initialValue: SavedTrip[])`  
-**Returns:** `[SavedTrip[], Dispatch<SetStateAction<SavedTrip[]>>]`  
-**Descripción:** Persiste viajes en localStorage con sincronización automática.
+## ⚡ Funcionalidades Clave
+1. **Radar de Rentabilidad:** Algoritmo en tiempo real que calcula Ganancia Neta, $/KM y EPH (Ganancia por hora).
+2. **Psicología del Conductor:** Interfaz jerárquica que prioriza "Plata en mano" y alertas de pérdida.
+3. **Persistencia Total:** Recuperación instantánea de sesión y pestaña activa mediante hidratación local.
+4. **Modo Emergencia:** Feedback visual agresivo (shaking & glow) ante viajes con ROI negativo.
+5. **Onboarding Contextual:** Configuración detallada de costos (nafta, mantenimiento, amortización).
 
 ---
 
-## 📊 Tipos
+## 🎨 Sistema de Diseño
+- **Fuente:** Plus Jakarta Sans (400, 700, 800).
+- **Estética:** Dark Mode por defecto, neones, glassmorphism y micro-animaciones CSS.
+- **Accesibilidad:** Cumplimiento WCAG AA (fuentes min 12px, contrastes reforzados).
+- **Localización:** Formato ARS ($3.482,50), 24h (14:30) y copy en español rioplatense.
 
-### TripMetrics
-```typescript
-interface TripMetrics {
-  isValid: boolean;
-  totalCost: number;
-  netMargin: number;
-  profitPerKm: number;
-  status: 'excellent' | 'fair' | 'poor' | 'neutral';
-}
+---
+
+## 🚀 Desarrollo
+
+```bash
+# Iniciar servidor de desarrollo
+npm run dev
+
+# Construir para producción
+npm run build
+
+# Previsualización de build
+npm run preview
 ```
 
-### SavedTrip
-```typescript
-interface SavedTrip {
-  id: number;
-  fare: number;
-  margin: number;
-  timestamp: number;
-}
-```
-
-### ExpenseToggle
-```typescript
-interface ExpenseToggle {
-  id: string;
-  label: string;
-  enabled: boolean;
-}
-```
+**Variables de Entorno:**
+Requiere un archivo `.env` con las credenciales de Supabase:
+- `PUBLIC_SUPABASE_URL`
+- `PUBLIC_SUPABASE_ANON_KEY`
 
 ---
 
-## 🎨 Umbrales de Rentabilidad
-
-| Status | Ganancia/KM | Color | Label |
-|--------|-------------|-------|-------|
-| Excellent | ≥ $1000 | 🟢 Verde | EXCELENTE |
-| Fair | $850 - $999 | 🟡 Amarillo | ACEPTABLE |
-| Poor | < $850 | 🔴 Rojo | BAJA RENTABILIDAD |
-| Neutral | Sin datos | ⚪ Gris | ESPERANDO DATOS |
-
----
-
-## 🛠️ Extensibilidad
-
-### Agregar un nuevo tipo de gasto
-
-1. Actualiza `expenseSettings` en `Calculator.tsx`:
-```tsx
-const [expenseSettings] = useState<ExpenseToggle[]>([
-  { id: 'fuel', label: 'Combustible', enabled: true },
-  { id: 'maintenance', label: 'Mantenimiento', enabled: true }, // ← Nuevo
-]);
-```
-
-2. Modifica el cálculo en `useProfitability.ts`:
-```tsx
-const maintCost = expenseSettings.find(e => e.id === 'maintenance')?.enabled 
-  ? totalDist * maintPerKm 
-  : 0;
-```
-
-### Agregar un nuevo componente
-
-1. Crea el archivo en `components/Calculator/`
-2. Expórtalo en `components/Calculator/index.ts`
-3. Úsalo en `Calculator.tsx`
-
----
-
-## 📝 Notas Técnicas
-
-- **Persistencia:** Los viajes se guardan en `localStorage` con la key `nodo_session_v1`
-- **Tráfico Pesado:** Reduce la eficiencia del vehículo en un 20% (multiplica `kmPerLiter` por 0.8)
-- **Validación:** Un viaje es válido solo si tiene `fare > 0` y `distTrip > 0`
-- **Cálculos:** Todos los valores monetarios se redondean con `Math.round()`
-
----
-
-## 🔮 Próximas Mejoras
-
-- [ ] Integración con OAuth de Uber
-- [ ] Exportación de reportes (CSV/PDF)
-- [ ] Gráficos de evolución diaria
-- [ ] Múltiples perfiles de vehículos
-- [ ] Modo offline con Service Workers
-- [ ] Tests unitarios (Jest + React Testing Library)
+## 📅 RoadMap 2026
+- [x] Migración a Astro 5 & Tailwind v4
+- [x] Persistencia de Sesión Zero-Flicker
+- [ ] Integración con Mercado Pago para suscripciones Pro
+- [ ] Exportación de balances mensuales en PDF
+- [ ] Modo "Cero Datos" para ahorro de batería extremo
 
 ---
 
 ## 📄 Licencia
-
-NODO Studio © 2026
+NODO Studio © 2026 - Diseñado para quienes mueven la ciudad.

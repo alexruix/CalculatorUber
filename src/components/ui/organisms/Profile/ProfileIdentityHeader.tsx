@@ -112,7 +112,7 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
           <div className="relative z-10 mt-4 pt-4 border-t border-white/10 animate-in fade-in duration-500">
             <button
               onClick={swapVehicle}
-              className="w-full flex items-center justify-center gap-2 bg-info/10 hover:bg-info/20 border border-info/30 text-info py-3 px-4 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.15)]"
+              className="w-full flex items-center justify-center gap-2 bg-info/10 hover:bg-info/20 border border-info/30 text-info py-3 px-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.15)]"
             >
               <RefreshCw className="w-4 h-4" />
               {vertical === "transport"
@@ -121,7 +121,7 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
                   ? PROFILE_STRINGS.header.swapModeText.delivery
                   : PROFILE_STRINGS.header.swapModeText.fallback}
             </button>
-            <p className="text-[10px] text-white/30 mt-2 font-medium">
+            <p className="text-xs text-white/60 mt-2 font-medium">
               {PROFILE_STRINGS.header.swapModeHint}
             </p>
           </div>

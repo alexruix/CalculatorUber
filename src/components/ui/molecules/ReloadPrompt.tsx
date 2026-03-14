@@ -35,7 +35,7 @@ export const ReloadPrompt: React.FC = () => {
                <RefreshCw className={cn("w-5 h-5 text-primary", needRefresh && "animate-spin-slow")} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-0.5">
+              <span className="text-xs font-black text-white uppercase tracking-[0.2em] mb-0.5">
                 {needRefresh ? 'Actualización' : 'Offline Ready'}
               </span>
               <p className="text-xs font-semibold text-white/90">
@@ -60,7 +60,7 @@ export const ReloadPrompt: React.FC = () => {
             size="sm" 
             fullWidth 
             onClick={() => updateServiceWorker(true)}
-            className="h-10 text-[10px] tracking-widest uppercase font-black"
+            className="h-10 text-xs tracking-widest uppercase font-black"
           >
             Recargar la app
           </Button>

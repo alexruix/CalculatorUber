@@ -49,7 +49,7 @@ export const ProfileInsightCard: React.FC<ProfileInsightCardProps> = ({
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5">
-          <p className="text-[11px] font-black text-white/50 uppercase tracking-widest">
+          <p className="text-xs font-black text-white/50 uppercase tracking-widest">
             Tu Eficiencia
           </p>
           <span className={badge} aria-hidden="true">

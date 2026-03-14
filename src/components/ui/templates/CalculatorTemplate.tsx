@@ -48,8 +48,9 @@ const CalculatorApp: React.FC = () => {
     deleteTrip,
   } = useUnifiedSession();
 
-  const { initProfile } = useProfileStore();
-  const { initTrips } = useCalculatorStore();
+  // Stabilize store actions to prevent unnecessary re-renders
+  const initProfile = useProfileStore(s => s.initProfile);
+  const initTrips = useCalculatorStore(s => s.initTrips);
 
   const [showToast, setShowToast] = useState(false);
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
@@ -66,20 +67,19 @@ const CalculatorApp: React.FC = () => {
     });
   }, [activeTab]);
 
-  // Initialize Supabase data on mount e interceptar cambios de sesión
+  // Initialize Supabase data on mount - SILENT SYNC
   useEffect(() => {
     const checkSessionAndInit = async () => {
-      // 1. Inicializamos datos (Background sync)
-      await initProfile();
-      await initTrips();
-
-      // 2. Verificamos sesión para el guardia
+      // 1. Verificamos sesión para el guardia (Rápido)
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session && isSupabaseConfigured()) {
-        // ✅ Si no hay sesión, redirigimos a la página oficial de login
         window.location.replace('/login');
+        return;
       }
+
+      // 2. Inicializamos datos en background (No bloquea UI si ya hay data local)
+      await Promise.all([initProfile(), initTrips()]);
     };
 
     checkSessionAndInit();
@@ -91,8 +91,8 @@ const CalculatorApp: React.FC = () => {
       if (event === "SIGNED_OUT") {
         window.location.replace('/login');
       } else if (event === "SIGNED_IN") {
-        await initProfile();
-        await initTrips();
+        // Al entrar, sync total
+        await Promise.all([initProfile(), initTrips()]);
       }
     });
 
@@ -129,7 +129,7 @@ const CalculatorApp: React.FC = () => {
           <h1 className="text-2xl font-extrabold text-starlight tracking-tighter mb-0">
             Manejate
           </h1>
-          <p className="label-hint text-[10px] mb-0.5 opacity-60">La posta de tus viajes</p>
+          <p className="label-hint text-xs mb-0.5 opacity-80">La posta de tus viajes</p>
         </div>
       </header>
 

@@ -108,7 +108,7 @@ export const CardMetric: React.FC<CardMetricProps> = ({
       {/* Header: Label + Icon */}
       <div className="flex items-start justify-between mb-1">
         {label && (
-          <p className="text-[10px] text-moon uppercase font-extrabold tracking-widest">
+          <p className="text-xs text-moon uppercase font-extrabold tracking-widest">
             {label}
           </p>
         )}
@@ -136,7 +136,7 @@ export const CardMetric: React.FC<CardMetricProps> = ({
 
       {/* Sub Value / Secondary Info */}
       {subValue && (
-        <p className="text-[10px] text-moon font-bold uppercase mt-1">
+        <p className="text-xs text-moon font-bold uppercase mt-1">
           {subValue}
         </p>
       )}

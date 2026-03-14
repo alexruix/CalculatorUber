@@ -1,8 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { WelcomeTemplate } from "../components/ui/templates/WelcomeTemplate";
+import { getImage } from "astro:assets";
+import iconLogo from "../assets/icon5.png";
+
+const optimizedLogo = await getImage({ src: iconLogo, format: 'webp', width: 200, height: 200 });
 ---
 
 <Layout title="Bienvenido a Manejate | Rendimiento App">
-  <WelcomeTemplate client:only="react" />
+  <h1 class="sr-only">Manejate - La posta de tus viajes</h1>
+  <WelcomeTemplate client:only="react" logoUrl={optimizedLogo.src} />
 </Layout>

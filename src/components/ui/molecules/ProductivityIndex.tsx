@@ -34,8 +34,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
                 <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-primary" aria-hidden="true" />
                     <h3
-                        className="font-black text-white uppercase tracking-widest"
-                        style={{ fontSize: 'var(--text-micro)' }}
+                        className="text-xs font-black text-white uppercase tracking-widest"
                     >
                         {PRODUCTIVITY.title}
                     </h3>
@@ -70,7 +69,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
             </div>
 
             {/* Leyenda */}
-            <div className="flex justify-between" style={{ fontSize: 'var(--text-caption)' }}>
+            <div className="flex justify-between text-xs">
                 <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-primary shrink-0" aria-hidden="true" />
                     <span className="text-white/60 font-bold">{PRODUCTIVITY.producing(fmt(activeTime))}</span>
@@ -84,8 +83,7 @@ export const ProductivityIndex: React.FC<ProductivityIndexProps> = ({ activeTime
             {/* EPH */}
             {eph && eph > 0 ? (
                 <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <span className="text-white/30 font-black uppercase tracking-widest"
-                        style={{ fontSize: 'var(--text-micro)' }}>
+                    <span className="text-xs text-white/30 font-black uppercase tracking-widest">
                         {PRODUCTIVITY.ephLabel}
                     </span>
                     <span className="text-base font-black text-info text-glow-secondary">

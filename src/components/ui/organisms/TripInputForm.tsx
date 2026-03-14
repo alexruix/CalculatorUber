@@ -160,7 +160,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                         <Plus className="w-6 h-6 text-primary" />
                     </button>
                 </div>
-                <p className="text-[11px] text-moon font-medium ml-1">
+                <p className="text-xs text-moon font-medium ml-1">
                     💡 Copiá el monto directo de la app
                 </p>
             </div>
@@ -185,14 +185,14 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                         <div className="flex items-center justify-between bg-warning/20 border border-warning/30 rounded-xl px-4 py-2.5 animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2">
                                 <span className="text-base">📅</span>
-                                <p className="text-[11px] font-extrabold text-warning uppercase tracking-wider">
+                                <p className="text-xs font-extrabold text-warning uppercase tracking-wider">
                                     Agregar viaje del {formatDateLatam(overrideDate, 'short')}
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={onClearDateOverride}
-                                className="text-xs font-bold text-white/40 hover:text-white transition-colors p-1"
+                                className="text-xs font-bold text-white/65 hover:text-white transition-colors p-1"
                             >
                                 Cancelar
                             </button>
@@ -219,7 +219,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                             <button
                                 type="button"
                                 onClick={onOpenDateOverride}
-                                className="text-[11px] font-bold text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+                                className="text-xs font-bold text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
                             >
                                 {f.startTime.dateTrigger}
                             </button>
@@ -227,11 +227,11 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     </div>
                     {/* Hint inferior (Feedback sutil) */}
                     {/* <div className="px-1 flex justify-between items-center">
-                        <p className="text-[10px] text-moon font-medium italic">
+                        <p className="text-xs text-moon font-medium italic">
                             {f.startTime.hint}
                         </p>
                         {overrideDate && (
-                            <span className="text-[9px] font-bold text-warning/50 animate-pulse">
+                            <span className="text-xs font-bold text-warning/50 animate-pulse">
                                 MODO RETROACTIVO
                             </span>
                         )}
@@ -342,7 +342,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
 
             {/* Costos activos */}
             <div className="bg-secondary/10 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
-                <p className="text-[11px] text-starlight/70 font-medium leading-relaxed mb-0">
+                <p className="text-xs text-starlight/80 font-medium leading-relaxed mb-0">
                     {activeCostsText}
                 </p>
             </div>

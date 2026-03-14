@@ -118,7 +118,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
           <div className="flex items-end justify-between mb-3">
             {/* Today's Earnings */}
             <div>
-              <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mb-0.5">
+              <p className="text-xs font-extrabold text-moon uppercase tracking-widest mb-0.5">
                 Ganado hoy
               </p>
               <p
@@ -133,7 +133,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
 
             {/* Remaining / Goal Reached */}
             <div className="text-right">
-              <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mb-0.5">
+              <p className="text-xs font-extrabold text-moon uppercase tracking-widest mb-0.5">
                 {isReached ? '¡Meta!' : 'Faltan'}
               </p>
               <p
@@ -157,10 +157,10 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
                 'h-full transition-all duration-500',
                 isReached ? (
                   // Achievement gradient (green)
-                  'bg-gradient-to-r from-primary to-evergreen'
+                  'bg-linear-to-r from-primary to-evergreen'
                 ) : (
                   // Default gradient (purple to green)
-                  'bg-gradient-to-r from-secondary to-primary'
+                  'bg-linear-to-r from-secondary to-primary'
                 )
               )}
               style={{ width: `${progressPct}%` }}
@@ -171,7 +171,7 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
           </div>
 
           {/* Progress Percentage */}
-          <p className="text-[10px] font-extrabold text-moon uppercase tracking-widest mt-2 text-right">
+          <p className="text-xs font-extrabold text-moon uppercase tracking-widest mt-2 text-right">
             {progressPct}% completado
           </p>
         </div>
