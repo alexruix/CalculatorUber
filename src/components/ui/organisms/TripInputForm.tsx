@@ -138,7 +138,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     </button>
 
                     <div className="relative">
-                        <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-primary">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10 ">
                             <DollarSign className="w-6 h-6" />
                         </div>
                         <Input

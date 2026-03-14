@@ -6,7 +6,6 @@ import { useCalculatorStore } from "../../../store/useCalculatorStore";
 
 // UI Organisms & Templates (New Atomic Architecture)
 import { OnboardingFlow } from "../organisms/OnboardingFlow";
-import { AuthScreen } from "../organisms/AuthScreen";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 import { PartyPopper } from "../../../lib/icons";
 import { TabSkeleton } from "../molecules/TabSkeleton";
@@ -69,27 +68,37 @@ const CalculatorApp: React.FC = () => {
 
   // Initialize Supabase data on mount e interceptar cambios de sesión
   useEffect(() => {
-    const initializeApp = async () => {
+    const checkSessionAndInit = async () => {
+      // 1. Inicializamos datos (Background sync)
       await initProfile();
       await initTrips();
+
+      // 2. Verificamos sesión para el guardia
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session && isSupabaseConfigured()) {
+        // ✅ Si no hay sesión, redirigimos a la página oficial de login
+        window.location.replace('/login');
+      }
     };
-    initializeApp();
 
-    if (isSupabaseConfigured()) {
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === "SIGNED_OUT") {
-          useProfileStore.getState().setUser(null);
-        } else if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY") {
-          await initProfile();
-        }
-      });
+    checkSessionAndInit();
 
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
+    // Suscripción a cambios de auth
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === "SIGNED_OUT") {
+        window.location.replace('/login');
+      } else if (event === "SIGNED_IN") {
+        await initProfile();
+        await initTrips();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [initProfile, initTrips]);
 
   // Show motivational toast after login/init
@@ -104,16 +113,8 @@ const CalculatorApp: React.FC = () => {
   // No bloqueamos con "Sincronizando" de pantalla completa. 
   // La app se carga instantáneamente con la data local de Zustand Persist.
   
-  // Auth Gate
-  if (!user && isSupabaseConfigured()) {
-    return (
-      <AuthScreen
-        onSuccess={() => {
-          initProfile();
-          initTrips();
-        }}
-      />
-    );
+  if (isInitialLoading || !isReady) {
+    return <TabSkeleton />;
   }
 
   if (!isConfigured) {

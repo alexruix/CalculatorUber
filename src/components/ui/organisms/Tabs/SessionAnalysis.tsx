@@ -49,25 +49,26 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
   const insights = useSessionInsights(trips);
 
   // ── 1. EMPTY STATE ──────────────────────────────────────────
-  if (trips.length === 0) {
-    return (
       <div
-        className="glass-card rounded-3xl p-8 text-center border-2 border-dashed border-white/10 animate-in fade-in duration-500"
+        className="glass-card rounded-3xl p-10 text-center border-2 border-dashed border-white/10 animate-in fade-in duration-500"
         role="status"
       >
-        <div className="relative w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5">
-          <div className="absolute inset-0 bg-secondary/10 blur-xl rounded-full" />
-          <BarChart3 className="relative w-8 h-8 text-white/10" aria-hidden="true" />
+        <div className="relative w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,240,104,0.1)]">
+          <Activity className="relative w-10 h-10 text-primary animate-pulse" aria-hidden="true" />
         </div>
-        <h3 className="text-sm font-black text-white/50 uppercase tracking-widest mb-2">
-          {STATS.emptyTitle}
+        <h3 className="text-lg font-black text-white uppercase tracking-tight mb-3">
+          ¿Arrancamos la jornada?
         </h3>
-        <p className="text-xs text-white/25 font-bold uppercase tracking-wider leading-relaxed">
-          {STATS.emptyBody}
+        <p className="text-sm text-white/50 font-medium leading-relaxed mb-6">
+          Cargá tu primer viaje para ver el radar de inteligencia en acción y empezar a sumar puntos.
         </p>
+        <button
+          onClick={onClear} // In this context, it won't do much if empty, but visually it should be a button to 'Start'
+          className="w-full py-4 bg-primary text-black font-black uppercase tracking-widest rounded-2xl shadow-[0_0_20px_var(--color-primary-glow)] hover:scale-105 transition-transform"
+        >
+          Cargar mi primer viaje
+        </button>
       </div>
-    );
-  }
 
   // ── 2. PARTIAL STATE (< 3 viajes) ───────────────────────────
   if (trips.length < 3) {
@@ -130,7 +131,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
           <span className={cn(
             "text-[10px] font-black uppercase tracking-widest",
             insights.trend === 'improving' ? 'text-success' :
-            insights.trend === 'declining' ? 'text-error' : 'text-white/30'
+            insights.trend === 'declining' ? 'text-error' : 'text-white/50'
           )}>
             {insights.trend === 'improving' ? 'Tendencia en alza' :
              insights.trend === 'declining' ? 'Tendencia a la baja' : 'Tendencia estable'}
@@ -152,7 +153,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+              <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">
                 {STATS.metaLabel}
               </span>
             </div>
@@ -259,7 +260,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
         {/* Próximo logro en progreso */}
         {nextBadgeThresholds && (
           <div className="bg-white/3 rounded-2xl p-3 border border-white/5">
-            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">
+            <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">
               {STATS.badgesInProgress}
             </p>
             <div className="flex items-center gap-3">
@@ -272,7 +273,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
                     style={{ width: `${Math.round((trips.length / nextBadgeThresholds.target) * 100)}%` }}
                   />
                 </div>
-                <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-1">
+                <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest mt-1">
                   {trips.length}/{nextBadgeThresholds.target} viajes · {STATS.badgesRemaining(nextBadgeThresholds.target - trips.length)}
                 </p>
               </div>
@@ -286,7 +287,7 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
         <div className="glass-card rounded-3xl p-5 border-2 border-white/10 space-y-4">
           {optimizeTips.length > 0 && (
             <div>
-              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">
+              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-3">
                 {STATS.tipOptimize}
               </p>
               <div className="space-y-2">
@@ -361,15 +362,20 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
                     const verticalName = vp.vertical === 'transport' ? 'Transporte' : vp.vertical === 'delivery' ? 'Delivery' : vp.vertical === 'logistics' ? 'Logística' : 'Otros';
                     const medals = ['🥇', '🥈', '🥉'];
                     return (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-white/3 rounded-2xl border border-white/5">
+                      <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/10">
                         <div className="flex items-center gap-3">
-                          <span className="text-base">{medals[idx] ?? '•'}</span>
+                           <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-sm">
+                            {medals[idx] ?? '•'}
+                           </div>
                           <div>
-                            <p className="text-xs font-black text-white uppercase">{verticalName}</p>
-                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">{vp.count} viajes · {formatCurrency(vp.margin)} netos</p>
+                            <p className="text-xs font-black text-white uppercase tracking-tight">{verticalName}</p>
+                            <p className="text-[9px] text-white/50 font-bold uppercase tracking-widest">{vp.count} viajes · {formatCurrency(vp.margin)} netos</p>
                           </div>
                         </div>
-                        <p className="text-sm font-black text-success italic">{formatCurrency(vp.efficiency)}<span className="text-[9px] text-white/30 not-italic">/km</span></p>
+                        <div className="text-right">
+                            <p className="text-sm font-black text-primary italic leading-none">{formatCurrency(vp.efficiency)}</p>
+                            <p className="text-[8px] text-white/30 uppercase font-black tracking-tighter mt-1">ganancia/km</p>
+                        </div>
                       </div>
                     );
                   })}
@@ -451,7 +457,7 @@ const LevelHeader: React.FC<{
             aria-label="Progreso de nivel"
           />
         </div>
-        <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest text-right">
+        <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest text-right">
           {STATS.xpToNext(insights.pointsToNextLevel)}
         </p>
       </div>
@@ -464,26 +470,26 @@ const QuickStatsGrid: React.FC<{
 }> = ({ insights }) => (
   <div className="grid grid-cols-3 gap-3">
     {/* EPH */}
-    <div className="glass-card rounded-2xl p-4 border-2 border-secondary/20 bg-secondary/5 text-center">
-      <p className="text-[9px] font-black text-secondary/60 uppercase tracking-widest mb-1">{STATS.quickEph}</p>
-      <p className="text-xl font-black text-secondary leading-none">
+    <div className="glass-card rounded-2xl p-4 border border-white/5 bg-white/2 text-center group transition-all hover:border-secondary/30">
+      <p className="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1 group-hover:text-secondary/70 transition-colors">{STATS.quickEph}</p>
+      <p className="text-xl font-black text-white leading-none group-hover:text-secondary transition-colors">
         {insights.eph > 0 ? formatCurrency(insights.eph) : '—'}
       </p>
-      <p className="text-[8px] text-white/20 font-bold uppercase mt-1">/hr</p>
+      <p className="text-[8px] text-white/30 font-bold uppercase mt-1">/hr</p>
     </div>
     {/* Viajes */}
-    <div className="glass-card rounded-2xl p-4 border-2 border-white/10 text-center">
-      <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">{STATS.quickTrips}</p>
+    <div className="glass-card rounded-2xl p-4 border border-white/5 bg-white/2 text-center transition-all hover:border-white/20">
+      <p className="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1 transition-colors">{STATS.quickTrips}</p>
       <p className="text-xl font-black text-white leading-none">{insights.tripCount}</p>
-      <p className="text-[8px] text-white/20 font-bold uppercase mt-1">total</p>
+      <p className="text-[8px] text-white/30 font-bold uppercase mt-1">total</p>
     </div>
     {/* Puntería */}
     <div className={cn(
-      "glass-card rounded-2xl p-4 border-2 text-center",
+      "glass-card rounded-2xl p-4 border transition-all text-center",
       insights.profitableTripsPercent >= 90 ? "border-success/30 bg-success/5" :
-      insights.profitableTripsPercent >= 70 ? "border-primary/20" : "border-error/20 bg-error/5"
+      insights.profitableTripsPercent >= 70 ? "border-white/5 bg-white/2 hover:border-primary/20" : "border-error/20 bg-error/5"
     )}>
-      <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1 truncate">{STATS.quickAim}</p>
+      <p className="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1 truncate">{STATS.quickAim}</p>
       <p className={cn(
         "text-xl font-black leading-none",
         insights.profitableTripsPercent >= 90 ? "text-success" :
@@ -491,7 +497,7 @@ const QuickStatsGrid: React.FC<{
       )}>
         {insights.profitableTripsPercent}%
       </p>
-      <p className="text-[8px] text-white/20 font-bold uppercase mt-1">ok</p>
+      <p className="text-[8px] text-white/30 font-bold uppercase mt-1">ok</p>
     </div>
   </div>
 );

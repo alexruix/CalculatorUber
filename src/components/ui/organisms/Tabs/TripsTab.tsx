@@ -50,13 +50,8 @@ export const TripsTab: React.FC = () => {
     );
     const tripCount = tripsToday.length;
 
-    const totalEPH = useMemo(() => {
-        const withTime = tripsToday.filter((t: SavedTrip) => (t.duration || 0) > 0);
-        if (!withTime.length) return 0;
-        const totalNet = withTime.reduce((acc: number, t: SavedTrip) => acc + t.margin, 0);
-        const totalMins = withTime.reduce((acc: number, t: SavedTrip) => acc + (t.duration || 0), 0);
-        const hours = totalMins / 60;
-        return hours > 0 ? Math.round(totalNet / hours) : 0;
+    const totalMinsToday = useMemo(() => {
+        return tripsToday.reduce((acc: number, t: SavedTrip) => acc + (t.duration || 0), 0);
     }, [tripsToday]);
 
     const saveTrip = useCallback(() => {
@@ -111,9 +106,9 @@ export const TripsTab: React.FC = () => {
                         </div>
                         {/* Consolidamos los dos en un grupo visual */}
                         <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
-                            <QuickStatsGrid trips={tripsToday} compact />
-                            <div className="h-px bg-white/5 w-full" />
-                            <MiniSummary totalMargin={totalMargin} tripCount={tripCount} eph={totalEPH} compact />
+                            {/* <QuickStatsGrid trips={tripsToday} compact /> */}
+                            <MiniSummary totalMargin={totalMargin} tripCount={tripCount} activeMinutes={totalMinsToday} compact />
+                            {/* <div className="h-px bg-white/5 w-full" /> */}
                         </div>
                     </div>
                 )}

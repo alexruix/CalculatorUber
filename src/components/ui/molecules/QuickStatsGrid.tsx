@@ -125,7 +125,7 @@ const StatCard: React.FC<StatCardProps> = ({
                     <span className="text-[10px] ml-0.5 opacity-60 font-bold">{unit}</span>
                 )}
             </span>
-            <span className="text-[9px] font-extrabold text-white/30 uppercase tracking-[0.2em] leading-none">
+            <span className="text-[9px] font-extrabold text-white/50 uppercase tracking-[0.2em] leading-none">
                 {label}
             </span>
         </div>

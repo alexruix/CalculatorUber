@@ -14,8 +14,8 @@ import { formatCurrency } from '../../../lib/utils';
 interface MiniSummaryProps {
   totalMargin?: number;
   tripCount?: number;
-  /** Ganancia Por Hora acumulada del día (EPH) */
-  eph?: number;
+  /** Tiempo activo acumulado del día en minutos */
+  activeMinutes?: number;
   /** Versión minimalista sin fondo/bordes propios */
   compact?: boolean;
 }
@@ -23,7 +23,7 @@ interface MiniSummaryProps {
 export const MiniSummary: React.FC<MiniSummaryProps> = ({ 
   totalMargin = 0, 
   tripCount = 0, 
-  eph,
+  activeMinutes,
   compact = false
 }) => {
   // Don't render if no trips
@@ -32,7 +32,7 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
   return (
     <div className={cn(
       "grid gap-3 animate-fade-in animate-zoom-in",
-      compact ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2"
+      compact ? "grid-cols-3 lg:grid-cols-3" : "grid-cols-3"
     )}>
       {/* Ganancia Neta (Success State) */}
       <div
@@ -46,7 +46,7 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <TrendingUp className="w-3 h-3 text-primary" />
-          <span className="text-[10px] font-extrabold text-moon uppercase tracking-widest">
+          <span className="text-[10px] font-extrabold text-white/50 uppercase tracking-widest">
             Ganancia Neta
           </span>
         </div>
@@ -72,7 +72,7 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <Target className="w-3 h-3 text-secondary" />
-          <span className="text-[10px] font-extrabold text-moon uppercase tracking-widest">
+          <span className="text-[10px] font-extrabold text-white/50 uppercase tracking-widest">
             Viajes
           </span>
         </div>
@@ -86,8 +86,8 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
         </p>
       </div>
 
-      {/* EPH: Ganancia Por Hora (only if available) */}
-      {eph && eph > 0 && (
+      {/* Tiempo Activo (only if available) */}
+      {activeMinutes !== undefined && activeMinutes > 0 && (
         <div
           className={cn(
             compact ? 'col-span-1' : 'col-span-2',
@@ -100,8 +100,8 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
           {/* Header */}
           <div className="flex items-center gap-2 mb-1">
             <Clock className="w-3 h-3 text-secondary" />
-            <span className="text-[10px] font-extrabold text-moon uppercase tracking-widest">
-              EPH
+            <span className="text-[10px] font-extrabold text-white/50 uppercase tracking-widest">
+              Tiempo Activo
             </span>
           </div>
           
@@ -110,8 +110,8 @@ export const MiniSummary: React.FC<MiniSummaryProps> = ({
             "font-extrabold text-secondary leading-tight",
             compact ? "text-lg" : "text-xl"
           )}>
-            {formatCurrency(eph)}
-            <span className="text-[10px] font-bold text-moon ml-1">/hr</span>
+            {activeMinutes}
+            <span className="text-[10px] font-bold text-white/50 ml-1">min</span>
           </p>
         </div>
       )}

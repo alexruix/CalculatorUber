@@ -31,11 +31,11 @@ export const HistoryTab: React.FC = () => {
     const [expandedJourneys, setExpandedJourneys] = useState<Record<string, boolean>>({});
     const [isConfirmingClear, setIsConfirmingClear] = useState(false);
 
-    const isPro = useProfileStore((state: any) => state.isPro);
-    const dailyGoal = useProfileStore((state: any) => state.dailyGoal);
-    const trips = useCalculatorStore((state: any) => state.sessionTrips);
-    const onClearHistory = useCalculatorStore((state: any) => state.clearHistory);
-    const onDeleteTrip = useCalculatorStore((state: any) => state.deleteTrip);
+    const isPro = useProfileStore((state) => state.isPro);
+    const dailyGoal = useProfileStore((state) => state.dailyGoal);
+    const trips = useCalculatorStore((state) => state.sessionTrips);
+    const onClearHistory = useCalculatorStore((state) => state.clearSession);
+    const onDeleteTrip = useCalculatorStore((state) => state.deleteTrip);
 
     // Process and group trips
     const { groupedData, totalMetrics, filteredCount } = useMemo(() => {
@@ -99,90 +99,78 @@ export const HistoryTab: React.FC = () => {
                 role="status"
                 aria-label="No hay viajes registrados"
             >
-                <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 shadow-2xl">
-                    <HistoryIcon className="w-10 h-10 text-white/10" aria-hidden="true" />
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,240,104,0.1)]">
+                    <HistoryIcon className="w-10 h-10 text-primary animate-pulse" aria-hidden="true" />
                 </div>
-                <h2 className={cn("text-xl font-black uppercase tracking-tight mb-2", TEXT_OPACITY.PRIMARY)}>
-                    {HISTORY.emptyTitle}
+                <h2 className="text-xl font-black uppercase tracking-tight text-white mb-3">
+                    Tu garaje está vacío
                 </h2>
-                <p className={cn("text-xs uppercase tracking-widest leading-relaxed", TEXT_OPACITY.DISABLED)}>
-                    {HISTORY.emptyBody}
+                <p className="text-sm text-white/50 font-medium leading-relaxed mb-8">
+                    Cargá tus viajes para empezar a trackear tu rentabilidad y ver tu historial detallado.
                 </p>
+                {/* Visual context suggests a button or knowing how to proceed */}
+                <div className="text-[10px] font-black text-white/20 uppercase tracking-widest border border-white/10 rounded-full px-6 py-3">
+                   Empezá desde la pestaña de Viajes
+                </div>
             </div>
         );
     }
 
     return (
         <div className="pb-32 space-y-6 animate-in slide-in-from-right-4 duration-500">
-            {/* Header Summary */}
-            <div className="px-4 pt-4 space-y-4">
-                <div className="glass-card rounded-3xl p-6 border-2 border-white/10 shadow-2xl bg-white/3">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className={cn("text-xl font-black uppercase tracking-tight", TEXT_OPACITY.PRIMARY)}>
-                            {HISTORY.sectionTitle}
-                        </h2>
+            {/* Header Summary (Compacto) */}
+            <div className="px-4 pt-4">
+                <div className="glass-card rounded-3xl p-5 border border-white/5 bg-white/2">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                           <HistoryIcon className="w-4 h-4 text-white/20" />
+                           <h2 className="text-sm font-black uppercase tracking-widest text-white/50 mb-0">
+                                {HISTORY.sectionTitle}
+                            </h2>
+                        </div>
                         
                         {isConfirmingClear ? (
                             <div 
                                 className="flex items-center gap-2 animate-in zoom-in-95"
                                 role="group"
-                                aria-label="Confirmación de borrado total"
                             >
                                 <button 
                                     onClick={() => setIsConfirmingClear(false)}
-                                    className={cn(
-                                        "min-w-11 min-h-11 p-2 rounded-xl bg-white/5",
-                                        "hover:bg-white/10 transition-colors",
-                                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-                                    )}
-                                    aria-label="Cancelar borrado"
+                                    className="p-2 rounded-xl text-white/50"
+                                    aria-label="Cancelar"
                                 >
                                     <X className="w-4 h-4" aria-hidden="true" />
                                 </button>
-                                
                                 <button 
                                     onClick={onClearHistory}
-                                    className={cn(
-                                        "min-w-11 min-h-11 p-2 rounded-xl",
-                                        "bg-error text-white shadow-lg shadow-error/20",
-                                        "hover:bg-error/90 transition-colors",
-                                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error"
-                                    )}
-                                    aria-label="Confirmar: borrar todo el historial"
+                                    className="px-4 py-2 rounded-xl bg-error text-white text-[10px] font-black uppercase"
                                 >
-                                    <Check className="w-5 h-5" aria-hidden="true" />
+                                    Confirmar
                                 </button>
                             </div>
                         ) : (
                             <button 
                                 onClick={() => setIsConfirmingClear(true)}
-                                className={cn(
-                                    "min-w-11 min-h-11 p-2 rounded-xl",
-                                    "text-white/20 hover:text-error transition-colors",
-                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error/50"
-                                )}
-                                aria-label="Borrar todo el historial"
+                                className="p-2 text-white/20 hover:text-error transition-colors"
                             >
-                                <Trash2 className="w-4 h-4" aria-hidden="true" />
+                                <Trash2 className="w-4 h-4" />
                             </button>
                         )}
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
-                        <CardMetric 
-                            flat 
-                            label={HISTORY.stats.netLabel} 
-                            value={formatCurrency(totalMetrics.margin)} 
-                            subValue="En el periodo" 
-                            status="positive" 
-                        />
-                        <CardMetric 
-                            flat 
-                            label={HISTORY.stats.fareLabel} 
-                            value={formatCurrency(totalMetrics.fare)} 
-                            subValue={`${totalMetrics.count} viajes`} 
-                            status="neutral" 
-                        />
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Margen Neto</p>
+                            <p className="text-2xl font-black text-primary leading-none">
+                                {formatCurrency(totalMetrics.margin)}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Viajes Totales</p>
+                            <p className="text-2xl font-black text-starlight leading-none">
+                                {totalMetrics.count}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
