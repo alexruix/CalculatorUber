@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import type { JourneyData, JourneyMetrics } from "../../../types/calculator.types";
 import { formatCurrency, formatDateLatam } from "../../../lib/utils";
 import { TripItem } from "./TripItem";
+import { InfoRow } from "./InfoRow";
 import { cn } from "../../../lib/utils";
 import { ChevronDown, Clock, Zap, Flame, Check } from "lucide-react";
 import { 
@@ -238,39 +239,28 @@ export const JourneyCard = memo<{
                     <div className="glass-card p-4 rounded-2xl border-2 border-white/10 bg-white/3">
                         <div className="grid grid-cols-2 gap-4">
                             {/* Left: Time Range */}
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <Clock className={cn("w-4 h-4", TEXT_OPACITY.DISABLED)} aria-hidden="true" />
-                                    <span className={cn("text-xs font-bold uppercase tracking-wider", TEXT_OPACITY.TERTIARY)}>
-                                        Horario
-                                    </span>
-                                </div>
-                                <p className={cn("text-sm font-black tabular-nums", TEXT_OPACITY.PRIMARY)}>
-                                    {metrics.startTime} — {metrics.endTime}
-                                </p>
-                                <p className={cn("text-xs uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
-                                    {metrics.totalHours}hs totales
-                                </p>
-                            </div>
+                            <InfoRow
+                                label="Horario"
+                                value={`${metrics.startTime} — ${metrics.endTime}`}
+                                subValue={`${metrics.totalHours}hs totales`}
+                                icon={Clock}
+                            />
 
                             {/* Right: Productivity */}
-                            <div className="space-y-2 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                    <span className={cn("text-xs font-bold uppercase tracking-wider", TEXT_OPACITY.TERTIARY)}>
-                                        Productividad
-                                    </span>
-                                    <Zap className={cn("w-4 h-4", TEXT_OPACITY.DISABLED)} aria-hidden="true" />
-                                </div>
-                                <p className={cn("text-sm font-black tabular-nums", productivityColor)}>
-                                    {metrics.productivity}% activo
-                                </p>
-                                <p className={cn("text-xs uppercase tracking-wider", TEXT_OPACITY.DISABLED)}>
-                                    {metrics.activeHours}hs manejadas
-                                </p>
-                            </div>
+                            <InfoRow
+                                label="Productividad"
+                                value={`${metrics.productivity}% activo`}
+                                subValue={`${metrics.activeHours}hs manejadas`}
+                                icon={Zap}
+                                variant={
+                                    metrics.productivity >= PRODUCTIVITY_THRESHOLDS.HIGH ? 'success' :
+                                    metrics.productivity >= PRODUCTIVITY_THRESHOLDS.MEDIUM ? 'primary' : 'warning'
+                                }
+                                align="right"
+                            />
                         </div>
 
-                        {/* Productivity Bar (Visual continuity - Gestalt fix) */}
+                        {/* Productivity Bar (Visual continuity) */}
                         <div className="mt-4 space-y-1.5">
                             <div className="relative w-full h-2 bg-white/10 rounded-full overflow-hidden">
                                 <div 

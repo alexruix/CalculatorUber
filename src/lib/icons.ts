@@ -54,6 +54,7 @@ export {
   Rocket,
   RotateCcw,
   Settings,
+  Receipt,
   Star,
   Target,
   TimerReset,

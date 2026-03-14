@@ -27,7 +27,7 @@ const variantStyles: Record<LabelVariant, string> = {
 };
 
 const sizeStyles: Record<LabelSize, string> = {
-  xs: 'text-xs tracking-[0.2em]',      // 12px, extra wide tracking
+  xs: 'text-xs tracking-[0.1em]',      // 12px, extra wide tracking
   sm: 'text-sm tracking-widest',       // 14px, wide tracking
   md: 'text-base tracking-wide',      // 16px, normal wide
 };
@@ -69,7 +69,7 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
       >
         {children}
         {required && (
-          <span className="text-error ml-1" aria-label="required">
+          <span className="text-moon ml-1" aria-label="required">
             *
           </span>
         )}

@@ -65,72 +65,7 @@ function computeStats(trips: SavedTrip[]): QuickStats {
     };
 }
 
-// ─── StatCard ─────────────────────────────────────────────────────────────────
-
-interface StatCardProps {
-    label: string;
-    value: string;
-    unit?: string;
-    color?: 'default' | 'primary' | 'accent' | 'success' | 'streak' | 'error';
-    glow?: boolean;
-    pulse?: boolean;
-    compact?: boolean;
-    className?: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({
-    label,
-    value,
-    unit,
-    color = 'default',
-    glow = false,
-    pulse = false,
-    compact = false,
-    className,
-}) => {
-    const colorMap = {
-        default: 'text-starlight',
-        primary: 'text-primary',
-        accent:  'text-accent',
-        success: 'text-success',
-        streak:  'text-accent',
-        error:   'text-error',
-    };
-
-    const glowMap = {
-        default: '',
-        primary: 'shadow-[0_0_16px_var(--color-primary-glow)]',
-        accent:  'shadow-[0_0_16px_var(--color-accent-glow)]',
-        success: 'shadow-[0_0_14px_var(--color-success-dim)]',
-        streak:  'shadow-[0_0_20px_var(--color-accent-glow)] border-accent/40',
-        error:   'shadow-[0_0_16px_rgba(255,68,68,0.3)]',
-    };
-
-    return (
-        <div
-            className={cn(
-                'card-metric flex flex-col items-center justify-center gap-1 py-4 min-h-[80px] transition-all',
-                glow && glowMap[color],
-                pulse && 'animate-pulse-once',
-                compact && 'border-none bg-transparent shadow-none py-2 min-h-0',
-                className
-            )}
-        >
-            <span className={cn(
-                'text-xl font-black leading-none tabular-nums tracking-tight',
-                colorMap[color]
-            )}>
-                {value}
-                {unit && (
-                    <span className="text-xs ml-0.5 opacity-60 font-bold">{unit}</span>
-                )}
-            </span>
-            <span className="text-xs font-extrabold text-white/50 uppercase tracking-[0.2em] leading-none">
-                {label}
-            </span>
-        </div>
-    );
-};
+import { MetricCard, type MetricVariant } from './MetricCard';
 
 // ─── QuickStatsGrid ───────────────────────────────────────────────────────────
 
@@ -160,26 +95,26 @@ export const QuickStatsGrid = memo(({
         <div className={cn('space-y-2', className)}>
             {/* Fila principal — 3 columnas */}
             <div className="grid grid-cols-3 gap-2">
-                <StatCard
+                <MetricCard
                     label={s.trips.label}
-                    value={String(stats.trips)}
-                    color="default"
+                    value={stats.trips}
+                    variant="default"
                     pulse={pulseOnUpdate}
                     compact={compact}
                 />
-                <StatCard
+                <MetricCard
                     label={s.earned.label}
                     value={formatCurrency(stats.earned)}
-                    color={stats.earned < 0 ? 'error' : 'primary'}
+                    variant={stats.earned < 0 ? 'error' : 'primary'}
                     glow={!compact && stats.earned !== 0}
                     pulse={pulseOnUpdate}
                     compact={compact}
                 />
-                <StatCard
+                <MetricCard
                     label={s.eph.label}
                     value={formatCurrency(stats.eph)}
                     unit={s.eph.unit}
-                    color={stats.eph >= 3000 ? 'success' : (stats.eph < 0 ? 'error' : 'default')}
+                    variant={stats.eph >= 3000 ? 'success' : (stats.eph < 0 ? 'error' : 'default')}
                     pulse={pulseOnUpdate}
                     compact={compact}
                 />
@@ -187,26 +122,25 @@ export const QuickStatsGrid = memo(({
 
             {/* Fila secundaria — 2 (o 3 si hay racha) columnas */}
             <div className={cn('grid gap-2', showStreak ? 'grid-cols-3' : 'grid-cols-2')}>
-                <StatCard
+                <MetricCard
                     label={s.active.label}
-                    value={String(stats.activeMinutes)}
+                    value={stats.activeMinutes}
                     unit={s.active.unit}
-                    color="default"
+                    variant="default"
                     compact={compact}
                 />
-                <StatCard
-                    // Fallback de seguridad por si no actualizas ui-strings.ts
+                <MetricCard
                     label={(s as any).wait?.label || 'ESPERA'}
-                    value={String(stats.waitMinutes)}
+                    value={stats.waitMinutes}
                     unit={(s as any).wait?.unit || 'min'}
-                    color="default"
+                    variant="default"
                     compact={compact}
                 />
                 {showStreak && (
-                    <StatCard
+                    <MetricCard
                         label={s.streak.label}
                         value={`${stats.profitableStreak}×`}
-                        color="streak"
+                        variant="streak"
                         glow={!compact}
                         compact={compact}
                         className="animate-in zoom-in-95 duration-500"

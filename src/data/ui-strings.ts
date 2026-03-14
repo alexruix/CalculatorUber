@@ -68,6 +68,8 @@ export const PROFITABILITY = {
 
   // Labels de métricas en el card
   netLabel:     'En mano',
+  lossLabel:    'Pérdida Neta',
+  emergency:    'ALERTA DE PÉRDIDA',
   costLabel:    'Costo total',
   qualityLabel: 'Rendimiento',
   roiUnit:      'ROI',
@@ -259,8 +261,8 @@ export const HOME_SCREEN = {
   },
 
   dateOverride: {
-    title:        'Cargar viaje retroactivo',
-    warning:      'El viaje se asignará a la jornada del día seleccionado.',
+    title:        'Cargar viaje anterior',
+    warning:      'El viaje se guardará en la jornada seleccionada.',
     dateLabel:    'Fecha del viaje',
     cancelBtn:    'Cancelar',
     confirmBtn:   'Continuar',
@@ -329,3 +331,18 @@ export const STATS = {
   verticalTitle:   'POR VERTICAL',
   verticalRec:     (name: string, pct: number) => `${name} te rinde +${pct}% más. Priorizalo.`,
 } as const;
+
+// ─────────────────────────────────────────────────────────────
+// APP SHELL & TOASTS
+// ─────────────────────────────────────────────────────────────
+export const APP_SHELL = {
+  branding: {
+    name: 'Manejate',
+    tagline: 'La posta de tus viajes',
+  },
+  toasts: {
+    motivationalTitle: '¡A romperla hoy! 🚀',
+    motivationalBody: 'Ayer te ahorraste mucha plata evitando viajes trampa.',
+  }
+} as const;
+

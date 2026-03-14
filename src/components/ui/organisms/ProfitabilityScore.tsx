@@ -94,7 +94,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
                     <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />
                 )}
                 <span className={cn("text-xs font-black tracking-[0.3em] uppercase", isNegative ? "text-error" : theme.text)}>
-                    {isNegative ? "ALERTA DE PÉRDIDA" : theme.label}
+                    {isNegative ? PROFITABILITY.emergency : theme.label}
                 </span>
                 {!isNegative && <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor]", theme.text)} />}
             </div>
@@ -106,7 +106,7 @@ export const ProfitabilityScore: React.FC<ProfitabilityScoreProps> = ({ metrics 
                     theme.text
                 )}>
                     {/* ✅ Ahora la etiqueta cambia según la realidad */}
-                    {isNegative ? "Pérdida Neta" : "Dinero en mano"}
+                    {isNegative ? PROFITABILITY.lossLabel : PROFITABILITY.netLabel}
                 </span>
                 <div className="flex items-baseline gap-1">
                     <span

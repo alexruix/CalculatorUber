@@ -32,17 +32,17 @@ export const TripsTab: React.FC = () => {
         vertical,
         { kmPerLiter, maintPerKm, amortizationPerKm, fuelPrice, expenseSettings }
     );
-    
+
     const journeyDate = overrideDate ?? getTodayString();
     // ✅ FIX DE RENDIMIENTO: Memoizamos el filtrado localmente
     const tripsToday = useMemo(() => {
-    const todayDate = getTodayString();
-    return sessionTrips.filter(trip => {
-        // Si el viaje no tiene fecha grabada (legacy), la calculamos al vuelo
-        const tripJourneyDate = trip.date ?? getJourneyDate(trip.timestamp);
-        return tripJourneyDate === todayDate;
-    });
-}, [sessionTrips]);
+        const todayDate = getTodayString();
+        return sessionTrips.filter(trip => {
+            // Si el viaje no tiene fecha grabada (legacy), la calculamos al vuelo
+            const tripJourneyDate = trip.date ?? getJourneyDate(trip.timestamp);
+            return tripJourneyDate === todayDate;
+        });
+    }, [sessionTrips]);
 
     const totalMargin = useMemo(
         () => tripsToday.reduce((acc: number, t: SavedTrip) => acc + t.margin, 0),
@@ -53,6 +53,18 @@ export const TripsTab: React.FC = () => {
     const totalMinsToday = useMemo(() => {
         return tripsToday.reduce((acc: number, t: SavedTrip) => acc + (t.duration || 0), 0);
     }, [tripsToday]);
+
+    const activeCostsText = useMemo(() => {
+        const activeExpenses = (expenseSettings ?? [])
+            .filter((e) => e.enabled)
+            .map((e) => e.label.toLowerCase());
+
+        if (activeExpenses.length === 0) return 'Calculando margen bruto sin descuentos de costos.';
+        if (activeExpenses.length === 1) return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
+        const last = [...activeExpenses].pop();
+        const rest = activeExpenses.slice(0, -1);
+        return `Calculando rentabilidad basada en ${rest.join(', ')} y ${last}.`;
+    }, [expenseSettings]);
 
     const saveTrip = useCallback(() => {
         if (!metrics.isValid) return;
@@ -87,36 +99,36 @@ export const TripsTab: React.FC = () => {
     };
 
 
-    
+
 
     return (
         <div className="pb-32 space-y-5 animate-in fade-in duration-500">
             {/* 1. HUD DE RENTABILIDAD (Sticky & Compact) */}
-            
-            {tripCount > 0 && (
-                    <div className="space-y-3 px-1 animate-in slide-in-from-top-2">
-                        <h2 className="sr-only">Resumen de jornada hoy</h2>
-                        <div className="flex items-center gap-2 mb-1">
-                            {/* <Activity className="w-3 h-3 text-white/20" /> */}
-                            <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Tu jornada hoy</span>
-                        </div>
-                        {/* Consolidamos los dos en un grupo visual */}
-                        <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
-                            {/* <QuickStatsGrid trips={tripsToday} compact /> */}
-                            <MiniSummary totalMargin={totalMargin} tripCount={tripCount} activeMinutes={totalMinsToday} compact />
-                            {/* <div className="h-px bg-white/5 w-full" /> */}
-                        </div>
-                    </div>
-                )}
 
-            
+            {tripCount > 0 && (
+                <div className="space-y-3 px-1 animate-in slide-in-from-top-2">
+                    <h2 className="sr-only">Resumen de jornada hoy</h2>
+                    <div className="flex items-center gap-2 mb-1">
+                        {/* <Activity className="w-3 h-3 text-white/20" /> */}
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Tu jornada hoy</span>
+                    </div>
+                    {/* Consolidamos los dos en un grupo visual */}
+                    <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
+                        {/* <QuickStatsGrid trips={tripsToday} compact /> */}
+                        <MiniSummary totalMargin={totalMargin} tripCount={tripCount} activeMinutes={totalMinsToday} compact />
+                        {/* <div className="h-px bg-white/5 w-full" /> */}
+                    </div>
+                </div>
+            )}
+
+
 
             <div className="space-y-5">
                 {/* 2. RESUMEN DE HOY (Unificado y más compacto) */}
                 <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-md -mx-4 px-4 py-3 border-b border-white/5">
-                <h2 className="sr-only">Radar de Metas y Rentabilidad</h2>
-                <ProfitabilityScore metrics={metrics} />
-            </div>
+                    <h2 className="sr-only">Radar de Metas y Rentabilidad</h2>
+                    <ProfitabilityScore metrics={metrics} />
+                </div>
 
                 {/* 3. ALERTAS CRÍTICAS */}
                 {metrics.wasHeavyTraffic && metrics.isValid && (
@@ -140,11 +152,13 @@ export const TripsTab: React.FC = () => {
                 <button
                     type="button"
                     onClick={resetInputs}
-                    className="w-full py-4 text-xs font-black text-white/60 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
+                    className="w-full text-xs font-black text-white/60 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
                 >
                     <RotateCcw className="w-3 h-3" aria-hidden="true" />
                     Limpiar formulario
                 </button>
+
+                
             </div>
 
 

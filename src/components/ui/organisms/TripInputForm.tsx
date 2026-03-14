@@ -21,6 +21,7 @@ import {
     Minus,
     Plus,
     ChevronDown,
+    Receipt
 } from '../../../lib/icons';
 // Importamos formatDateLatam desde utilidades
 import { cn, formatDateLatam } from '../../../lib/utils';
@@ -30,6 +31,7 @@ import { Input } from '../atoms/Input';
 import { Button } from '../atoms/Button';
 import { Label } from '../atoms/Label';
 import { TRIP_FORM, HOME_SCREEN } from '../../../data/ui-strings';
+import { TimeInput } from '../molecules/TimeInput';
 
 interface TripInputFormProps {
     onSave: () => void;
@@ -110,17 +112,20 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
     return (
         <div className="space-y-6 pb-6">
             {/* Header */}
-            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-                <div className="w-1 h-8 bg-primary rounded-full shadow-[0_0_10px_var(--color-primary-glow)]" />
+            <div className="flex items-center gap-3 bg-secondary/10 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
+                {/* <div className="w-1 h-8 bg-primary/70 rounded-full" /> */}
                 <div className="flex-1">
-                    <h3 className="font-extrabold text-starlight uppercase tracking-[0.2em] text-sm mb-0.5">
+                    <h3 className="font-bold leading-relaxed text-starlight text-sm mb-0.5">
                         {TRIP_FORM.sectionTitle}
                     </h3>
-                    <p className="text-moon text-xs font-medium">
+                    <p className="text-starlight/70 leading-relaxed text-xs font-medium">
                         {TRIP_FORM.sectionSubtitle}
                     </p>
                 </div>
+
             </div>
+            {/* Costos activos */}
+
 
             {/* 1. TARIFA COBRADA */}
             <div className="space-y-3">
@@ -131,7 +136,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                 <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-stretch h-16">
                     <button
                         type="button"
-                        onClick={() => adjustValue(fare, setFare, -1000)}
+                        onClick={() => adjustValue(fare, setFare, -100)}
                         className="w-14 h-16 rounded-2xl border-2 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0"
                     >
                         <Minus className="w-6 h-6 text-error" />
@@ -139,7 +144,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
 
                     <div className="relative">
                         <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none z-10 ">
-                            <DollarSign className="w-6 h-6" />
+                            <DollarSign className="w-6 h-6 text-moon" />
                         </div>
                         <Input
                             id="field-fare"
@@ -154,14 +159,14 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
 
                     <button
                         type="button"
-                        onClick={() => adjustValue(fare, setFare, 1000)}
+                        onClick={() => adjustValue(fare, setFare, 100)}
                         className="w-14 h-16 rounded-2xl border-2 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center shrink-0"
                     >
                         <Plus className="w-6 h-6 text-primary" />
                     </button>
                 </div>
                 <p className="text-xs text-moon font-medium ml-1">
-                    💡 Copiá el monto directo de la app
+                    Copiá el monto directo de la app
                 </p>
             </div>
 
@@ -169,7 +174,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
             <div className={cn(
                 "p-4 rounded-3xl border-2 transition-all duration-500",
                 overrideDate
-                    ? "bg-warning/5 border-warning/20 shadow-[0_0_20px_rgba(234,179,8,0.05)]"
+                    ? "bg-warning/5 border-warning/40 shadow-[0_0_20px_rgba(234,179,8,0.05)]"
                     : "bg-white/5 border-white/5"
             )}>
                 {/* Header del bloque: Label + Trigger de Fecha */}
@@ -182,17 +187,17 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                 <div className="space-y-3">
                     {/* Banner Retroactivo (Solo si existe overrideDate) */}
                     {overrideDate && (
-                        <div className="flex items-center justify-between bg-warning/20 border border-warning/30 rounded-xl px-4 py-2.5 animate-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2">
                                 <span className="text-base">📅</span>
-                                <p className="text-xs font-extrabold text-warning uppercase tracking-wider">
-                                    Agregar viaje del {formatDateLatam(overrideDate, 'short')}
+                                <p className="text-xs font-bold mb-0">
+                                    Agregar viaje al {formatDateLatam(overrideDate, 'long')}
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={onClearDateOverride}
-                                className="text-xs font-bold text-white/65 hover:text-white transition-colors p-1"
+                                className="text-xs font-bold text-warning hover:text-warning/80 transition-colors p-1"
                             >
                                 Cancelar
                             </button>
@@ -201,25 +206,21 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
 
                     {/* Input de Hora con Badge Dinámico */}
                     <div className="relative group">
-                        <Input
+                        <TimeInput
                             id="field-starttime"
-                            type="time"
-                            step="60" // Evita que aparezcan los segundos en algunos navegadores
                             value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            icon={<Clock className="w-5 h-5 text-secondary" />}
-                            // Aplicamos scheme-dark para que el picker nativo sea oscuro
-                            className="h-14 font-mono text-lg tracking-wider bg-secondary/5 border-secondary/20 scheme-dark"
+                            onChange={(val) => setStartTime(val)}
+                            className="h-14 font-mono text-xl tracking-widest"
                         />
                     </div>
 
-                    <div className="flex items-end justify-between mt-1">                        
+                    <div className="flex items-end justify-end mt-1">
 
                         {!overrideDate && (
                             <button
                                 type="button"
                                 onClick={onOpenDateOverride}
-                                className="text-xs font-bold text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+                                className="text-xs font-bold text-warning hover:text-warning/80 transition-colors"
                             >
                                 {f.startTime.dateTrigger}
                             </button>
@@ -253,7 +254,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                         value={distTrip}
                         onChange={(e) => setDistTrip(e.target.value)}
                         icon={<Navigation className="w-5 h-5" />}
-                        className="h-14 font-bold text-xl text-center"
+                        className="h-14 font-bold text-xl"
                     />
                 </div>
 
@@ -269,7 +270,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
                         icon={<Timer className="w-5 h-5" />}
-                        className="h-14 font-bold text-xl text-center"
+                        className="h-14 font-bold text-xl"
                     />
                 </div>
             </div>
@@ -298,7 +299,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
             {/* 5. GASTOS EXTRAS */}
             <div className={cn(
                 'rounded-2xl border-2 transition-all duration-300',
-                showExtras ? 'bg-white/5 border-white/20' : 'bg-white/2 border-white/10'
+                showExtras ? 'bg-white/5 border-white/20' : 'bg-white/10 border-white/10'
             )}>
                 <button
                     type="button"
@@ -307,10 +308,10 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     aria-expanded={showExtras}
                 >
                     <div className="flex items-center gap-3">
-                        <MapPin className="w-5 h-5 text-moon" />
+                        <Receipt className="w-5 h-5 text-moon" />
                         <div className="text-left">
                             <p className="text-sm font-bold text-starlight">{f.expenses.label}</p>
-                            <p className="text-xs text-moon">Toca para agregar peajes</p>
+                            <p className="text-xs text-moon">Toca para agregar peajes, etc</p>
                         </div>
                     </div>
                     <ChevronDown
@@ -330,7 +331,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                             placeholder="0"
                             value={tolls}
                             onChange={(e) => setTolls(e.target.value)}
-                            icon={<MapPin className="w-5 h-5" />}
+                            icon={<Receipt className="w-5 h-5" />}
                             className="h-14 font-bold"
                         />
                         <p className="text-xs text-moon font-medium ml-1">
@@ -340,12 +341,13 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                 )}
             </div>
 
-            {/* Costos activos */}
-            <div className="bg-secondary/10 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
-                <p className="text-xs text-starlight/80 font-medium leading-relaxed mb-0">
+            <div>
+                <p className="text-xs text-center text-moon font-medium leading-relaxed mb-0">
                     {activeCostsText}
                 </p>
             </div>
+
+
 
             {/* CTA */}
             <div className="pt-6">
@@ -362,6 +364,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     {TRIP_FORM.saveButton}
                 </Button>
             </div>
+
         </div>
     );
 };

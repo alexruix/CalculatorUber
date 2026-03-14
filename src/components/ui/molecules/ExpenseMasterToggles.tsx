@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-import { Fuel, Wrench, ShieldCheck, CheckCircle2, TrendingDown, TrendingUp } from "lucide-react";
-import { Switch } from "@ark-ui/react/switch";
+import { Fuel, Wrench, ShieldCheck, Check, TrendingDown, TrendingUp } from "lucide-react";
+import { SettingsRow } from "./SettingsRow";
+import { cn } from "../../../lib/utils";
 import type { ExpenseToggle } from "../../../types/calculator.types";
 
 interface ExpenseMasterTogglesProps {
@@ -106,65 +107,36 @@ export const ExpenseMasterToggles: React.FC<ExpenseMasterTogglesProps> = ({
           const diff = previewCost - costPerKm;
 
           return (
-            <Switch.Root
+            <SettingsRow
               key={expense.id}
-              checked={isOn}
-              onCheckedChange={() => onToggle(expense.id)}
-              className={isOn ? "toggle-row-on border-info box-glow-secondary" : "toggle-row-off border-white/10"}
-            >
-              <Switch.HiddenInput />
-              <div className="flex items-center gap-3.5">
-                <Switch.Control className="sr-only">
-                  <Switch.Thumb />
-                </Switch.Control>
-                <div
-                  className={`icon-wrap-md ${isOn ? "icon-wrap-accent box-glow-secondary" : "icon-wrap-neutral"}`}
-                  aria-hidden="true"
-                >
-                  <Icon
-                    size={18}
-                    className={isOn ? "text-info text-glow-secondary" : "text-white/40"}
-                  />
+              label={label}
+              description={desc}
+              icon={<Icon size={18} />}
+              isActive={isOn}
+              onClick={() => onToggle(expense.id)}
+              variant="info"
+              action={
+                <div className="flex items-center gap-3">
+                  {/* Impact preview */}
+                  {diff !== 0 && (
+                    <span className={cn(
+                      'text-[10px] font-black uppercase tracking-tight flex items-center gap-0.5',
+                      isOn ? 'text-success' : 'text-error'
+                    )}>
+                      {isOn ? <TrendingDown size={11} /> : <TrendingUp size={11} />}
+                      ${Math.abs(diff)}
+                    </span>
+                  )}
+                  {/* Visual indicator (replacing thumb) */}
+                  <div className={cn(
+                    'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300',
+                    isOn ? 'bg-info shadow-[0_0_15px_var(--color-info-glow)]' : 'bg-white/10'
+                  )}>
+                    {isOn && <Check size={14} className="text-white" />}
+                  </div>
                 </div>
-
-                <div className="text-left">
-                  <Switch.Label className={isOn ? "toggle-label-on text-glow-secondary" : "toggle-label-off"}>
-                    {label}
-                  </Switch.Label>
-                  <p className={isOn ? "toggle-desc-on" : "toggle-desc-off"}>
-                    {desc}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {/* Preview of cost impact when toggling */}
-                {diff !== 0 && (
-                  <span
-                    className={`text-xs font-black uppercase tracking-tight flex items-center gap-0.5 ${isOn
-                      ? "text-success" // turning OFF → cost goes down → green
-                      : "text-error" // turning ON  → cost goes up   → red
-                      }`}
-                    aria-hidden="true"
-                  >
-                    {isOn ? (
-                      <TrendingDown size={11} />
-                    ) : (
-                      <TrendingUp size={11} />
-                    )}
-                    ${Math.abs(diff)}
-                  </span>
-                )}
-                <div
-                  className={
-                    isOn ? "toggle-indicator-on shadow-[0_0_15px_var(--color-info-glow)]" : "toggle-indicator-off"
-                  }
-                  aria-hidden="true"
-                >
-                  {isOn && <CheckCircle2 size={14} className="text-white" />}
-                </div>
-              </div>
-            </Switch.Root>
+              }
+            />
           );
         })}
       </fieldset>

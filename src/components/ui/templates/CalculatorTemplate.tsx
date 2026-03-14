@@ -33,6 +33,7 @@ const ProfileScreen = lazy(() =>
 // Refactored Tabs
 import { BottomTabNavigation } from "../organisms/BottomNavigation";
 import { useUnifiedSession } from "../../../hooks/useUnifiedSession";
+import { APP_SHELL } from "../../../data/ui-strings";
 
 const CalculatorApp: React.FC = () => {
   // --- 1. SESSION & PROFILE (Unified Hook Interface) ---
@@ -127,9 +128,9 @@ const CalculatorApp: React.FC = () => {
       <header className="app-header border-b border-white/5 bg-black/50 backdrop-blur-md">
         <div className="max-w-md mx-auto px-6 py-5 flex justify-between items-end">
           <h1 className="text-2xl font-extrabold text-starlight tracking-tighter mb-0">
-            Manejate
+            {APP_SHELL.branding.name}
           </h1>
-          <p className="label-hint text-xs mb-0.5 opacity-80">La posta de tus viajes</p>
+          <p className="label-hint text-xs mb-0.5 opacity-80">{APP_SHELL.branding.tagline}</p>
         </div>
       </header>
 
@@ -177,10 +178,10 @@ const CalculatorApp: React.FC = () => {
             </div>
             <div className="flex-1">
               <h4 className="text-starlight text-sm font-extrabold uppercase tracking-wider">
-                ¡A romperla hoy! 🚀
+                {APP_SHELL.toasts.motivationalTitle}
               </h4>
               <p className="text-moon text-xs mt-0.5 mb-0 leading-tight">
-                Ayer te ahorraste mucha plata evitando viajes trampa.
+                {APP_SHELL.toasts.motivationalBody}
               </p>
             </div>
           </div>
