@@ -3,16 +3,17 @@
  * Mapea los mensajes de error en inglés a mensajes amigables en español.
  */
 export const AUTH_ERRORS: Record<string, string> = {
-    "Invalid login credentials": "El correo o la contraseña son incorrectos.",
-    "User already registered": "Este correo ya está registrado.",
+    "Invalid login credentials": "Correo o contraseña incorrectos.",
+    "User not found": "Correo o contraseña incorrectos.", // Anti-enumeración
+    "User already registered": "Ya sos parte del club. Probá iniciando sesión.",
     "Email not confirmed": "Tu correo aún no ha sido confirmado. Revisa tu bandeja de entrada.",
     "Signup is disabled": "El registro de nuevos usuarios está deshabilitado temporalmente.",
-    "Password should be at least 6 characters": "La contraseña debe tener al menos 6 caracteres.",
+    "Password should be at least 8 characters": "La contraseña debe tener al menos 8 caracteres.",
     "Invalid email format": "El formato del correo electrónico no es válido.",
     "Rate limit exceeded": "Demasiados intentos. Por favor, espera un minuto antes de volver a intentarlo.",
-    "User not found": "No se encontró ningún usuario con este correo electrónico.",
-    "Email link is invalid or has expired": "El enlace de confirmación es inválido o ha expirado.",
+    "Email link is invalid or has expired": "El código es inválido o ha expirado.",
     "Database error saving new user": "Error técnico al guardar el usuario. Reintenta en unos instantes.",
+    "Failed to fetch": "Sin conexión. Revisá tu señal e intentá de nuevo.", // Error de red\
 };
 
 /**

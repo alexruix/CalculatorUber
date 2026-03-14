@@ -6,9 +6,26 @@ import { AUTH_ERRORS, translateAuthError } from '../constants/auth-errors';
 export type AuthView = 'login' | 'signup' | 'check-email' | 'forgot-password' | 'reset-password';
 
 export const PASSWORD_REQUIREMENTS = [
-    { id: 'length', label: '8 caracteres mínimos', test: (pass: string) => pass.length >= 8 },
-    { id: 'uppercase', label: 'Una mayúscula', test: (pass: string) => /[A-Z]/.test(pass) },
-    { id: 'special', label: 'Un caracter especial (!@#$%^&*)', test: (pass: string) => /[!@#$%^&*]/.test(pass) },
+    { 
+        id: 'length', 
+        label: '8 caracteres mínimos', 
+        test: (pass: string) => pass.length >= 8 
+    },
+    { 
+        id: 'uppercase', 
+        label: 'Una mayúscula', 
+        test: (pass: string) => /[A-Z]/.test(pass) 
+    },
+    { 
+        id: 'lowercase', 
+        label: 'Una minúscula', 
+        test: (pass: string) => /[a-z]/.test(pass) 
+    },
+    { 
+        id: 'number', 
+        label: 'Al menos un número', 
+        test: (pass: string) => /[0-9]/.test(pass) 
+    },
 ];
 
 export const useAuthForm = (onSuccess: () => void, initialView: AuthView = 'login') => {
@@ -21,6 +38,8 @@ export const useAuthForm = (onSuccess: () => void, initialView: AuthView = 'logi
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [isLocked, setIsLocked] = useState(false);
 
     const validateEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -60,30 +79,27 @@ const handleGoogleLogin = async (redirectTo?: string) => {
     }
 };
 
+const PASSWORD_ERROR_MSG = 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.';
+
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!validateEmail(email)) {
-            setError('Por favor, ingresá un correo válido.');
-            return;
-        }
-
-        if (password.length < 8) {
-            setError('La contraseña debe tener al menos 8 caracteres.');
-            return;
-        }
-
         if (view === 'signup') {
             if (!validateName(fullName)) {
                 setError('Ingresá un nombre válido (letras y espacios únicamente).');
                 return;
             }
             if (!validatePassword(password)) {
-                setError('La contraseña debe tener al menos 8 caracteres, una mayúscula y un caracter especial.');
+                setError(PASSWORD_ERROR_MSG);
                 return;
             }
             if (password !== confirmPassword) {
                 setError('Las contraseñas no coinciden.');
+                return;
+            }
+        } else if (view === 'login') {
+            if (password.length < 8) {
+                setError('La contraseña debe tener al menos 8 caracteres.');
                 return;
             }
         }
@@ -100,15 +116,34 @@ const handleGoogleLogin = async (redirectTo?: string) => {
             return;
         }
 
+        if (isLocked) {
+            setError('Demasiados intentos. Por favor, esperá un minuto.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
             if (view === 'login') {
                 const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
+                if (error) {
+                    setFailedAttempts(prev => {
+                        const next = prev + 1;
+                        if (next >= 5) {
+                            setIsLocked(true);
+                            setTimeout(() => {
+                                setIsLocked(false);
+                                setFailedAttempts(0);
+                            }, 60000); // 1 minuto de bloqueo local
+                        }
+                        return next;
+                    });
+                    throw error;
+                }
                 
                 if (data.session) {
+                    setFailedAttempts(0);
                     onSuccess();
                 }
             } else {
@@ -149,7 +184,11 @@ const handleGoogleLogin = async (redirectTo?: string) => {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: `${window.location.origin}/forgot-password`
             });
-            if (error) throw error;
+            // Siempre enviamos a 'check-email' para evitar enumeración de usuarios
+            if (error) {
+                // Si es un error de red real, avisamos. Si es "User not found", lo ignoramos y seguimos.
+                if (error.message.includes('fetch')) throw error;
+            }
             setView('check-email');
         } catch (err: any) {
             setError(translateAuthError(err.message));
@@ -217,48 +256,57 @@ const handleGoogleLogin = async (redirectTo?: string) => {
     };
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!validatePassword(password)) {
-        setError('La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un caracter especial.');
-        return;
-    }
+        e.preventDefault();
+        setError(null);
+        if (!validatePassword(password)) {
+            setError(PASSWORD_ERROR_MSG);
+            return;
+        }
 
-    if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden.');
-        return;
-    }
+        if (password !== confirmPassword) {
+            setError('Las contraseñas no coinciden.');
+            return;
+        }
 
-    setLoading(true);
+        setLoading(true);
 
-    try {
-        const { error: updateError } = await supabase.auth.updateUser({ password });
-        if (updateError) throw updateError;
+        try {
+            const { error: updateError } = await supabase.auth.updateUser({ password });
+            if (updateError) throw updateError;
 
-        await supabase.auth.signOut();
-        // Mandamos el parámetro success para que el LoginForm muestre el mensaje verde.
-        window.location.href = '/login?success=password-updated';
+            await supabase.auth.signOut();
+            // Mandamos el parámetro success para que el LoginForm muestre el mensaje verde.
+            window.location.href = '/login?success=password-updated';
 
-    } catch (err: any) {
-        // Traducimos el error de Supabase (ej: link expirado o misma clave anterior)
-        setError(translateAuthError(err.message));
-        setLoading(false); 
-    }
-};
+        } catch (err: any) {
+            // Traducimos el error de Supabase (ej: link expirado o misma clave anterior)
+            setError(translateAuthError(err.message));
+            setLoading(false); 
+        }
+    };
 
     const toggleView = () => {
         setView(prev => prev === 'login' ? 'signup' : 'login');
         setError(null);
     };
 
+    const canSubmit = (() => {
+        if (loading || isLocked) return false;
+        if (view === 'login') return validateEmail(email) && password.length >= 8;
+        if (view === 'signup') return validateEmail(email) && validatePassword(password) && password === confirmPassword && validateName(fullName);
+        if (view === 'forgot-password') return validateEmail(email);
+        if (view === 'reset-password') return validatePassword(password) && password === confirmPassword;
+        if (view === 'check-email') return otpCode.length === 6;
+        return false;
+    })();
+
     // Diagnostic console logs
     console.log('[useAuthForm] Rendering Hook:', { 
         view, 
         email, 
-        passwordLen: password.length, 
-        confirmPasswordLen: confirmPassword.length,
-        isPasswordValid: validatePassword(password),
-        arePasswordsMatching: password === confirmPassword
+        canSubmit,
+        failedAttempts,
+        isLocked
     });
 
     return {
@@ -287,6 +335,8 @@ const handleGoogleLogin = async (redirectTo?: string) => {
         showPassword,
         setShowPassword,
         validatePassword,
-        validateName
+        validateName,
+        canSubmit,
+        isLocked
     };
 };

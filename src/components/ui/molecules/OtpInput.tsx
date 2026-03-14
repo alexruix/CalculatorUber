@@ -30,10 +30,22 @@ export const OtpInput: React.FC<OtpInputProps> = ({
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const val = e.target.value;
-        const lastChar = val.slice(-1);
+        const val = e.target.value.trim();
+        
+        // Handle auto-fill or multi-digit paste
+        if (val.length > 1) {
+            const digits = val.match(/\d/g)?.join('').slice(0, length) || '';
+            if (digits) {
+                onChange(digits);
+                const focusIndex = Math.min(digits.length, length - 1);
+                setActiveInput(focusIndex);
+                inputRefs.current[focusIndex]?.focus();
+            }
+            return;
+        }
 
-        if (!/^\d*$/.test(lastChar)) return; // Only allow digits
+        const lastChar = val.slice(-1);
+        if (lastChar && !/^\d$/.test(lastChar)) return; // Only allow digits
 
         if (lastChar !== '') {
             updateCodeAt(index, lastChar);
@@ -112,6 +124,7 @@ export const OtpInput: React.FC<OtpInputProps> = ({
                         ref={(el) => { inputRefs.current[index] = el; }}
                         type="text"
                         inputMode="numeric"
+                        name="otp"
                         autoComplete="one-time-code"
                         maxLength={2} // Allows catching quick keystrokes
                         value={char === ' ' ? '' : char}

@@ -36,10 +36,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     // We bind directly to the existing hook functionality
     const {
         email, setEmail, password, setPassword,
-        loading, error, handleAuth, handleGoogleLogin
+        loading, error, handleAuth, handleGoogleLogin, canSubmit, isLocked
     } = useAuthForm(handleLoginSuccess, 'login');
 
-    const isFormValid = email.length > 0 && password.length > 5 && !loading;
+
 
     return (
         <form onSubmit={handleAuth} className="w-full flex justify-center">
@@ -71,12 +71,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                         label="Contraseña"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
+                        placeholder="********"
                         icon={<Lock className="w-5 h-5" />}
                         required
                         isPassword
-                        minLength={6}
-                        disabled={loading || loginSuccess}
+                        minLength={8}
+                        disabled={loading || loginSuccess || isLocked}
                         error={error?.toLowerCase().includes('contraseña') ? error : undefined}
                     />
 
@@ -88,17 +88,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                 </div>
 
                 {error && !error.toLowerCase().includes('email') && !error.toLowerCase().includes('contraseña') && (
-                    <div className="w-full mt-4 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-xs font-medium text-center animate-in shake">
+                    <div 
+                        role="alert" 
+                        aria-live="polite" 
+                        className="w-full mt-4 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-[11px] font-bold text-center animate-in shake"
+                    >
                         {error}
                     </div>
                 )}
 
                 <Button
                     type="submit"
-                    variant={loginSuccess ? "neon" : (isFormValid ? "neon" : "secondary-dark")}
+                    variant={loginSuccess ? "neon" : (canSubmit ? "neon" : "secondary-dark")}
                     size="lg"
                     fullWidth
-                    disabled={!isFormValid || loading || loginSuccess}
+                    disabled={!canSubmit && !loginSuccess}
                     className={cn(
                         "mt-8 transition-all duration-500 gap-2 h-14",
                         loginSuccess && "bg-primary text-black scale-105 shadow-[0_0_30px_var(--color-primary-glow)]"

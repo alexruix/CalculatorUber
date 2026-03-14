@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Mail, ArrowRight, CheckCircle2, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { cn } from '../../../lib/utils';
 import { FormField } from '../molecules/FormField';
 import { Button } from '../atoms/Button';
 import { OtpInput } from '../molecules/OtpInput';
-import { useAuthForm } from '../../../hooks/useAuthForm';
+import { useAuthForm, PASSWORD_REQUIREMENTS } from '../../../hooks/useAuthForm';
 
 export const ForgotPasswordForm: React.FC = () => {
     // Reusing the state and functions from our custom hook
@@ -14,7 +15,7 @@ export const ForgotPasswordForm: React.FC = () => {
         otpCode, setOtpCode,
         loading, error, handleResetPassword, handleVerifyOtp, handleUpdatePassword,
         handleResendOtp,
-        view
+        view, canSubmit
     } = useAuthForm(() => {
         window.location.href = '/app';
     }, 'forgot-password');
@@ -36,9 +37,7 @@ export const ForgotPasswordForm: React.FC = () => {
         }
     };
 
-    const isEmailValid = email.length > 0;
-    const isOtpValid = otpCode.length === 6;
-    const isPasswordValid = password.length > 5 && password === confirmPassword;
+
 
     if (view === 'check-email') {
         return (
@@ -59,7 +58,11 @@ export const ForgotPasswordForm: React.FC = () => {
                     </div>
 
                     {error && (
-                        <div className="w-full mb-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                        <div 
+                            role="alert" 
+                            aria-live="polite" 
+                            className="w-full mb-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                        >
                             {error}
                         </div>
                     )}
@@ -67,10 +70,10 @@ export const ForgotPasswordForm: React.FC = () => {
                     <Button
                         type="button"
                         onClick={() => handleVerifyOtp('recovery')}
-                        variant={isOtpValid ? "neon" : "secondary-dark"}
+                        variant={canSubmit ? "neon" : "secondary-dark"}
                         size="lg"
                         fullWidth
-                        disabled={!isOtpValid || loading}
+                        disabled={!canSubmit}
                         className="transition-colors duration-300 gap-2 h-14"
                     >
                         {loading ? 'Verificando...' : 'Confirmar código'}
@@ -114,9 +117,33 @@ export const ForgotPasswordForm: React.FC = () => {
                             icon={<Lock className="w-5 h-5" />}
                             required
                             isPassword
-                            minLength={6}
+                            minLength={8}
                             error={error?.toLowerCase().includes('contraseña') && !error.toLowerCase().includes('coinciden') ? error : undefined}
                         />
+
+                        {/* Validaciones de Seguridad Visuales */}
+                        {password.length > 0 && (
+                            <div className="flex flex-col gap-1.5 px-3 py-3 animate-in fade-in slide-in-from-top-1 duration-300 bg-white/2 rounded-2xl border border-white/5">
+                                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Tu contraseña debe tener:</p>
+                                {PASSWORD_REQUIREMENTS.map((check) => {
+                                    const met = check.test(password);
+                                    return (
+                                        <div key={check.id} className={cn(
+                                            "text-[11px] font-bold tracking-wide flex items-center gap-2 transition-all duration-300",
+                                            met ? 'text-primary' : 'text-white/20'
+                                        )}>
+                                            <div className={cn(
+                                                "w-4 h-4 rounded-full flex items-center justify-center text-[10px] border transition-all duration-300",
+                                                met ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/10 text-white/20"
+                                            )}>
+                                                {met ? '✓' : '•'}
+                                            </div>
+                                            {check.label}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         <FormField
                             id="confirmPassword"
@@ -128,23 +155,27 @@ export const ForgotPasswordForm: React.FC = () => {
                             icon={<Lock className="w-5 h-5" />}
                             required
                             isPassword
-                            minLength={6}
-                            error={error?.toLowerCase().includes('coinciden') || confirmPassword && password !== confirmPassword ? "Las contraseñas no coinciden" : undefined}
+                            minLength={8}
+                            error={confirmPassword.length >= password.length && confirmPassword !== password ? "Las contraseñas no coinciden" : undefined}
                         />
                     </div>
 
                     {error && !error.toLowerCase().includes('contraseña') && !error.toLowerCase().includes('coinciden') && (
-                        <div className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                        <div 
+                            role="alert" 
+                            aria-live="polite" 
+                            className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                        >
                             {error}
                         </div>
                     )}
 
                     <Button
                         type="submit"
-                        variant={isPasswordValid ? "neon" : "secondary-dark"}
+                        variant={canSubmit ? "neon" : "secondary-dark"}
                         size="lg"
                         fullWidth
-                        disabled={!isPasswordValid || loading}
+                        disabled={!canSubmit}
                         className="mt-8 transition-colors duration-300 gap-2 h-14"
                     >
                         {loading ? 'Procesando...' : 'Actualizar y entrar'}
@@ -174,20 +205,24 @@ export const ForgotPasswordForm: React.FC = () => {
                 </div>
 
                 {error && !error.toLowerCase().includes('email') && (
-                    <div className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                    <div 
+                        role="alert" 
+                        aria-live="polite" 
+                        className="w-full mt-6 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                    >
                         {error}
                     </div>
                 )}
 
                 <Button
                     type="submit"
-                    variant={isEmailValid ? "neon" : "secondary-dark"}
+                    variant={canSubmit ? "neon" : "secondary-dark"}
                     size="lg"
                     fullWidth
-                    disabled={!isEmailValid || loading}
+                    disabled={!canSubmit}
                     className="mt-8 transition-colors duration-300 gap-2 h-14"
                 >
-                    {loading ? 'Procesando...' : 'Recuperar'}
+                    {loading ? 'Procesando...' : 'Enviar código'}
                     {!loading && <ArrowRight className="w-5 h-5" />}
                 </Button>
 

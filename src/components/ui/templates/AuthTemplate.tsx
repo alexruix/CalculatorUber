@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import iconLogo from '../../../assets/icon4.png';
 
 interface AuthTemplateProps {
     title: string;
@@ -29,8 +30,26 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({ title, description, 
 
                 {/* Hero Section */}
                 <div className="flex flex-col items-center text-center mb-10 w-full animate-in slide-in-from-bottom-4 fade-in duration-500">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.15)] mb-6">
-                        <span className="text-black font-extrabold text-xl tracking-tighter">M</span>
+                    <div className="relative group">
+                        {/* Glow de fondo con el color de la marca */}
+                        <div className="bg-primary/20 blur-3xl rounded-full scale-150 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+
+                        {/* Contenedor del Logo (Estilo Glassmorphism Cuadrado Redondeado) */}
+                        <div className="relative mb-4 w-28 h-28 bg-white/[0.03] backdrop-blur-md rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(var(--color-primary-rgb),0.15)] border border-white/10 overflow-hidden group-hover:border-primary/40 transition-colors duration-500">
+                            {/* Overlay de luz interna */}
+                            {/* <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" /> */}
+
+                            <img
+                                src={iconLogo.src}
+                                alt="Manejate Logo"
+                                className="w-full h-full object-contain animate-in zoom-in duration-700 ease-out"
+                            />
+                        </div>
+
+                        {/* Badge sutil de versión o "beta" (Opcional, le da un look más pro) */}
+                        {/* <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-secondary px-3 py-0.5 rounded-full shadow-[0_0_15px_var(--color-primary-glow)]">
+                            <span className="text-xs font-black uppercase tracking-tighter text-black">V1.0</span>
+                        </div> */}
                     </div>
 
                     <h1 className="text-3xl font-extrabold leading-tight tracking-tight mb-3">

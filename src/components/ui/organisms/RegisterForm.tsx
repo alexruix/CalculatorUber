@@ -19,15 +19,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         confirmPassword, setConfirmPassword,
         otpCode, setOtpCode,
         loading, error, setError, handleAuth, handleVerifyOtp, handleResendOtp,
-        validatePassword, validateName
+        validatePassword, validateName, canSubmit, isLocked
     } = useAuthForm(onSuccess || (() => window.location.href = '/app'), 'signup');
 
     // Debug logs para detectar reactividad
     useEffect(() => {
-        console.log('[RegisterForm] State Updated:', { 
-            fullName, 
-            email, 
-            password: '***', 
+        console.log('[RegisterForm] State Updated:', {
+            fullName,
+            email,
+            password: '***',
             confirmPassword: '***',
             isNameValid: validateName(fullName),
             isEmailValid: email.includes('@'),
@@ -60,24 +60,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         }
     };
 
-    const isFormValid = useMemo(() => {
-        const nameOk = validateName(fullName);
-        const passOk = validatePassword(password);
-        const matchOk = password === confirmPassword;
-        const emailOk = email.length > 0 && email.includes('@');
-        
-        const valid = nameOk && passOk && matchOk && emailOk && !loading;
-        
-        console.log('[RegisterForm] isFormValid Check:', { 
-            nameOk, passOk, matchOk, emailOk, loading, 
-            finalResult: valid 
-        });
-        
-        return valid;
-    }, [fullName, email, password, confirmPassword, loading, validateName, validatePassword]);
+
 
     if (view === 'check-email') {
-        const isOtpValid = otpCode.length === 6;
         return (
             <div className="w-full flex justify-center mt-4 animate-in fade-in zoom-in-95 duration-300">
                 <div className="w-full max-w-sm flex flex-col items-center">
@@ -97,7 +82,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                     </div>
 
                     {error && (
-                        <div className="w-full mb-6 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-xs font-medium text-center animate-in shake">
+                        <div
+                            role="alert"
+                            aria-live="polite"
+                            className="w-full mb-6 p-3 rounded-2xl bg-error/10 border border-error/20 text-error text-[11px] font-bold text-center animate-in shake"
+                        >
                             {error}
                         </div>
                     )}
@@ -105,34 +94,33 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                     <Button
                         type="button" // Cambiar a submit si se envuelve en un <form> propio
                         onClick={() => handleVerifyOtp('signup')}
-                        variant={isOtpValid ? "neon" : "secondary-dark"}
+                        variant={canSubmit ? "neon" : "secondary-dark"}
                         size="lg"
                         fullWidth
-                        disabled={!isOtpValid || loading}
+                        disabled={!canSubmit}
                         className="transition-colors duration-300 gap-2 h-14"
                     >
                         {loading ? 'Verificando...' : 'Confirmar cuenta'}
                         {!loading && <ChevronRight className="w-5 h-5" />}
                     </Button>
 
-                    <div className="mt-6 flex flex-col items-center justify-center w-full gap-2">
+                    <div className="mt-8 flex flex-col items-center gap-4">
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            disabled={countdown > 0 || loading}
+                            disabled={countdown > 0}
                             onClick={handleResend}
-                            className="text-starlight hover:text-white transition-colors"
+                            className="text-white/60 hover:text-white transition-colors underline underline-offset-4"
                         >
-                            {countdown > 0 ? `Reenviar código en ${countdown}s` : 'Volver a enviar el código'}
+                            {countdown > 0 ? `Reenviar código en ${countdown}s` : '¿No te llegó? Reenviar código'}
                         </Button>
 
-                        {/* ✅ Mejora UX: Salida de emergencia si el usuario se equivocó de email */}
                         <button
                             onClick={() => window.location.reload()}
-                            className="text-[10px] text-white/30 hover:text-white transition-colors uppercase tracking-widest mt-2"
+                            className="text-[11px] text-white/50 hover:text-primary transition-colors font-bold uppercase tracking-widest"
                         >
-                            Usar otro correo
+                            ← Corregir correo electrónico
                         </button>
                     </div>
                 </div>
@@ -219,25 +207,29 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                         minLength={8}
                         error={
                             // Lógica Mersiva/Permisiva: Solo mostrar error si ya escribió el mismo largo o más
-                            confirmPassword.length >= password.length && confirmPassword !== password 
-                                ? "Las contraseñas no coinciden" 
+                            confirmPassword.length >= password.length && confirmPassword !== password
+                                ? "Las contraseñas no coinciden"
                                 : undefined
                         }
                     />
                 </div>
 
                 {error && !error.toLowerCase().includes('email') && !error.toLowerCase().includes('contraseña') && !error.toLowerCase().includes('coinciden') && (
-                    <div className="w-full mt-4 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-xs font-medium text-center">
+                    <div
+                        role="alert"
+                        aria-live="polite"
+                        className="w-full mt-4 p-3 rounded-2xl bg-error-bg border border-error-border text-error text-[11px] font-bold text-center animate-in shake"
+                    >
                         {error}
                     </div>
                 )}
 
                 <Button
                     type="submit"
-                    variant={isFormValid ? "neon" : "secondary-dark"}
+                    variant={canSubmit ? "neon" : "secondary-dark"}
                     size="lg"
                     fullWidth
-                    disabled={!isFormValid || loading}
+                    disabled={!canSubmit}
                     className="mt-8 transition-colors duration-300 gap-2 h-14"
                 >
                     {loading ? 'Procesando...' : 'Crear cuenta'}
