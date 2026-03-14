@@ -12,11 +12,11 @@ import { cn } from '../../../lib/utils';
 export type InputVariant = 'default' | 'error' | 'success';
 export type InputSize = 'sm' | 'md' | 'lg';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: InputVariant;
   size?: InputSize;
   icon?: React.ReactNode;      // Left icon
-  suffix?: React.ReactNode;     // Right content (e.g., "XP")
+  suffix?: React.ReactNode;     // Right content (e.g., "XP", interactive icons)
   fullWidth?: boolean;
 }
 
@@ -104,9 +104,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
 
-        {/* Right Suffix (e.g., "XP", icons) */}
+        {/* Right Suffix (e.g., "XP", interactive icons) */}
         {hasSuffix && (
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-primary font-extrabold text-sm uppercase tracking-widest pointer-events-none">
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-primary font-extrabold text-sm uppercase tracking-widest flex items-center justify-center z-20">
             {suffix}
           </div>
         )}

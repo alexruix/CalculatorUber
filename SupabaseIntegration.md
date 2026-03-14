@@ -169,10 +169,14 @@ BEGIN
     -- Extrae 'full_name' (Registro manual), o 'name' (Google OAuth), o corta el email como plan de contingencia absoluto
     COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
     new.raw_user_meta_data->>'avatar_url'
-  );
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    display_name = EXCLUDED.display_name,
+    avatar_url = EXCLUDED.avatar_url;
   RETURN new;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- 2. Conectar el Trigger en Supabase internal Auth
 drop trigger if exists on_auth_user_created on auth.users;

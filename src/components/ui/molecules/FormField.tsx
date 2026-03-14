@@ -19,32 +19,30 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
                 <Label htmlFor={id} variant={error ? 'primary' : 'default'} className={error ? 'text-error' : ''}>
                     {label}
                 </Label>
-                <div className="relative">
-                    <Input
-                        id={id}
-                        ref={ref}
-                        type={resolvedType}
-                        variant={error ? 'error' : 'default'}
-                        aria-invalid={!!error}
-                        aria-describedby={error ? `${id}-error` : undefined}
-                        className={isPassword ? 'pr-12' : ''}
-                        {...props}
-                    />
-                    {isPassword && (
+                <Input
+                    id={id}
+                    ref={ref}
+                    type={resolvedType}
+                    variant={error ? 'error' : 'default'}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? `${id}-error` : undefined}
+                    suffix={isPassword ? (
                         <button
                             type="button"
                             onClick={(e) => {
+                                console.log('[FormField] Eye clicked. ID:', id);
                                 e.preventDefault();
                                 e.stopPropagation();
                                 setShowPassword(prev => !prev);
                             }}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-white/20 hover:text-white transition-colors focus:outline-none z-10"
+                            className="p-1.5 text-white/20 hover:text-white transition-colors focus:outline-none z-10"
                             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                         >
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
-                    )}
-                </div>
+                    ) : props.suffix}
+                    {...props}
+                />
                 {error && (
                     <p id={`${id}-error`} className="text-xs text-error mt-1" role="alert">
                         {error}

@@ -5,6 +5,12 @@ import { AUTH_ERRORS, translateAuthError } from '../constants/auth-errors';
 
 export type AuthView = 'login' | 'signup' | 'check-email' | 'forgot-password' | 'reset-password';
 
+export const PASSWORD_REQUIREMENTS = [
+    { id: 'length', label: '8 caracteres mínimos', test: (pass: string) => pass.length >= 8 },
+    { id: 'uppercase', label: 'Una mayúscula', test: (pass: string) => /[A-Z]/.test(pass) },
+    { id: 'special', label: 'Un caracter especial (!@#$%^&*)', test: (pass: string) => /[!@#$%^&*]/.test(pass) },
+];
+
 export const useAuthForm = (onSuccess: () => void, initialView: AuthView = 'login') => {
     const [view, setView] = useState<AuthView>(initialView);
     const [fullName, setFullName] = useState('');
@@ -20,11 +26,8 @@ export const useAuthForm = (onSuccess: () => void, initialView: AuthView = 'logi
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
-    const MIN_PASSWORD_LENGTH = 8;
     const validatePassword = (pass: string) => {
-        // 8 caracteres, al menos una mayúscula y un carácter especial
-        const regex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
-        return regex.test(pass);
+        return PASSWORD_REQUIREMENTS.every(req => req.test(pass));
     };
 
     const validateName = (name: string) => {
@@ -247,6 +250,16 @@ const handleGoogleLogin = async (redirectTo?: string) => {
         setView(prev => prev === 'login' ? 'signup' : 'login');
         setError(null);
     };
+
+    // Diagnostic console logs
+    console.log('[useAuthForm] Rendering Hook:', { 
+        view, 
+        email, 
+        passwordLen: password.length, 
+        confirmPasswordLen: confirmPassword.length,
+        isPasswordValid: validatePassword(password),
+        arePasswordsMatching: password === confirmPassword
+    });
 
     return {
         view,
