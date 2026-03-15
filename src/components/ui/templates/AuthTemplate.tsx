@@ -41,7 +41,7 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({ title, description, 
                             <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
 
                             <img
-                                src={logoUrl || "/icon5.png"}
+                                src={"/icon5.png"}
                                 alt="Manejate Logo"
                                 className="w-full h-full object-contain animate-in zoom-in duration-700 ease-out"
                             />

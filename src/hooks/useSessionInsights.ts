@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { SavedTrip, SessionInsights, Badge, ActionableTip, LossPattern } from '../types/calculator.types';
 import { formatCurrency } from '../lib/utils';
-
+import { useProfileStore } from '../store/useProfileStore';
 // ──────────────────────────────────────────────────────────────
 // TIPOS EXTENDIDOS V5
 // ──────────────────────────────────────────────────────────────
@@ -31,6 +31,8 @@ export interface ExtendedSessionInsights extends SessionInsights {
     totalMargin: number;
     totalFare: number;
     fuelCost: number;
+    maintenanceCost: number;
+    amortizationCost: number;
     tolls: number;
     appFee: number;
     tripCount: number;
@@ -50,24 +52,40 @@ export const useSessionInsights = (
     const now = new Date();
     const limitDate = now.getTime() - (60 * 24 * 60 * 60 * 1000);
     const recentTrips = trips.filter(t => t.timestamp >= limitDate);
-    
-    // 1. Identificar Última Jornada (Datos 100% Reales, sin inventar comisiones)
+    const profile = useProfileStore();
+
+    const maintenanceEnabled = profile.expenseSettings.find(e => e.id === 'maintenance')?.enabled || false;
+    const amortizationEnabled = profile.expenseSettings.find(e => e.id === 'amortization')?.enabled || false;
+
+   // 1. Identificar Última Jornada
     const sortedTrips = [...recentTrips].sort((a, b) => b.timestamp - a.timestamp);
     const lastJourneyDate = sortedTrips[0]?.date || '';
     const lastJourneyTrips = recentTrips.filter(t => t.date === lastJourneyDate);
-    const totalFuelUsed = lastJourneyTrips.reduce((s, t) => s + (t.fuelCost || 0), 0);
+    
+    // Totales de la última jornada
     const ljMargin = lastJourneyTrips.reduce((s, t) => s + t.margin, 0);
     const ljFare = lastJourneyTrips.reduce((s, t) => s + t.fare, 0);
     const ljTolls = lastJourneyTrips.reduce((s, t) => s + (t.tolls || 0), 0);
+    const ljDistance = lastJourneyTrips.reduce((s, t) => s + (t.distance || 0), 0);
     const ljActiveMins = lastJourneyTrips.reduce((s, t) => s + (t.duration || 0), 0);
-        
 
-    const lastJourney = {
+    const tripsToday = trips.filter(t => t.date === new Date().toLocaleDateString());
+    const isPreStart = tripsToday.length === 0 && timeframe === 'day';
+
+    
+    const fuelCostPerKm = profile.kmPerLiter > 0 ? (profile.fuelPrice / profile.kmPerLiter) : 0;
+    const ljFuelCost = ljDistance * fuelCostPerKm;
+    const ljMaintenance = maintenanceEnabled ? (ljDistance * profile.maintPerKm) : 0;
+    const ljAmortization = amortizationEnabled ? (ljDistance * profile.amortizationPerKm) : 0;
+
+   const lastJourney = {
       totalMargin: ljMargin,
       totalFare: ljFare,
-      fuelCost: totalFuelUsed, 
+      fuelCost: ljFuelCost,
+      maintenanceCost: ljMaintenance,
+      amortizationCost: ljAmortization,
       tolls: ljTolls,
-      appFee: 0, // Lo dejamos en 0 ya que no lo pedimos al usuario
+      appFee: 0,
       tripCount: lastJourneyTrips.length,
       eph: ljActiveMins > 0 ? Math.round(ljMargin / (ljActiveMins / 60)) : 0,
       date: lastJourneyDate,
@@ -83,6 +101,7 @@ export const useSessionInsights = (
     };
 
     if (recentTrips.length === 0) return empty;
+
 
     // 2. Filtrar por Timeframe Actual y Periodo Anterior (para vsPrev)
     let currentTrips = recentTrips;
@@ -125,7 +144,7 @@ export const useSessionInsights = (
     const prevMins = previousTrips.reduce((s, t) => s + (t.duration || 0), 0);
     const prevEph = prevMins > 0 ? Math.round(prevMargin / (prevMins / 60)) : 0;
 
-    const vsPrev = {
+    const vsPrev = isPreStart ? undefined : {
       amount: totalMargin - prevMargin,
       pct: prevMargin > 0 ? Math.round(((totalMargin - prevMargin) / prevMargin) * 100) : 0,
       eph: eph - prevEph,
@@ -172,6 +191,9 @@ export const useSessionInsights = (
       });
     }
 
+    const sessionStatus = tripsToday.length === 0 ? 'pre_start' : 
+                     tripsToday.length < 3 ? 'calibrating' : 'active';
+
     // 7. Tips Accionables Dinámicos
     const prioritizedTips = generatePrioritizedTipsV5(currentTrips, avgMarginPerTrip, vsPrev, longPoorTrips);
 
@@ -210,7 +232,7 @@ export const useSessionInsights = (
 const generatePrioritizedTipsV5 = (
   trips: SavedTrip[],
   avgMargin: number,
-  vsPrev: any,
+  vsPrev: ExtendedSessionInsights['vsPrev'],
   longPoorTrips: SavedTrip[]
 ): ActionableTip[] => {
   const tips: ActionableTip[] = [];
@@ -233,7 +255,7 @@ const generatePrioritizedTipsV5 = (
   }
 
   // Tip de mejora (Optimize) - Realista
-  if (vsPrev.pct < -10) {
+  if (vsPrev && vsPrev.pct < -10) {
     tips.push({
       id: 'tip-optimization',
       priority: 'optimize',
