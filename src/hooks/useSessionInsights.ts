@@ -47,13 +47,14 @@ export const useSessionInsights = (
   dailyGoal: number = 20000,
   timeframe: TimeframeView = 'day'
 ): ExtendedSessionInsights => {
+  const profile = useProfileStore();
+
   return useMemo(() => {
     // 0. Performance Fix: Limitar historial a los últimos 60 días para cálculos ágiles
     const now = new Date();
     const limitDate = now.getTime() - (60 * 24 * 60 * 60 * 1000);
     const recentTrips = trips.filter(t => t.timestamp >= limitDate);
-    const profile = useProfileStore();
-
+    
     const maintenanceEnabled = profile.expenseSettings.find(e => e.id === 'maintenance')?.enabled || false;
     const amortizationEnabled = profile.expenseSettings.find(e => e.id === 'amortization')?.enabled || false;
 
@@ -222,7 +223,7 @@ export const useSessionInsights = (
         avgProfitablePercent: 75 
       }
     };
-  }, [trips, dailyGoal, timeframe]);
+  }, [trips, dailyGoal, timeframe, profile]);
 };
 
 // ──────────────────────────────────────────────────────────────
