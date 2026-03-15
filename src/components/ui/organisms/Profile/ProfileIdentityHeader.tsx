@@ -4,6 +4,7 @@ import type { VerticalType } from "../../../../types/calculator.types";
 import { PROFILE_STRINGS } from "../../../../data/profile.data";
 import { VehicleIdentityCard } from "../../molecules/VehicleIdentityCard";
 import { Badge } from "../../atoms/Badge";
+import { cn } from "../../../../lib/utils";
 
 interface ProfileIdentityHeaderProps {
   isPro: boolean;
@@ -26,9 +27,42 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
   vertical,
   swapVehicle,
 }) => {
+  const VERTICAL_THEME = {
+    transport: {
+      text: "text-primary",
+      card: "border-primary/40 bg-primary/5 shadow-[0_0_30px_var(--color-primary-glow)]",
+      label: "Viajes con pasajeros",
+    },
+    delivery: {
+      text: "text-secondary",
+      card: "border-secondary/40 bg-secondary/5 shadow-[0_0_30px_rgba(168,85,247,0.2)]", // Ajusta el rgba a tu secondary
+      label: "Delivery",
+    },
+    logistics: {
+      text: "text-warning",
+      card: "border-warning/40 bg-warning/5 shadow-[0_0_30px_rgba(245,158,11,0.2)]",
+      label: "Logística",
+    },
+    default: {
+      text: "text-white/60",
+      card: "border-white/10 bg-white/5",
+      label: "Conductor",
+    },
+  };
+
+  // 2. Extraes el tema actual basado en la vertical
+  const currentTheme =
+    VERTICAL_THEME[vertical as keyof typeof VERTICAL_THEME] ||
+    VERTICAL_THEME.default;
+
   return (
     <div className="px-4 py-6">
-      <div className="glass rounded-3xl p-6 border-2 border-primary/30 relative overflow-hidden transition-all duration-300 shadow-[0_0_30px_var(--color-primary-glow)]">
+      <div
+        className={cn(
+          "glass rounded-3xl p-6 border-2 relative overflow-hidden transition-all duration-300",
+          currentTheme.card, // Aplica el borde, fondo y resplandor dinámico
+        )}
+      >
         {/* Glow effect offset (Claude's style) */}
         <div
           className="absolute top-0 right-0 w-40 h-40 blur-[80px] rounded-full pointer-events-none"
@@ -39,7 +73,6 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
               : "var(--color-primary-glow)",
           }}
         />
-
         {/* User Info Block */}
         <div className="flex items-center gap-4 relative z-10 mb-6">
           {/* Avatar Area */}
@@ -79,34 +112,31 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
 
           {/* Text Info */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-extrabold text-starlight truncate">
+            <h2 className="text-2xl font-extrabold text-white truncate">
               {displayName}
             </h2>
-            <p className="text-sm font-semibold mt-0.5 text-primary text-glow-primary">
-              {vertical === "transport"
-                ? "Transporte"
-                : vertical === "delivery"
-                  ? "Delivery"
-                  : vertical === "logistics"
-                    ? "Logística"
-                    : "Conductor"}
+            <p
+              className={cn(
+                "text-sm font-black",
+                currentTheme.text,
+              )}
+            >
+              {currentTheme.label}
             </p>
           </div>
 
           {/* Decorative Chevron Button */}
-          <button
+          {/* <button
             className="w-12 h-12 rounded-full border-2 border-white/10 hover:bg-white/10 flex items-center justify-center transition-colors shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             aria-label="Perfil"
           >
             <ChevronRight className="w-6 h-6 text-starlight" />
-          </button>
+          </button> */}
         </div>
-
         {/* Vehicle identity - Component already handles styling internally */}
-        <div className="relative z-10">
+        {/* <div className="relative z-10">
           <VehicleIdentityCard vehicleName={vehicleName} vertical={vertical} />
-        </div>
-
+        </div> */}
         {/* Quick Swapper (PRO) */}
         {isPro && (
           <div className="relative z-10 mt-4 pt-4 border-t border-white/10 animate-in fade-in duration-500">

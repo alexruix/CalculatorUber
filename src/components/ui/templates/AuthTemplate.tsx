@@ -38,10 +38,10 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({ title, description, 
                         {/* Contenedor del Logo (Estilo Glassmorphism Cuadrado Redondeado) */}
                         <div className="relative mb-4 w-28 h-28 bg-white/3 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(var(--color-primary-rgb),0.15)] border border-white/10 overflow-hidden group-hover:border-primary/40 transition-colors duration-500">
                             {/* Overlay de luz interna */}
-                            {/* <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" /> */}
+                            <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
 
                             <img
-                                src={logoUrl || iconLogo.src}
+                                src={logoUrl || "/icon5.png"}
                                 alt="Manejate Logo"
                                 className="w-full h-full object-contain animate-in zoom-in duration-700 ease-out"
                             />

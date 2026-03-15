@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useProfileStore } from '../../../../store/useProfileStore';
 import { TrafficCone, Zap, Car, Truck, Bike, Info, ArrowRight, RefreshCw } from '../../../../lib/icons';
 import { useCalculatorStore } from '../../../../store/useCalculatorStore';
+import { SIMULATOR } from '../../../../data/ui-strings';
 
 export const ShiftSimulatorTab: React.FC = () => {
     const { kmPerLiter, maintPerKm, fuelPrice, expenseSettings, vertical, vehicleName, swapVehicle } = useProfileStore();
@@ -38,10 +39,10 @@ export const ShiftSimulatorTab: React.FC = () => {
         return (
             <div className="h-[60vh] flex flex-col items-center justify-center text-center px-8 animate-in fade-in">
                 <TrafficCone className="w-16 h-16 text-white/40 mb-4" />
-                <h2 className="text-xl font-black text-white mb-2">Configurá tus Válvulas</h2>
-                <p className="text-sm text-white/50 mb-6">Necesitamos saber cuánto gasta tu {vehicleName || 'vehículo'} para darte el número mágico.</p>
+                <h2 className="text-xl font-black text-white mb-2">{SIMULATOR.emptyState.title}</h2>
+                <p className="text-sm text-white/50 mb-6">{SIMULATOR.emptyState.body(vehicleName || 'vehículo')}</p>
                 <button onClick={() => setActiveTab('profile')} className="btn-primary">
-                    Ir a Configuración
+                    {SIMULATOR.emptyState.action}
                 </button>
             </div>
         );
@@ -62,7 +63,7 @@ export const ShiftSimulatorTab: React.FC = () => {
 
             {/* QUICK PROFILE SWAPPER */}
             <div className="flex justify-between items-center px-2">
-                <h2 className="text-xl font-black text-white">Buen día ☀️</h2>
+                <h2 className="text-xl font-black text-white">{SIMULATOR.greeting}</h2>
                 <button
                     onClick={swapVehicle}
                     className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all active:scale-95"
@@ -81,22 +82,22 @@ export const ShiftSimulatorTab: React.FC = () => {
                     <Zap className="w-6 h-6 text-error" />
                 </div>
 
-                <h2 className="text-sm text-white/50 uppercase tracking-widest font-black mb-1">Costo Operativo</h2>
+                <h2 className="text-sm text-white/50 uppercase tracking-widest font-black mb-1">{SIMULATOR.costHeader}</h2>
                 <div className="flex justify-center items-end gap-1 mb-2">
                     <span className="text-5xl font-black text-white tracking-tighter">${Math.round(costPerKm)}</span>
                     <span className="text-lg text-white/70 font-bold mb-1">/km</span>
                 </div>
                 <p className="text-xs text-white/70 mx-auto max-w-[250px] leading-relaxed">
-                    Esto te cuesta mover tu {vehicleName || 'vehículo'} 1 kilómetro (nafta, arreglos y desgaste).
+                    {SIMULATOR.costBody(vehicleName || 'vehículo')}
                 </p>
             </div>
 
             {/* SEMÁFORO DE REFERENCIA */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between px-2">
-                    <h3 className="text-xs font-black text-white uppercase tracking-widest">Semáforo de Viajes</h3>
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest">{SIMULATOR.trafficLight.title}</h3>
                     <span className="text-xs bg-white/5 text-white/50 px-2 py-1 rounded-full uppercase font-bold text-center">
-                        Piso a cobrar
+                        {SIMULATOR.trafficLight.subtitle}
                     </span>
                 </div>
 
@@ -108,11 +109,11 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <div className="w-4 h-4 rounded-full bg-success shadow-[0_0_10px_var(--color-success-glow)]" />
                         </div>
                         <div className="flex-1">
-                            <h4 className="text-white font-black uppercase text-sm">Viaje Ideal</h4>
-                            <p className="text-xs text-success/50 leading-tight mt-0.5">Ganás más del doble</p>
+                            <h4 className="text-white font-black uppercase text-sm">{SIMULATOR.trafficLight.ideal.title}</h4>
+                            <p className="text-xs text-success/50 leading-tight mt-0.5">{SIMULATOR.trafficLight.ideal.body}</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Pedir más de</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">{SIMULATOR.trafficLight.ideal.action}</span>
                             <span className="text-xl font-black text-success">${Math.round(greenMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -124,11 +125,11 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <div className="w-4 h-4 rounded-full bg-warning shadow-[0_0_10px_var(--color-warning-glow)]" />
                         </div>
                         <div className="flex-1">
-                            <h4 className="text-white font-black uppercase text-sm">Viaje Normal</h4>
-                            <p className="text-xs text-warning/50 leading-tight mt-0.5">Cubre gastos y deja margen</p>
+                            <h4 className="text-white font-black uppercase text-sm">{SIMULATOR.trafficLight.normal.title}</h4>
+                            <p className="text-xs text-warning/50 leading-tight mt-0.5">{SIMULATOR.trafficLight.normal.body}</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Ronda los</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">{SIMULATOR.trafficLight.normal.action}</span>
                             <span className="text-xl font-black text-warning">${Math.round(yellowMin)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -140,11 +141,11 @@ export const ShiftSimulatorTab: React.FC = () => {
                             <div className="w-4 h-4 rounded-full bg-error shadow-[0_0_10px_var(--color-error-glow)]" />
                         </div>
                         <div className="flex-1">
-                            <h4 className="text-white font-black uppercase text-sm">Viaje Trampa</h4>
-                            <p className="text-xs text-error/50 leading-tight mt-0.5">Estás pagando por trabajar</p>
+                            <h4 className="text-white font-black uppercase text-sm">{SIMULATOR.trafficLight.trap.title}</h4>
+                            <p className="text-xs text-error/50 leading-tight mt-0.5">{SIMULATOR.trafficLight.trap.body}</p>
                         </div>
                         <div className="text-right">
-                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">Menos de</span>
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black block mb-0.5">{SIMULATOR.trafficLight.trap.action}</span>
                             <span className="text-xl font-black text-error">${Math.round(yellowMin - 1)} <span className="text-xs opacity-50">/km</span></span>
                         </div>
                     </div>
@@ -155,12 +156,12 @@ export const ShiftSimulatorTab: React.FC = () => {
             <div className="glass-card rounded-3xl p-5 border border-white/5 space-y-4">
                 <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-success" />
-                    <h3 className="text-xs font-black text-white uppercase tracking-widest">Simular Distancia</h3>
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest">{SIMULATOR.simulation.title}</h3>
                 </div>
 
                 <div>
                     <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm font-bold text-white/40">Viaje de prueba</span>
+                        <span className="text-sm font-bold text-white/40">{SIMULATOR.simulation.subtitle}</span>
                         <span className="text-xl font-black text-white">{simulatedDistance} km</span>
                     </div>
                     <input
@@ -173,19 +174,19 @@ export const ShiftSimulatorTab: React.FC = () => {
                         className="w-full accent-success bg-white/10 rounded-full h-2 appearance-none outline-none"
                     />
                     <div className="flex justify-between text-xs text-white/60 uppercase font-black mt-2">
-                        <span>Corto (1km)</span>
-                        <span>Largo (30km)</span>
+                        <span>{SIMULATOR.simulation.rangeStart}</span>
+                        <span>{SIMULATOR.simulation.rangeEnd}</span>
                     </div>
                 </div>
 
                 <div className="bg-black/50 rounded-2xl p-4 flex justify-between items-center">
                     <div>
-                        <span className="block text-xs uppercase text-white/70 font-black tracking-widest mb-1">En {simulatedDistance}km pedí más de:</span>
+                        <span className="block text-xs uppercase text-white/70 font-black tracking-widest mb-1">{SIMULATOR.simulation.askMore(simulatedDistance)}</span>
                         <span className="text-2xl font-black text-white">${simYellow}</span>
                     </div>
                     <ArrowRight className="w-5 h-5 text-white/20" />
                     <div className="text-right">
-                        <span className="block text-xs uppercase text-success/50 font-black tracking-widest mb-1">Para clavar un viaje ideal:</span>
+                        <span className="block text-xs uppercase text-success/50 font-black tracking-widest mb-1">{SIMULATOR.simulation.dealIdeal}</span>
                         <span className="text-2xl font-black text-success">${simGreen}</span>
                     </div>
                 </div>

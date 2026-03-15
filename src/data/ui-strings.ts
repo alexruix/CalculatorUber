@@ -11,6 +11,9 @@
  *  · SHIFT_CLOSE    → ShiftCloseForm (Cierre de Turno)
  *  · HISTORY        → HistoryTab
  *  · ONBOARDING     → OnboardingFlow
+ *  · SIMULATOR      → ShiftSimulatorTab
+ *  · PREMIUM        → PremiumGate
+ *  · WELCOME        → WelcomeTemplate
  *  · COMMON         → Strings reutilizables
  */
 
@@ -116,6 +119,17 @@ export const TRIP_FORM = {
 
   saveButton: 'Guardar Viaje',
   clearButton: 'Limpiar Formulario',
+  trafficAlert: 'Tráfico pesado detectado. Consumo ajustado automáticamente.',
+  adjustHint: 'Copiá el monto directo de la app',
+  expensesHint: 'Se restará de tu ganancia neta',
+  extrasHint: 'Toca para agregar peajes, etc',
+  retroactiveTitle: 'Datos del viaje anterior',
+  retroactiveBanner: (date: string) => `Agregar viaje al ${date}`,
+  activeCosts: {
+    none: 'Calculando margen bruto sin descuentos de costos.',
+    single: (label: string) => `Calculando rentabilidad basada en ${label}.`,
+    multiple: (rest: string, last: string) => `Calculando rentabilidad basada en ${rest} y ${last}.`,
+  }
 } as const;
 
 // ─────────────────────────────────────────────────────────────
@@ -184,6 +198,7 @@ export const ONBOARDING = {
       transport:  { label: 'Transporte',  caption: 'Uber, Didi, Cabify' },
       delivery:   { label: 'Delivery',    caption: 'Rappi, PedidosYa' },
       logistics:  { label: 'Logística',   caption: 'Envíos Extra, Cargas' },
+      others:     'Otros',
     },
   },
 
@@ -276,12 +291,12 @@ export const HOME_SCREEN = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────
-// STATS DASHBOARD — SessionAnalysis v3
+// STATS DASHBOARD — SessionAnalysis v4
 // ─────────────────────────────────────────────────────────────
 export const STATS = {
   // Empty & Partial States
-  emptyTitle:   'Garage vacío',
-  emptyBody:    'Anotá tus viajes del día para activar el radar Manejate.',
+  emptyTitle:   '¿Arrancamos la jornada?',
+  emptyBody:    'Cargá tu primer viaje para ver el radar de inteligencia en acción y empezar a tomar mejores decisiones.',
   partialTitle: 'Calentando motores',
   partialBody:  (remaining: number) => `Anotá ${remaining} viaje${remaining > 1 ? 's' : ''} más para activar el análisis completo.`,
 
@@ -296,11 +311,14 @@ export const STATS = {
     diff >= 0
       ? `+${diff.toLocaleString('es-AR')} vs ayer (+${pct}%) ↑`
       : `${diff.toLocaleString('es-AR')} vs ayer (${pct}%) ↓`,
+  trendImproving:  'Tendencia en alza',
+  trendDeclining:  'Tendencia a la baja',
+  trendStable:     'Tendencia estable',
 
   // Quick Stats
-  quickEph:   'EPH',
-  quickTrips: 'VIAJES',
-  quickAim:   'PUNTERÍA',
+  quickEph:   'En mano por hora',
+  quickTrips: 'Viajes',
+  quickAim:   'Puntería',
 
   // Meta
   metaLabel:   'META DEL DÍA',
@@ -308,28 +326,155 @@ export const STATS = {
   metaDone:    '¡Meta cumplida! 🏆',
   metaSuffix:  (pct: number) => `${pct}% completado`,
 
-  // Tips
+  // Tips & Insights
   tipCritical:  '🚨 ACCIÓN PRIORITARIA',
   tipOptimize:  '📈 OPTIMIZACIONES',
   tipPositive:  '💡 BIEN HECHO',
   tipDismiss:   'Entendido',
+  strategyTitle:   'Estrategia de hoy',
+  strategyGood:    '¡Bien hecho!',
+  strategyAdjust:  'Ajuste:',
+  strategyAvoid:   'Evitá esto:',
+  strategyImpact:  (impact: string) => `Impacto: ${impact}`,
+
+  // Loss Analysis
+  lossAlertTitle:  'Alerta de Pérdida',
+  lossAlertBody:   (count: number) => `Hoy tuviste ${count} viajes que no cubrieron tus costos operativos.`,
+  lossBurntMoney:  'Dinero quemado',
+  lossTip:         (total: string) => `Si filtrás esos viajes, tu ganancia de hoy sería de ${total}.`,
 
   // Badges
   badgesTitle:       'MIS LOGROS',
   badgesUnlocked:    (n: number) => `DESBLOQUEADOS (${n})`,
   badgesInProgress:  'EN PROGRESO',
   badgesRemaining:   (n: number) => `Faltan ${n} más`,
+  badgesProgress:    'En progreso',
+  badgesRemainingCount: (count: number) => `Faltan ${count} viajes`,
 
-  // Premium
+  // Premium & Advanced
   premiumTitle:    'ANÁLISIS PRO',
+  weeklyTitle:     'Proyección Semanal',
   weeklyLabel:     'ESTA SEMANA',
   weeklyVsPrev:    (pct: number) => pct >= 0 ? `+${pct}% vs semana anterior` : `${pct}% vs semana anterior`,
+  weeklyClosure:   'Cierre Hoy',
+  weeklyMetaReady: '¡Meta lista!',
+  weeklyMetaLeft:  (amount: string) => `Faltan ${amount}`,
   peakHoursTitle:  'MEJORES HORARIOS',
   peakHoursRec:    (slot: string, gain: string) => `Trabajá más en ${slot}. Potencial: +${gain}`,
   projectionTitle: 'PROYECCIÓN DEL DÍA',
   projectionBody:  (total: string) => `A este ritmo, cerrarías el día con ${total}`,
   verticalTitle:   'POR VERTICAL',
   verticalRec:     (name: string, pct: number) => `${name} te rinde +${pct}% más. Priorizalo.`,
+  journeyToday:    'Tu jornada hoy',
+  radarTitle:      'Radar de Metas y Rentabilidad',
+  summaryTitle:    'Resumen de jornada hoy',
+  streakActive:    'RACHA ACTIVA',
+  streakBody:      (count: number) => `${count} viajes rentables al hilo 🔥`,
+  avgPerTrip:      'Promedio por viaje',
+  clearConfirm:    '¿Limpiamos el balance del día?',
+  daysShort:       ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+
+  // v4 "Decision Engine" Strings
+  netLabel:        'Ganancia Neta',
+  grossLabel:      'Recaudación Bruta',
+  expensesLabel:   'Gastos y Desgaste',
+  expensesBreakdown: {
+    fuel: 'Combustible',
+    tolls: 'Peajes',
+    appFee: 'Comisión App',
+    wear: 'Desgaste (km/mant)',
+  },
+
+  projectionTitleRealistic: 'Proyección Realista',
+  projectionRealistic: 'Semana Típica (5 días)',
+  projectionOptimistic: 'Semana Full (6 días)',
+  projectionStatus: (rem: string) => `Faltan ${rem} para la meta`,
+  projectionMetaReady: '¡Meta superada!',
+
+  lossPatternsTitle: 'Patrones de Pérdida',
+  lossPatternZone: (zone: string, count: number) => `Perdés plata en ${zone} (${count} viajes)`,
+  lossShortRule: (limit: string) => `Evitá viajes < ${limit} antes de las 12pm`,
+  lossSavingPotential: (amount: string) => `Ahorrarías ${amount}/día (+5.4%)`,
+
+  weekdayPerformanceTitle: 'Tus mejores días',
+  weekdayTopDay: 'Tu día estrella',
+  weekdayLowDay: 'Día para descansar',
+  weekdayComparison: (pct: number) => `Paga ${pct}% más que otros días`,
+
+  emotionalSupport: {
+    toughDayTitle: 'Un día de esos...',
+    toughDayBody: (pct: number) => `Hoy fue difícil (-${pct}% vs tu promedio). Es normal, 7 de cada 10 choferes tienen días así.`,
+    bestDayTitle: '¡Récord Personal!',
+    bestDayBody: (amount: string) => `¡Brutal! Ganaste ${amount}, tu mejor marca hasta ahora.`,
+  },
+
+  benchmarkingTitle: 'Tu Ranking Global',
+  benchmarkingStatus: (pct: number) => `Estás en el TOP ${pct}% de la ciudad`,
+  benchmarkingVsAvg: (isAbove: boolean) => isAbove ? 'Arriba del promedio' : 'En el promedio',
+
+  badgeLabels: {
+    speed:    'Metiendo Pata',
+    rower:    'Remador',
+    owner:    'Dueño del Asfalto',
+  },
+
+  timeframeLabels: {
+    day: 'Hoy',
+    week: 'Semana',
+    month: 'Mes'
+  },
+  lastJourneyLabel: 'Última Jornada',
+} as const;
+
+// ─────────────────────────────────────────────────────────────
+// SIMULATOR
+// ─────────────────────────────────────────────────────────────
+export const SIMULATOR = {
+  emptyState: {
+    title: 'Configurá tus Válvulas',
+    body: (vehicle: string) => `Necesitamos saber cuánto gasta tu ${vehicle} para darte el número mágico.`,
+    action: 'Ir a Configuración',
+  },
+  greeting: 'Buen día ☀️',
+  costHeader: 'Costo Operativo',
+  costBody: (vehicle: string) => `Esto te cuesta mover tu ${vehicle} 1 kilómetro (nafta, arreglos y desgaste).`,
+  trafficLight: {
+    title: 'Semáforo de Viajes',
+    subtitle: 'Piso a cobrar',
+    ideal: { title: 'Viaje Ideal', body: 'Ganás más del doble', action: 'Pedir más de' },
+    normal: { title: 'Viaje Normal', body: 'Cubre gastos y deja margen', action: 'Ronda los' },
+    trap: { title: 'Viaje Trampa', body: 'Estás pagando por trabajar', action: 'Menos de' },
+  },
+  simulation: {
+    title: 'Simular Distancia',
+    subtitle: 'Viaje de prueba',
+    rangeStart: 'Corto (1km)',
+    rangeEnd: 'Largo (30km)',
+    askMore: (dist: number) => `En ${dist}km pedí más de:`,
+    dealIdeal: 'Para clavar un viaje ideal:',
+  }
+} as const;
+
+// ─────────────────────────────────────────────────────────────
+// PREMIUM
+// ─────────────────────────────────────────────────────────────
+export const PREMIUM = {
+  title: 'Función Premium',
+  description: (feature: string) => `Desbloqueá ${feature} convirtiéndote en conductor PRO.`,
+  action: 'Obtener Acceso PRO',
+  demoConfirm: '¿[DEMO] Simular pago de suscripción PRO?',
+} as const;
+
+// ─────────────────────────────────────────────────────────────
+// WELCOME
+// ─────────────────────────────────────────────────────────────
+export const WELCOME = {
+  title: 'La posta de tus viajes',
+  subtitle: 'Controlá tu rentabilidad y maximizá cada kilómetro recorrido con Manejate',
+  version: (v: string) => `V${v}`,
+  googleAction: 'Continuar con Google',
+  emailRedirect: 'o usá tu email',
+  createAccount: 'Crear cuenta',
 } as const;
 
 // ─────────────────────────────────────────────────────────────
@@ -345,4 +490,3 @@ export const APP_SHELL = {
     motivationalBody: 'Ayer te ahorraste mucha plata evitando viajes trampa.',
   }
 } as const;
-

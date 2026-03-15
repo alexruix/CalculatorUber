@@ -100,11 +100,11 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
             .filter((e) => e.enabled)
             .map((e) => e.label.toLowerCase());
 
-        if (activeExpenses.length === 0) return 'Calculando margen bruto sin descuentos de costos.';
-        if (activeExpenses.length === 1) return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
+        if (activeExpenses.length === 0) return TRIP_FORM.activeCosts.none;
+        if (activeExpenses.length === 1) return TRIP_FORM.activeCosts.single(activeExpenses[0]);
         const last = [...activeExpenses].pop();
         const rest = activeExpenses.slice(0, -1);
-        return `Calculando rentabilidad basada en ${rest.join(', ')} y ${last}.`;
+        return TRIP_FORM.activeCosts.multiple(rest.join(', '), last!);
     }, [expenseSettings]);
 
     const f = TRIP_FORM.fields;
@@ -166,7 +166,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                     </button>
                 </div>
                 <p className="text-xs text-moon font-medium ml-1">
-                    Copiá el monto directo de la app
+                    {TRIP_FORM.adjustHint}
                 </p>
             </div>
 
@@ -180,7 +180,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                 {/* Header del bloque: Label + Trigger de Fecha */}
                 <div className="flex items-center justify-between mb-3 px-1">
                     <Label htmlFor="field-starttime" size="xs" variant="muted" className="mb-0">
-                        {overrideDate ? 'Datos del viaje anterior' : f.startTime.label}
+                        {overrideDate ? TRIP_FORM.retroactiveTitle : f.startTime.label}
                     </Label>
                 </div>
 
@@ -191,7 +191,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                             <div className="flex items-center gap-2">
                                 <span className="text-base">📅</span>
                                 <p className="text-xs font-bold mb-0">
-                                    Agregar viaje al {formatDateLatam(overrideDate, 'long')}
+                                    {TRIP_FORM.retroactiveBanner(formatDateLatam(overrideDate, 'long'))}
                                 </p>
                             </div>
                             <button
@@ -199,7 +199,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                                 onClick={onClearDateOverride}
                                 className="text-xs font-bold text-warning hover:text-warning/80 transition-colors p-1"
                             >
-                                Cancelar
+                                {HOME_SCREEN.dateOverride.cancelBtn}
                             </button>
                         </div>
                     )}
@@ -220,7 +220,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                             <button
                                 type="button"
                                 onClick={onOpenDateOverride}
-                                className="text-xs font-bold text-warning hover:text-warning/80 transition-colors"
+                                className="flex items-center gap-1 text-secondary/90 bg-secondary/10 hover:bg-secondary/20 transition-colors w-fit px-2 py-1 rounded-lg mt-0.5 text-left cursor-pointer active:scale-95"
                             >
                                 {f.startTime.dateTrigger}
                             </button>
@@ -311,7 +311,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                         <Receipt className="w-5 h-5 text-moon" />
                         <div className="text-left">
                             <p className="text-sm font-bold text-starlight">{f.expenses.label}</p>
-                            <p className="text-xs text-moon">Toca para agregar peajes, etc</p>
+                            <p className="text-xs text-moon">{TRIP_FORM.extrasHint}</p>
                         </div>
                     </div>
                     <ChevronDown
@@ -331,11 +331,11 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
                             placeholder="0"
                             value={tolls}
                             onChange={(e) => setTolls(e.target.value)}
-                            icon={<Receipt className="w-5 h-5" />}
+                            icon={<Coins className="w-5 h-5" />}
                             className="h-14 font-bold"
                         />
                         <p className="text-xs text-moon font-medium ml-1">
-                            Se restará de tu ganancia neta
+                            {TRIP_FORM.expensesHint}
                         </p>
                     </div>
                 )}

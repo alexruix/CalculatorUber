@@ -12,6 +12,7 @@ import { ProfitabilityScore } from '../ProfitabilityScore';
 import { TripInputForm } from '../TripInputForm';
 import { MiniSummary } from '../../molecules/MiniSummary';
 import { QuickStatsGrid } from '../../molecules/QuickStatsGrid';
+import { STATS, TRIP_FORM } from '../../../../data/ui-strings';
 // import { FloatingActionButton } from '../../atoms/FloatingActionButton';
 import { DateOverrideModal } from '../DateOverrideModal';
 
@@ -59,11 +60,11 @@ export const TripsTab: React.FC = () => {
             .filter((e) => e.enabled)
             .map((e) => e.label.toLowerCase());
 
-        if (activeExpenses.length === 0) return 'Calculando margen bruto sin descuentos de costos.';
-        if (activeExpenses.length === 1) return `Calculando rentabilidad basada en ${activeExpenses[0]}.`;
+        if (activeExpenses.length === 0) return TRIP_FORM.activeCosts.none;
+        if (activeExpenses.length === 1) return TRIP_FORM.activeCosts.single(activeExpenses[0]);
         const last = [...activeExpenses].pop();
         const rest = activeExpenses.slice(0, -1);
-        return `Calculando rentabilidad basada en ${rest.join(', ')} y ${last}.`;
+        return TRIP_FORM.activeCosts.multiple(rest.join(', '), last!);
     }, [expenseSettings]);
 
     const saveTrip = useCallback(() => {
@@ -107,10 +108,10 @@ export const TripsTab: React.FC = () => {
 
             {tripCount > 0 && (
                 <div className="space-y-3 px-1 animate-in slide-in-from-top-2">
-                    <h2 className="sr-only">Resumen de jornada hoy</h2>
+                    <h2 className="sr-only">{STATS.summaryTitle}</h2>
                     <div className="flex items-center gap-2 mb-1">
                         {/* <Activity className="w-3 h-3 text-white/20" /> */}
-                        <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Tu jornada hoy</span>
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-widest">{STATS.journeyToday}</span>
                     </div>
                     {/* Consolidamos los dos en un grupo visual */}
                     <div className="glass-card p-4 rounded-3xl border border-white/5 bg-white/2 space-y-4">
@@ -124,9 +125,8 @@ export const TripsTab: React.FC = () => {
 
 
             <div className="space-y-5">
-                {/* 2. RESUMEN DE HOY (Unificado y más compacto) */}
                 <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-md -mx-4 px-4 py-3 border-b border-white/5">
-                    <h2 className="sr-only">Radar de Metas y Rentabilidad</h2>
+                    <h2 className="sr-only">{STATS.radarTitle}</h2>
                     <ProfitabilityScore metrics={metrics} />
                 </div>
 
@@ -135,7 +135,7 @@ export const TripsTab: React.FC = () => {
                     <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-4 py-3 mx-1">
                         <AlertTriangle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
                         <p className="text-xs text-starlight font-bold mb-0 leading-tight">
-                            Tráfico pesado detectado. Consumo ajustado automáticamente.
+                            {TRIP_FORM.trafficAlert}
                         </p>
                     </div>
                 )}
@@ -155,7 +155,7 @@ export const TripsTab: React.FC = () => {
                     className="w-full text-xs font-black text-white/60 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest transition-colors"
                 >
                     <RotateCcw className="w-3 h-3" aria-hidden="true" />
-                    Limpiar formulario
+                    {TRIP_FORM.clearButton}
                 </button>
 
                 

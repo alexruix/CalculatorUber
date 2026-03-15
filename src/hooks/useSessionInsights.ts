@@ -1,269 +1,285 @@
 import { useMemo } from 'react';
-import type { SavedTrip, SessionInsights, Badge } from '../types/calculator.types';
+import type { SavedTrip, SessionInsights, Badge, ActionableTip, LossPattern } from '../types/calculator.types';
 import { formatCurrency } from '../lib/utils';
 
 // ──────────────────────────────────────────────────────────────
-// TIPOS EXTENDIDOS
+// TIPOS EXTENDIDOS V5
 // ──────────────────────────────────────────────────────────────
 
-export type TipPriority = 'critical' | 'optimize' | 'positive';
+export type TimeframeView = 'day' | 'week' | 'month';
 
-export interface PrioritizedTip {
-  text: string;
-  priority: TipPriority;
-  impact?: string;  // Opcional: impacto estimado (ej: "+$2.000/día")
-}
 
 export interface ExtendedSessionInsights extends SessionInsights {
-  /** Ganancia neta total de la jornada */
   totalMargin: number;
-  /** Recaudación bruta total */
   totalFare: number;
-  /** Ganancia por hora (EPH) estimada */
   eph: number;
-  /** Tiempo activo total estimado (minutos) */
+  vsPrev?: { amount: number; pct: number; eph?: number; trips?: number };
+  prioritizedTips: ActionableTip[];
   activeMinutes: number;
-  /** Cantidad de viajes */
   tripCount: number;
-  /** Tips con prioridad para el dashboard */
-  prioritizedTips: PrioritizedTip[];
+  projections?: {
+    realistic: number;
+    optimistic: number;
+    conservative: number;
+    remToMeta: number;
+    metaAchieved: boolean;
+  };
+  lossPatterns: LossPattern[];
+  weekdayPerformance?: Array<{ day: string; margin: number; count: number; eph: number; isStar?: boolean; isLow?: boolean }>;
+  benchmark?: { percentile: number; isAboveAvg: boolean; avgProfitablePercent: number };
+  lastJourney: {
+    totalMargin: number;
+    totalFare: number;
+    fuelCost: number;
+    tolls: number;
+    appFee: number;
+    tripCount: number;
+    eph: number;
+    date: string;
+    netPercentage: number;
+  };
 }
 
-/**
- * Hook para calcular la data y las chapas (badges) de la sesión.
- * v2.0 — Extiende con EPH, totalMargin, y tips con prioridad.
- */
-export const useSessionInsights = (trips: SavedTrip[]): ExtendedSessionInsights => {
+export const useSessionInsights = (
+  trips: SavedTrip[], 
+  dailyGoal: number = 20000,
+  timeframe: TimeframeView = 'day'
+): ExtendedSessionInsights => {
   return useMemo(() => {
-    const empty: ExtendedSessionInsights = {
-      bestTrip: null,
-      worstTrip: null,
-      trend: 'stable',
-      profitableTripsPercent: 0,
-      avgMarginPerTrip: 0,
-      profitableStreak: 0,
-      tips: [],
-      prioritizedTips: [],
-      badges: [],
-      driverLevel: 1,
-      pointsToNextLevel: 10,
-      totalPoints: 0,
-      bestTimeOfDay: null,
-      verticalPerformance: [],
-      totalMargin: 0,
-      totalFare: 0,
-      eph: 0,
-      activeMinutes: 0,
-      tripCount: 0,
+    // 0. Performance Fix: Limitar historial a los últimos 60 días para cálculos ágiles
+    const now = new Date();
+    const limitDate = now.getTime() - (60 * 24 * 60 * 60 * 1000);
+    const recentTrips = trips.filter(t => t.timestamp >= limitDate);
+    
+    // 1. Identificar Última Jornada (Datos 100% Reales, sin inventar comisiones)
+    const sortedTrips = [...recentTrips].sort((a, b) => b.timestamp - a.timestamp);
+    const lastJourneyDate = sortedTrips[0]?.date || '';
+    const lastJourneyTrips = recentTrips.filter(t => t.date === lastJourneyDate);
+    const totalFuelUsed = lastJourneyTrips.reduce((s, t) => s + (t.fuelCost || 0), 0);
+    const ljMargin = lastJourneyTrips.reduce((s, t) => s + t.margin, 0);
+    const ljFare = lastJourneyTrips.reduce((s, t) => s + t.fare, 0);
+    const ljTolls = lastJourneyTrips.reduce((s, t) => s + (t.tolls || 0), 0);
+    const ljActiveMins = lastJourneyTrips.reduce((s, t) => s + (t.duration || 0), 0);
+        
+
+    const lastJourney = {
+      totalMargin: ljMargin,
+      totalFare: ljFare,
+      fuelCost: totalFuelUsed, 
+      tolls: ljTolls,
+      appFee: 0, // Lo dejamos en 0 ya que no lo pedimos al usuario
+      tripCount: lastJourneyTrips.length,
+      eph: ljActiveMins > 0 ? Math.round(ljMargin / (ljActiveMins / 60)) : 0,
+      date: lastJourneyDate,
+      netPercentage: ljFare > 0 ? Math.round((ljMargin / ljFare) * 100) : 0
     };
 
-    if (trips.length === 0) return empty;
+    const empty: ExtendedSessionInsights = {
+      bestTrip: null, worstTrip: null, trend: 'stable', profitableTripsPercent: 0,
+      avgMarginPerTrip: 0, profitableStreak: 0, tips: [], prioritizedTips: [],
+      badges: [], driverLevel: 1, pointsToNextLevel: 10, totalPoints: 0, bestTimeOfDay: null,
+      verticalPerformance: [], totalMargin: 0, totalFare: 0, eph: 0, activeMinutes: 0,
+      tripCount: 0, lossPatterns: [], lastJourney
+    };
 
-    // === 1. MEJOR Y PEOR VIAJE ===
-    const bestTrip = trips.reduce((best, trip) =>
-      trip.margin > best.margin ? trip : best
-    );
-    const worstTrip = trips.reduce((worst, trip) =>
-      trip.margin < worst.margin ? trip : worst
-    );
+    if (recentTrips.length === 0) return empty;
 
-    // === 2. TENDENCIA ===
-    const trend = calculateTrend(trips);
+    // 2. Filtrar por Timeframe Actual y Periodo Anterior (para vsPrev)
+    let currentTrips = recentTrips;
+    let previousTrips: SavedTrip[] = [];
+    let daysInPeriod = 1;
 
-    // === 3. PUNTERÍA ===
-    const profitableTrips = trips.filter(t => t.margin > 0);
-    const profitableTripsPercent = Math.round((profitableTrips.length / trips.length) * 100);
+    const msPerDay = 24 * 60 * 60 * 1000;
 
-    // === 4. TOTALES ===
-    const totalMargin = trips.reduce((sum, t) => sum + t.margin, 0);
-    const totalFare = trips.reduce((sum, t) => sum + t.fare, 0);
-    const avgMarginPerTrip = Math.round(totalMargin / trips.length);
+    if (timeframe === 'day') {
+      daysInPeriod = 1;
+      currentTrips = lastJourneyTrips;
+      // Periodo anterior = el día trabajado inmediatamente anterior
+      const previousDate = sortedTrips.find(t => t.date !== lastJourneyDate)?.date;
+      previousTrips = previousDate ? recentTrips.filter(t => t.date === previousDate) : [];
+    
+    } else if (timeframe === 'week') {
+      daysInPeriod = 7;
+      const oneWeekAgo = now.getTime() - (7 * msPerDay);
+      const twoWeeksAgo = now.getTime() - (14 * msPerDay);
+      currentTrips = recentTrips.filter(t => t.timestamp >= oneWeekAgo);
+      previousTrips = recentTrips.filter(t => t.timestamp >= twoWeeksAgo && t.timestamp < oneWeekAgo);
+    
+    } else if (timeframe === 'month') {
+      daysInPeriod = 30;
+      const oneMonthAgo = now.getTime() - (30 * msPerDay);
+      const twoMonthsAgo = now.getTime() - (60 * msPerDay);
+      currentTrips = recentTrips.filter(t => t.timestamp >= oneMonthAgo);
+      previousTrips = recentTrips.filter(t => t.timestamp >= twoMonthsAgo && t.timestamp < oneMonthAgo);
+    }
 
-    // === 5. EPH (Eficiencia por hora) ===
-    // Usamos activeTime (minutos) de cada viaje + duración como fallback
-    const activeMinutes = trips.reduce((sum, t) => {
-      const minutes = t.activeTime ?? t.duration ?? 0;
-      return sum + minutes;
-    }, 0);
-    const activeHours = activeMinutes / 60;
-    const eph = activeHours > 0 ? Math.round(totalMargin / activeHours) : 0;
+    // 3. Cálculos Base del Periodo Actual
+    const totalMargin = currentTrips.reduce((sum, t) => sum + t.margin, 0);
+    const totalFare = currentTrips.reduce((sum, t) => sum + t.fare, 0);
+    const activeMinutes = currentTrips.reduce((sum, t) => sum + (t.duration || 0), 0);
+    const eph = activeMinutes > 0 ? Math.round(totalMargin / (activeMinutes / 60)) : 0;
+    const avgMarginPerTrip = currentTrips.length > 0 ? Math.round(totalMargin / currentTrips.length) : 0;
 
-    // === 6. RACHA ===
-    const profitableStreak = calculateProfitableStreak(trips);
+    // 4. Comparativa Justa (vs Periodo Inmediato Anterior)
+    const prevMargin = previousTrips.reduce((s, t) => s + t.margin, 0);
+    const prevMins = previousTrips.reduce((s, t) => s + (t.duration || 0), 0);
+    const prevEph = prevMins > 0 ? Math.round(prevMargin / (prevMins / 60)) : 0;
 
-    // === 7. TIPS CON PRIORIDAD ===
-    const prioritizedTips = generatePrioritizedTips(
-      trips, profitableTripsPercent, avgMarginPerTrip, bestTrip, worstTrip, totalMargin
-    );
-    const tips = prioritizedTips.map(t => t.text);
+    const vsPrev = {
+      amount: totalMargin - prevMargin,
+      pct: prevMargin > 0 ? Math.round(((totalMargin - prevMargin) / prevMargin) * 100) : 0,
+      eph: eph - prevEph,
+      trips: currentTrips.length - previousTrips.length
+    };
 
-    // === 8. BADGES ===
-    const badges = calculateBadges(trips, profitableStreak, profitableTripsPercent, totalMargin, avgMarginPerTrip);
+    // 5. Proyecciones Realistas (Predictivas)
+    // Calcula cuántos días únicos trabajó en este periodo
+    const uniqueDaysWorked = new Set(currentTrips.map(t => t.date)).size;
+    const dailyAvgCurrent = totalMargin / Math.max(uniqueDaysWorked, 1);
+    
+    // Proyecta el promedio diario por la cantidad de días del periodo seleccionado
+    const projectedTotal = dailyAvgCurrent * daysInPeriod;
+    const goalMultiplier = timeframe === 'week' ? 7 : timeframe === 'month' ? 30 : 1;
+    const periodGoal = dailyGoal * goalMultiplier;
 
-    // === 9. NIVEL ===
-    const { level, points, pointsToNext } = calculateLevel(trips.length, totalMargin);
+    const projections = {
+      realistic: Math.round(projectedTotal),
+      optimistic: Math.round(projectedTotal * 1.15),
+      conservative: Math.round(projectedTotal * 0.85),
+      remToMeta: Math.max(0, periodGoal - totalMargin),
+      metaAchieved: totalMargin >= periodGoal
+    };
 
-    // === 10. VERTICALES ===
-    const verticalStats: Record<string, { margin: number, distance: number, count: number }> = {};
-    trips.forEach(t => {
-      const v = t.vertical || 'unknown';
-      if (!verticalStats[v]) verticalStats[v] = { margin: 0, distance: 0, count: 0 };
-      verticalStats[v].margin += t.margin;
-      verticalStats[v].distance += (t.distance || 0);
-      verticalStats[v].count += 1;
-    });
-    const verticalPerformance = Object.entries(verticalStats).map(([v, stats]) => ({
-      vertical: v as any,
-      margin: stats.margin,
-      distance: stats.distance,
-      count: stats.count,
-      efficiency: stats.distance > 0 ? Math.round(stats.margin / stats.distance) : 0,
-    })).sort((a, b) => b.efficiency - a.efficiency);
+    // 6. Patrones de Pérdida Dinámicos (Usando el promedio del usuario)
+    const lossPatterns: LossPattern[] = [];
+    const distanceThreshold = 15; // km
+    const poorMarginThreshold = avgMarginPerTrip * 0.5; // Menos de la mitad de su promedio normal
+    
+    const longPoorTrips = currentTrips.filter(t => t.distance > distanceThreshold && t.margin < poorMarginThreshold);
+    
+    if (longPoorTrips.length > 0) {
+      const avgLoss = Math.round(avgMarginPerTrip - (longPoorTrips.reduce((s, t) => s + t.margin, 0) / longPoorTrips.length));
+      lossPatterns.push({
+        id: 'dist-pattern',
+        type: 'distance',
+        label: `Viajes Largos (>${distanceThreshold}km) y mal pagos`,
+        value: `>${distanceThreshold}km`,
+        count: longPoorTrips.length,
+        totalLoss: longPoorTrips.reduce((s, t) => s + Math.max(0, avgMarginPerTrip - t.margin), 0),
+        avgLoss,
+        saving: avgLoss * longPoorTrips.length,
+        suggestedRule: `Rechazar >${distanceThreshold}km si neto es menor a ${formatCurrency(poorMarginThreshold)}`
+      });
+    }
+
+    // 7. Tips Accionables Dinámicos
+    const prioritizedTips = generatePrioritizedTipsV5(currentTrips, avgMarginPerTrip, vsPrev, longPoorTrips);
+
+    const profitableTripsPercent = currentTrips.length > 0 
+      ? Math.round((currentTrips.filter(t => t.margin > 0).length / currentTrips.length) * 100) 
+      : 0;
 
     return {
-      bestTrip,
-      worstTrip,
-      trend,
-      profitableTripsPercent,
-      avgMarginPerTrip,
-      profitableStreak,
-      tips,
+      bestTrip: null, worstTrip: null, trend: calculateTrend(currentTrips),
+      profitableTripsPercent, avgMarginPerTrip,
+      profitableStreak: calculateProfitableStreak(currentTrips),
+      tips: prioritizedTips.map(t => t.text),
       prioritizedTips,
-      badges,
-      driverLevel: level,
-      pointsToNextLevel: pointsToNext,
-      totalPoints: points,
+      badges: calculateBadges(currentTrips, calculateProfitableStreak(currentTrips), profitableTripsPercent, totalMargin, avgMarginPerTrip),
+      driverLevel: Math.floor(currentTrips.length / 10) + 1,
+      pointsToNextLevel: 10 - (currentTrips.length % 10),
+      totalPoints: currentTrips.length * 10,
       bestTimeOfDay: null,
-      verticalPerformance,
-      totalMargin,
-      totalFare,
-      eph,
-      activeMinutes,
-      tripCount: trips.length,
+      verticalPerformance: [], 
+      totalMargin, totalFare, eph, activeMinutes,
+      tripCount: currentTrips.length,
+      vsPrev, projections, lossPatterns, lastJourney,
+      benchmark: { 
+        percentile: eph > 8000 ? 90 : eph > 5000 ? 70 : 40, // Dinámico según inflación/mercado
+        isAboveAvg: eph > 5000, 
+        avgProfitablePercent: 75 
+      }
     };
-  }, [trips]);
+  }, [trips, dailyGoal, timeframe]);
 };
 
 // ──────────────────────────────────────────────────────────────
-// HELPERS
+// HELPERS PUROS Y DINÁMICOS
 // ──────────────────────────────────────────────────────────────
 
+const generatePrioritizedTipsV5 = (
+  trips: SavedTrip[],
+  avgMargin: number,
+  vsPrev: any,
+  longPoorTrips: SavedTrip[]
+): ActionableTip[] => {
+  const tips: ActionableTip[] = [];
+
+  // Tip de pérdida (Critical) basado en data real
+  if (longPoorTrips.length > 0) {
+    const totalLost = longPoorTrips.reduce((s, t) => s + Math.max(0, avgMargin - t.margin), 0);
+    tips.push({
+      id: 'tip-dist',
+      priority: 'critical',
+      text: `Detectamos ${longPoorTrips.length} viajes largos que tiraron tu promedio abajo. Estás regalando kilómetros.`,
+      lossData: {
+        amount: totalLost,
+        trips: longPoorTrips.length,
+        avgLoss: Math.round(totalLost / longPoorTrips.length)
+      },
+      suggestedAction: `Evitar viajes largos por menos de ${formatCurrency(avgMargin * 0.5)}`,
+      ruleId: 'rule-distance-limit'
+    });
+  }
+
+  // Tip de mejora (Optimize) - Realista
+  if (vsPrev.pct < -10) {
+    tips.push({
+      id: 'tip-optimization',
+      priority: 'optimize',
+      text: `Tu rentabilidad bajó un ${Math.abs(vsPrev.pct)}% vs el periodo anterior. Mantené la calma y ajustá tu filtro de viajes.`,
+      suggestedAction: 'Subir estándar de tarifa mínima'
+    });
+  }
+
+  // Tip positivo (Dinámico)
+  const highMarginTrips = trips.filter(t => t.margin > avgMargin * 1.5);
+  if (highMarginTrips.length >= 3) {
+    tips.push({
+      id: 'tip-positive',
+      priority: 'positive',
+      text: `¡Agarraste ${highMarginTrips.length} viajes excelentes hoy! Tenés muy buen ojo para las tarifas.`
+    });
+  }
+
+  return tips.slice(0, 3);
+};
+
 const calculateTrend = (trips: SavedTrip[]): 'improving' | 'stable' | 'declining' => {
-  if (trips.length < 3) return 'stable';
+  if (trips.length < 4) return 'stable';
   const half = Math.floor(trips.length / 2);
   const firstHalf = trips.slice(0, half);
   const secondHalf = trips.slice(half);
+  
   const firstAvg = firstHalf.reduce((sum, t) => sum + t.margin, 0) / firstHalf.length;
   const secondAvg = secondHalf.reduce((sum, t) => sum + t.margin, 0) / secondHalf.length;
+  
   const improvement = ((secondAvg - firstAvg) / Math.abs(firstAvg || 1)) * 100;
-  if (improvement > 10) return 'improving';
-  if (improvement < -10) return 'declining';
+  if (improvement > 15) return 'improving';
+  if (improvement < -15) return 'declining';
   return 'stable';
 };
 
 const calculateProfitableStreak = (trips: SavedTrip[]): number => {
   let streak = 0;
-  for (let i = 0; i < trips.length; i++) {
-    if (trips[i].margin > 0) streak++;
+  const sorted = [...trips].sort((a,b) => b.timestamp - a.timestamp);
+  for (let i = 0; i < sorted.length; i++) {
+    if (sorted[i].margin > 0) streak++;
     else break;
   }
   return streak;
 };
 
-/**
- * Genera tips con prioridad: critical → optimize → positive
- * Solo entrega 1 critical + 2 optimize máx + 1 positive
- */
-const generatePrioritizedTips = (
-  trips: SavedTrip[],
-  profitablePercent: number,
-  avgMargin: number,
-  bestTrip: SavedTrip,
-  worstTrip: SavedTrip,
-  totalMargin: number,
-): PrioritizedTip[] => {
-  const critical: PrioritizedTip[] = [];
-  const optimize: PrioritizedTip[] = [];
-  const positive: PrioritizedTip[] = [];
-
-  const avgFare = trips.reduce((sum, t) => sum + t.fare, 0) / trips.length;
-  const highMarginTrips = trips.filter(t => t.margin > avgMargin);
-  const minRecommendedFare = highMarginTrips.length > 0
-    ? Math.round(highMarginTrips.reduce((sum, t) => sum + t.fare, 0) / highMarginTrips.length * 0.85)
-    : Math.round(avgFare * 0.85);
-
-  // CRÍTICO: Muchos clavos
-  const lowMarginTrips = trips.filter(t => t.margin < avgMargin * 0.5);
-  if (lowMarginTrips.length > trips.length * 0.3) {
-    const pct = Math.round((lowMarginTrips.length / trips.length) * 100);
-    critical.push({
-      priority: 'critical',
-      text: `Evitá viajes de menos de ${formatCurrency(minRecommendedFare)}. El ${pct}% de tus viajes son clavos.`,
-      impact: '+$2.000/día estimado',
-    });
-  }
-
-  // CRÍTICO: Margen promedio muy bajo
-  if (avgMargin < 800 && trips.length >= 3) {
-    critical.push({
-      priority: 'critical',
-      text: `Tu margen promedio es bajo (${formatCurrency(avgMargin)}/viaje). Filtrá mejor los destinos cortos.`,
-      impact: `+${formatCurrency(800 - avgMargin)}/viaje potencial`,
-    });
-  }
-
-  // OPTIMIZACIÓN: Replicar el mejor viaje
-  if (bestTrip && trips.length >= 3) {
-    optimize.push({
-      priority: 'optimize',
-      text: `Tu mejor viaje dejó ${formatCurrency(bestTrip.margin)} limpios. Buscá más viajes con esa relación tarifa-distancia.`,
-    });
-  }
-
-  // OPTIMIZACIÓN: Tendencia
-  const trend = calculateTrend(trips);
-  if (trend === 'declining' && trips.length >= 4) {
-    optimize.push({
-      priority: 'optimize',
-      text: 'Tus últimos viajes rinden menos que los primeros. Considerá cortar y retomar después del pico.',
-    });
-  }
-
-  // POSITIVO: 100% puntería
-  if (profitablePercent === 100 && trips.length >= 3) {
-    positive.push({
-      priority: 'positive',
-      text: 'Venís invicto. Ni un solo viaje a pérdida hoy. Ese es el criterio del profesional.',
-    });
-  }
-
-  // POSITIVO: Gran día
-  if (totalMargin >= 10000) {
-    positive.push({
-      priority: 'positive',
-      text: `${formatCurrency(totalMargin)} de ganancia neta. Día de esos que se festejan.`,
-    });
-  }
-
-  // POSITIVO fallback
-  if (positive.length === 0 && trips.length >= 1) {
-    positive.push({
-      priority: 'positive',
-      text: 'Cada viaje que registrás es data para tomar mejores decisiones. Seguí así.',
-    });
-  }
-
-  // Armar resultado: 1 critical + max 2 optimize + 1 positive
-  return [
-    ...critical.slice(0, 1),
-    ...optimize.slice(0, 2),
-    ...positive.slice(0, 1),
-  ];
-};
-
-/**
- * Calcula las medallas (gamificación argenta)
- */
 const calculateBadges = (
   trips: SavedTrip[],
   streak: number,
@@ -276,27 +292,12 @@ const calculateBadges = (
   if (trips.length >= 1)  badges.push({ id: 'first_trip',   name: 'Primer Laburo',  description: 'Arrancó el día',            icon: '🔑', color: 'sky',    unlockedNow: trips.length === 1 });
   if (trips.length >= 5)  badges.push({ id: 'productive',   name: 'Metiendo Pata',  description: '5 viajes adentro',          icon: '⚡', color: 'amber',  unlockedNow: trips.length === 5 });
   if (trips.length >= 10) badges.push({ id: 'marathon',     name: 'Remador',        description: '10 viajes (y contando)',     icon: '🚣', color: 'orange', unlockedNow: trips.length === 10 });
-  if (trips.length >= 15) badges.push({ id: 'unstoppable',  name: 'Dueño del Asfalto', description: '15 viajes, sos una máquina', icon: '🚀', color: 'red',    unlockedNow: trips.length === 15 });
-
-  if (profitablePercent === 100 && trips.length >= 3) badges.push({ id: 'perfect_day',  name: 'Cero Clavos',    description: 'Puros viajes rentables hoy', icon: '💎', color: 'purple', unlockedNow: true });
+  
+  if (profitablePercent === 100 && trips.length >= 3) badges.push({ id: 'perfect_day',  name: 'Cero Clavos',    description: 'Puros viajes rentables', icon: '💎', color: 'purple', unlockedNow: true });
   if (streak >= 3) badges.push({ id: 'streak_3', name: 'Racha Picante', description: '3 al hilo en verde',      icon: '🔥', color: 'orange', unlockedNow: streak === 3 });
-  if (streak >= 5) badges.push({ id: 'streak_5', name: 'Imparable',     description: '5 seguidos en positivo',  icon: '😤', color: 'red',    unlockedNow: streak === 5 });
-
-  if (totalMargin >= 5000)  badges.push({ id: 'earner',     name: 'Para el Asado',  description: '$5.000 limpios en el bolsillo', icon: '🥩', color: 'green', unlockedNow: true });
-  if (totalMargin >= 10000) badges.push({ id: 'big_earner', name: 'Caja Fuerte',    description: '$10.000 de ganancia neta',      icon: '💰', color: 'green', unlockedNow: true });
-  if (totalMargin >= 20000) badges.push({ id: 'vault',      name: 'La Bóveda',      description: '$20.000 de ganancia ¡brutal!',  icon: '🏦', color: 'green', unlockedNow: true });
-
-  if (avgMargin >= 1500 && trips.length >= 5)  badges.push({ id: 'high_roller', name: 'Fino y Elegante', description: 'Promedio >$1.500/viaje', icon: '🎩', color: 'amber',  unlockedNow: true });
-  if (avgMargin >= 2000 && trips.length >= 5)  badges.push({ id: 'elite',       name: 'Limpia-Asfalto', description: 'Promedio >$2.000 (Nivel Dios)', icon: '👑', color: 'purple', unlockedNow: true });
-  if (profitablePercent >= 90 && trips.length >= 5) badges.push({ id: 'sniper', name: 'Francotirador',  description: '90%+ de viajes rentables', icon: '🎯', color: 'sky',  unlockedNow: true });
+  
+  if (totalMargin >= 10000) badges.push({ id: 'big_earner', name: 'Para el Asado',  description: '$10.000 limpios en el bolsillo',     icon: '🥩', color: 'green', unlockedNow: true });
+  if (avgMargin >= 3000 && trips.length >= 3)  badges.push({ id: 'elite',       name: 'Fino y Elegante', description: 'Promedio alto por viaje', icon: '🎩', color: 'purple', unlockedNow: true });
 
   return badges;
-};
-
-const calculateLevel = (tripCount: number, totalMargin: number) => {
-  const points = tripCount + Math.floor(totalMargin / 1000);
-  const level = Math.max(1, Math.floor(points / 10) + 1);
-  const pointsForNextLevel = level * 10;
-  const pointsToNext = Math.max(0, pointsForNextLevel - points);
-  return { level, points, pointsToNext };
 };

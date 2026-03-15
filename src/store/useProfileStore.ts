@@ -26,6 +26,9 @@ interface ProfileState {
     dailyGoal: number;
     dailyHours: number;
 
+    // Phase 5 — Persistence
+    acceptedRules: string[];
+
     // Quick Multi-Vertical Swapper
     secondaryVehicle: {
         vehicleName: string;
@@ -43,6 +46,7 @@ interface ProfileState {
     setUser: (user: User | null) => void;
     swapVehicle: () => void;
     logout: () => Promise<void>;
+    toggleRule: (ruleId: string) => void;
 }
 
 const initialProfileState = {
@@ -66,6 +70,7 @@ const initialProfileState = {
     dailyGoal: 0,
     dailyHours: 8,
     secondaryVehicle: null,
+    acceptedRules: [],
 };
 
 export const useProfileStore = create<ProfileState>()(
@@ -122,6 +127,7 @@ export const useProfileStore = create<ProfileState>()(
                                 vertical: data.vertical || null,
                                 dailyGoal: data.daily_goal !== undefined && data.daily_goal !== null ? Number(data.daily_goal) : initialProfileState.dailyGoal,
                                 secondaryVehicle: data.secondary_vehicle || null,
+                                acceptedRules: data.accepted_rules || [],
                                 isFetchingProfile: false,
                                 isInitialLoading: false
                             });
@@ -162,7 +168,8 @@ export const useProfileStore = create<ProfileState>()(
                         subscription_tier: state.isPro ? 'pro' : 'free',
                         vehicle_value: state.vehicleValue,
                         vehicle_lifetime_km: state.vehicleLifetimeKm,
-                        amortization_per_km: state.amortizationPerKm
+                        amortization_per_km: state.amortizationPerKm,
+                        accepted_rules: state.acceptedRules
                     };
 
                     await supabase
@@ -198,6 +205,15 @@ export const useProfileStore = create<ProfileState>()(
                     vertical: nextVehicle.vertical,
                     secondaryVehicle: newSecondary
                 });
+            },
+            toggleRule: (ruleId) => {
+                const current = get().acceptedRules;
+                const isAccepted = current.includes(ruleId);
+                const nextRules = isAccepted 
+                    ? current.filter(id => id !== ruleId)
+                    : [...current, ruleId];
+                
+                get().setProfile({ acceptedRules: nextRules });
             },
             resetProfile: () => set((state) => ({ ...initialProfileState, user: state.user })), // Keep user on reset
             logout: async () => {

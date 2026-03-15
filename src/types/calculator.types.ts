@@ -61,6 +61,8 @@ export interface SavedTrip {
   tip?: number;
   tolls?: number;
   activeTime?: number;
+  /** Gasto real de combustible ingresado por el usuario */
+  fuelCost?: number;
   /** ID del turno al que pertenece el viaje */
   shift_id?: string | number | null;
 
@@ -174,6 +176,36 @@ export interface SessionInsights {
   pointsToNextLevel: number;
   totalPoints: number;
   verticalPerformance: VerticalPerformance[];
+}
+
+export type TipPriority = 'critical' | 'optimize' | 'positive';
+
+export interface ActionableTip {
+  id: string;
+  priority: TipPriority;
+  text: string;
+  /** Impacto numérico de la pérdida detectada */
+  lossData?: {
+    amount: number;
+    trips: number;
+    avgLoss: number;
+  };
+  /** Acción concreta sugerida (ej: "Evitá viajes >20km") */
+  suggestedAction?: string;
+  /** ID de la regla técnica asociada para persistencia */
+  ruleId?: string;
+}
+
+export interface LossPattern {
+  id: string;
+  type: 'zone' | 'distance' | 'time' | 'fare';
+  label: string;
+  value: string;
+  count: number;
+  totalLoss: number;
+  avgLoss: number;
+  saving: number;
+  suggestedRule: string;
 }
 
 

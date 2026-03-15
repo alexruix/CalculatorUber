@@ -177,29 +177,7 @@ export const ProfileScreen: React.FC = () => {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-black animate-in fade-in duration-500 overflow-x-hidden">
-      {/* ── STICKY HEADER ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 px-4 h-16 flex items-center justify-between">
-        {/* <button
-          onClick={onBack}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors"
-          aria-label="Volver"
-        >
-          <ArrowLeft size={20} className="text-starlight" />
-        </button> */}
-
-        <h1 className="text-xl font-extrabold text-starlight tracking-tight">
-          Perfil
-        </h1>
-
-        <button
-          onClick={onSearch}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors"
-          aria-label="Buscar"
-        >
-          <Search size={20} className="text-starlight" />
-        </button>
-      </header>
+    <div className="min-h-screen bg-black animate-in fade-in duration-500 overflow-x-hidden">      
 
       <div className="pb-36 space-y-8">
         {/* ── TOAST ──────────────────────────────────────────────────────────── */}

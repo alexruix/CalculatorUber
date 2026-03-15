@@ -1,5 +1,6 @@
-import { Car, Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info, Package, Bike, Truck, HelpCircle, ChevronLeft, Rocket, Zap, Wrench, ShieldCheck } from '../lib/icons';
+import { Fuel, Settings, CheckCircle2, ChevronRight, DollarSign, Info, Package, HelpCircle, ChevronLeft, Rocket, Zap, Wrench, ShieldCheck } from '../lib/icons';
 import type { VerticalType } from '../types/calculator.types';
+import { VERTICAL_CONFIGS } from './verticalConfigs';
 
 export interface VerticalOption {
     id: VerticalType;
@@ -53,47 +54,19 @@ export const EXPENSE_META: Record<
     },
 };
 
-export const VERTICAL_OPTIONS: VerticalOption[] = [
-    {
-        id: 'transport',
-        icon: Car,
-        title: 'Transporte',
-        subtitle: 'Viajes con pasajeros',
-        apps: ['Uber', 'Cabify', 'DiDi'],
-        color: {
-            text: 'text-primary',
-            bg: 'bg-primary/10',
-            border: 'border-primary/30',
-            glow: 'var(--color-primary-glow)'
-        }
-    },
-    {
-        id: 'delivery',
-        icon: Package,
-        title: 'Delivery',
-        subtitle: 'Reparto urbano',
-        apps: ['PedidosYa', 'Rappi'],
-        color: {
-            text: 'text-secondary',
-            bg: 'bg-secondary/10',
-            border: 'border-secondary/30',
-            glow: 'var(--color-secondary-glow)'
-        }
-    },
-    {
-        id: 'logistics',
-        icon: Truck,
-        title: 'Logística',
-        subtitle: 'Cargas y fletes',
-        apps: ['Mercado Libre', 'Fletes'],
-        color: {
-            text: 'text-info',
-            bg: 'bg-info/10',
-            border: 'border-info/30',
-            glow: 'rgba(56, 189, 248, 0.4)'
-        }
+export const VERTICAL_OPTIONS: VerticalOption[] = Object.values(VERTICAL_CONFIGS).map(config => ({
+    id: config.id,
+    icon: config.Icon,
+    title: config.title,
+    subtitle: config.subtitle,
+    apps: config.apps,
+    color: {
+        text: config.theme.text,
+        bg: config.theme.bg,
+        border: config.theme.border,
+        glow: config.theme.glow
     }
-];
+}));
 
 export const ONBOARDING_TEXTS = {
     step1: {
@@ -161,9 +134,9 @@ export const ONBOARDING_TEXTS = {
         }
     },
     step3: {
-        title: 'Gastos Activos',
+        title: 'Gastos activos',
         subtitle: 'Paso 3 de 3',
-        infoCard: 'El radar MANEJATE usará estos datos para calcular tu ROI en tiempo real.',
+        infoCard: 'El radar Manejate usará estos datos para calcular tu ROI en tiempo real.',
         educationNote: 'Podés activar/desactivar estos gastos en cualquier momento desde Configuración. Al apagar un gasto, tu margen sube en tiempo real.',
         backButton: 'Atrás',
         finishButton: 'Comenzar'
