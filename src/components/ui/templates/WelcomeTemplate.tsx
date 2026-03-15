@@ -33,7 +33,7 @@ export const WelcomeTemplate: React.FC<WelcomeTemplateProps> = ({ logoUrl }) => 
                             <div className="absolute" />
 
                             <img
-                                src={"/icon5.png"}
+                                src={typeof iconLogo === 'string' ? iconLogo : (iconLogo as any).src}
                                 alt="Manejate Logo"
                                 className="w-full h-full object-contain animate-in zoom-in duration-700 ease-out"
                             />
