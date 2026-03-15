@@ -198,16 +198,32 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
                   </span>
                 </div>
                 <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                  <span className="text-white/70">Combustible/Gasto:</span>
+                  <span className="text-white/70">Combustible:</span>
                   <span className="text-error font-black">
-                    -{formatCurrency(insights.lastJourney.fuelCost)}
+                    -{formatCurrency(insights.timeframeExpenses.fuel)}
                   </span>
                 </div>
-                {insights.lastJourney.tolls > 0 && (
+                {insights.timeframeExpenses.maintenance > 0 && (
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
+                    <span className="text-white/70">Mantenimiento:</span>
+                    <span className="text-error font-black">
+                      -{formatCurrency(insights.timeframeExpenses.maintenance)}
+                    </span>
+                  </div>
+                )}
+                {insights.timeframeExpenses.amortization > 0 && (
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
+                    <span className="text-white/70">Amortización:</span>
+                    <span className="text-error font-black">
+                      -{formatCurrency(insights.timeframeExpenses.amortization)}
+                    </span>
+                  </div>
+                )}
+                {insights.timeframeExpenses.tolls > 0 && (
                   <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
                     <span className="text-white/70">Peajes:</span>
                     <span className="text-error font-black">
-                      -{formatCurrency(insights.lastJourney.tolls)}
+                      -{formatCurrency(insights.timeframeExpenses.tolls)}
                     </span>
                   </div>
                 )}
@@ -227,11 +243,14 @@ export const SessionAnalysis: React.FC<SessionAnalysisProps> = ({
                 <div className="h-2.5 bg-error/20 rounded-full overflow-hidden shadow-inner">
                   <div
                     className="h-full bg-primary shadow-[0_0_15px_var(--color-primary-glow)] transition-all duration-1000"
-                    style={{ width: `${insights.lastJourney.netPercentage}%` }}
+                    style={{
+                      width: `${insights.totalFare > 0 ? Math.round((insights.totalMargin / insights.totalFare) * 100) : 0}%`,
+                    }}
                   />
                 </div>
                 <p className="text-xs font-black text-white/60 text-right uppercase tracking-widest">
-                  Te quedás con el {insights.lastJourney.netPercentage}%
+                  Te quedás con el{" "}
+                  {insights.totalFare > 0 ? Math.round((insights.totalMargin / insights.totalFare) * 100) : 0}%
                 </p>
               </div>
             </div>

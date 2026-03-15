@@ -160,13 +160,13 @@ export const HistoryTab: React.FC = () => {
                     
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Margen Neto</p>
+                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">En mano</p>
                             <p className="text-2xl font-black text-primary leading-none">
                                 {formatCurrency(totalMetrics.margin)}
                             </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Viajes Totales</p>
+                            <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-1">Viajes</p>
                             <p className="text-2xl font-black text-starlight leading-none">
                                 {totalMetrics.count}
                             </p>

@@ -74,7 +74,7 @@ export const ProfileIdentityHeader: React.FC<ProfileIdentityHeaderProps> = ({
           }}
         />
         {/* User Info Block */}
-        <div className="flex items-center gap-4 relative z-10 mb-6">
+        <div className="flex items-center gap-4 relative z-10">
           {/* Avatar Area */}
           <div className="relative shrink-0">
             {avatarUrl ? (

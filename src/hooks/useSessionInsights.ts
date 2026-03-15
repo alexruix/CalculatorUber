@@ -40,6 +40,12 @@ export interface ExtendedSessionInsights extends SessionInsights {
     date: string;
     netPercentage: number;
   };
+  timeframeExpenses: {
+    fuel: number;
+    maintenance: number;
+    amortization: number;
+    tolls: number;
+  };
 }
 
 export const useSessionInsights = (
@@ -98,7 +104,8 @@ export const useSessionInsights = (
       avgMarginPerTrip: 0, profitableStreak: 0, tips: [], prioritizedTips: [],
       badges: [], driverLevel: 1, pointsToNextLevel: 10, totalPoints: 0, bestTimeOfDay: null,
       verticalPerformance: [], totalMargin: 0, totalFare: 0, eph: 0, activeMinutes: 0,
-      tripCount: 0, lossPatterns: [], lastJourney
+      tripCount: 0, lossPatterns: [], lastJourney,
+      timeframeExpenses: { fuel: 0, maintenance: 0, amortization: 0, tolls: 0 }
     };
 
     if (recentTrips.length === 0) return empty;
@@ -139,6 +146,13 @@ export const useSessionInsights = (
     const activeMinutes = currentTrips.reduce((sum, t) => sum + (t.duration || 0), 0);
     const eph = activeMinutes > 0 ? Math.round(totalMargin / (activeMinutes / 60)) : 0;
     const avgMarginPerTrip = currentTrips.length > 0 ? Math.round(totalMargin / currentTrips.length) : 0;
+
+    // 3b. Gastos Agregados del Periodo Actual
+    const totalDistance = currentTrips.reduce((s, t) => s + (t.distance || 0), 0);
+    const tfFuel = totalDistance * fuelCostPerKm;
+    const tfMaintenance = maintenanceEnabled ? (totalDistance * profile.maintPerKm) : 0;
+    const tfAmortization = amortizationEnabled ? (totalDistance * profile.amortizationPerKm) : 0;
+    const tfTolls = currentTrips.reduce((s, t) => s + (t.tolls || 0), 0);
 
     // 4. Comparativa Justa (vs Periodo Inmediato Anterior)
     const prevMargin = previousTrips.reduce((s, t) => s + t.margin, 0);
@@ -217,6 +231,12 @@ export const useSessionInsights = (
       totalMargin, totalFare, eph, activeMinutes,
       tripCount: currentTrips.length,
       vsPrev, projections, lossPatterns, lastJourney,
+      timeframeExpenses: {
+        fuel: tfFuel,
+        maintenance: tfMaintenance,
+        amortization: tfAmortization,
+        tolls: tfTolls
+      },
       benchmark: { 
         percentile: eph > 8000 ? 90 : eph > 5000 ? 70 : 40, // Dinámico según inflación/mercado
         isAboveAvg: eph > 5000, 
