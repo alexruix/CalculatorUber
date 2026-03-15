@@ -112,7 +112,7 @@ export const TripInputForm: React.FC<TripInputFormProps> = ({
     return (
         <div className="space-y-6 pb-6">
             {/* Header */}
-            <div className="flex items-center gap-3 bg-secondary/10 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
+            <div className="flex items-center gap-3 bg-secondary/5 border-l-4 border-secondary/40 px-4 py-3 rounded-r-2xl">
                 {/* <div className="w-1 h-8 bg-primary/70 rounded-full" /> */}
                 <div className="flex-1">
                     <h3 className="font-bold leading-relaxed text-starlight text-sm mb-0.5">
